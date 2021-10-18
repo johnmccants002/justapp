@@ -23,6 +23,7 @@ class SignUpViewController: UIViewController {
     var nextButton : UIBarButtonItem?
     var passwordValid = false
     var emailValid = false
+    var usernameValid : Bool?
 
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var signUpTextField: UITextField!
@@ -88,15 +89,21 @@ class SignUpViewController: UIViewController {
         }
     }
     
-    func checkUsername(username: String) -> Bool {
+    func checkUsername(username: String, completion: @escaping(Int) -> Void) {
         if username.count < 20 && username.count >= 4 {
-            self.usernameString = username
-            clearTextField()
-            labelAnimation()
-            count += 1
-            return true
-        }
-        return false
+            AuthService.shared.checkIfUsernameExists(username: username) { int in
+                if int == 0 {
+                    self.usernameString = username
+                    self.usernameValid = true
+                    self.clearTextField()
+                    self.labelAnimation()
+                    self.count += 1
+                    completion(0)
+                } else {
+                    completion(1)
+                }
+            }
+    }
     }
     
     func checkPassword(password: String) {
@@ -169,6 +176,21 @@ class SignUpViewController: UIViewController {
     func presentNotificationController() {
         self.performSegue(withIdentifier: "notificationController", sender: self)
     }
+    
+    func checkEmailAvailable(email: String?) {
+        guard let email = email else { return }
+        AuthService.shared.checkIfEmailExists(email: email) { int in
+            if int == 0 {
+                self.count += 1
+                self.clearTextField()
+                self.labelAnimation()
+                self.label.text = "Enter First Name"
+                self.emailString = email
+            } else {
+                print("Email in use")
+            }
+        }
+    }
 
     // MARK: - Selectors
     
@@ -177,7 +199,7 @@ class SignUpViewController: UIViewController {
         switch count {
         case 0:
             guard let email = self.validateEmail(email: self.signUpTextField.text) else { return }
-            self.emailString = email
+            self.checkEmailAvailable(email: email)
         case 1:
             guard let firstName = self.signUpTextField.text else { return }
             if self.checkFirstName(firstName: firstName) {
@@ -190,10 +212,19 @@ class SignUpViewController: UIViewController {
             }
         case 3:
             guard let username = self.signUpTextField.text else { return }
-            if self.checkUsername(username: username) {
-                self.signUpTextField.isSecureTextEntry = true
-                self.label.text = "Enter Password"
-            }
+            self.checkUsername(username: username, completion: { int in
+                switch int {
+                case 0:
+                    self.signUpTextField.isSecureTextEntry = true
+                    self.label.text = "Enter Password"
+                case 1:
+                    self.presentAlert()
+                case 2:
+                    self.presentAlert()
+                default:
+                    break
+                }
+            })
         case 4:
             guard let password = self.signUpTextField.text else { return }
             self.checkPassword(password: password)
@@ -260,10 +291,6 @@ extension SignUpViewController: UITextFieldDelegate {
         
         if allMatches.count == 1,
             allMatches.first?.url?.absoluteString.contains("mailto:") == true {
-            count += 1
-            clearTextField()
-            labelAnimation()
-            self.label.text = "Enter First Name"
             return trimmedText
         } else {
             let alertController = UIAlertController(title: "Error", message: "Please enter a valid email address.", preferredStyle: .alert)

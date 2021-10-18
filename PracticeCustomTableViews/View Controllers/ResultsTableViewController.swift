@@ -9,15 +9,34 @@ import UIKit
 
 class ResultsTableViewController: UITableViewController {
 
-    var dummyData = DummyData()
+    // MARK: - Properties
+
+    var currentUser : User?
+    var toUser: User? {
+        didSet {
+            self.checkUser()
+        }
+    }
     
     static let tableViewCellIdentifier = "cellID"
     private static let nibName = "TableCell"
-    var searchString : String?
-    var realUsername : Bool?
-    var resultTuple : (String, Bool)?
+    var searchString : String? 
     var searchDelegate : UISearchControllerDelegate?
     var searchController : UISearchController?
+    var inNetwork: Bool? {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
+    
+    var userExists : Bool? {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
+    
+    
+    // MARK: - Lifecycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,51 +48,89 @@ class ResultsTableViewController: UITableViewController {
         
     }
     
+    
+    // MARK: - Selectors
+    
+    @objc func searchButtonPressed() {
+       
+    }
+    
+ 
+    
+    // MARK: - Helper Functions
+    
+    func checkUser() {
+        guard let toUser = toUser, let currentUser = currentUser else { return }
+        self.tableView.reloadData()
+    }
+    
     func joinAlert() -> UIAlertController {
         guard let searchDelegate = searchDelegate, let searchController = searchController else {return UIAlertController()}
-        let joinAlert = UIAlertController(title: "Request to join network has been sent", message: nil, preferredStyle: .alert)
+        let joinAlert = UIAlertController(title: "Invite to join network sent", message: nil, preferredStyle: .alert)
         let joinAction = UIAlertAction(title: "Ok", style: .default) { joinAction in
+            self.toUser = nil
             self.dismiss(animated: true) {
                 searchDelegate.willDismissSearchController?(searchController)
             }
         }
         joinAlert.addAction(joinAction)
         return joinAlert
-        
     }
     
 
-    // MARK: - Table view data source
+    // MARK: - UITableViewDataSource
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
+        
         return 1
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellID", for: indexPath) as! ResultTableViewCell
-        cell.delegate = self
-        cell.userImage.setRounded()
         
-        guard let resultTuple = resultTuple else {return cell}
-        cell.usernameLabel.text = resultTuple.0
-        if resultTuple.1 == false {
-            cell.joinNetwork.isHidden = true
-        } else if resultTuple.1 == true {
-            cell.joinNetwork.isHidden = false
+        cell.delegate = self
+        cell.selectionStyle = .none
+        if let userExists = userExists {
+            cell.userExists = userExists
         }
         
-
-        // Configure the cell...
-
+        guard let currentUser = currentUser else { return UITableViewCell() }
+        
+        cell.currentUser = currentUser
+        if let toUser = toUser {
+            cell.user = toUser
+                if currentUser.uid == toUser.uid {
+                    cell.inviteButton.isHidden = true
+                    cell.userImage.setRounded()
+                    return cell
+                }
+            
+            if let inNetwork = inNetwork {
+                cell.inNetwork = inNetwork
+            }
+                cell.userImage.setRounded()
+                return cell
+        
+        }
+        
         return cell
+
     }
 
 }
 
+// MARK: - ResultTableViewCellDelegate
+
 extension ResultsTableViewController: ResultTableViewCellDelegate {
-    func didPressJoinNetwork(cell: ResultTableViewCell) {
+    func inviteToNetwork(cell: ResultTableViewCell) {
+        guard let currentUser = currentUser else { return }
+        guard let toUserUid = cell.user?.uid else { return }
+        NetworkService.shared.inviteUserToNetwork(toUserUid: toUserUid, fromUser: currentUser) {
+            guard let token = cell.token else { return }
+            PushNotificationSender.shared.sendPushNotification(to: token, title: "New Invite", body: "\(currentUser.firstName) \(currentUser.lastName) invited you to join their network.")
+            
+        }
         self.present(joinAlert(), animated: true, completion: nil)
     }
     

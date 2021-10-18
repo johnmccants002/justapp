@@ -7,8 +7,13 @@
 
 import UIKit
 
+
 class NetworkViewController: UIViewController {
 
+    
+    // MARK: - Properties
+    
+    var networkId: String?
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     @IBOutlet weak var networkTableView: UITableView!
@@ -16,29 +21,32 @@ class NetworkViewController: UIViewController {
     var selectedIndexPath : IndexPath?
     var delegate : UITableViewDelegate?
     var tableViewHeight: CGFloat = 0
-    var dummyData = DummyData()
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
     }
+    
+    // MARK: - Lifecycles
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         tableViewHeightConstraint.constant = networkTableView.contentSize.height
     }
     
+    // MARK: - Helper Functions
+    
     func updateViews() {
         self.delegate = self
         self.loadingIndicator.isHidden = true
         self.networkTableView.isUserInteractionEnabled = true
-        if dummyData.requestsArray.isEmpty {
-            self.networkTableView.isHidden = true
-        }
+       
     }
     
     func delayedReloadData() {
         let _ : Timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.performCode), userInfo: nil, repeats: false)
     }
+    
+    // MARK: - Selectors
     
     @objc func performCode() {
         self.networkTableView.reloadData()
@@ -47,15 +55,17 @@ class NetworkViewController: UIViewController {
 
 }
 
+
+// MARK: - UITableViewDatasource
+
 extension NetworkViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dummyData.requestsArray.count
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "networkCell") as! RequestsTableViewCell
         cell.delegate = self
-        cell.requestLabel.text = "\(dummyData.requestsArray[indexPath.row]) wants to join your network."
         cell.tag = indexPath.row
         return cell
     }
@@ -72,9 +82,10 @@ extension NetworkViewController: UITableViewDelegate, UITableViewDataSource {
      
 }
 
+// MARK: - NetworkCellDelegate
+
 extension NetworkViewController: NetworkCellDelegate {
     func acceptTapped(cell: RequestsTableViewCell) {
-        dummyData.requestsArray.remove(at: cell.tag)
         networkTableView.deleteRows(at: [NSIndexPath(row: cell.tag, section: 0) as IndexPath], with: .automatic)
         print(cell.tag)
         self.networkTableView.isUserInteractionEnabled = false
@@ -86,7 +97,6 @@ extension NetworkViewController: NetworkCellDelegate {
     }
     
     func denyTapped(cell: RequestsTableViewCell) {
-        dummyData.requestsArray.remove(at: cell.tag)
         networkTableView.deleteRows(at: [NSIndexPath(row: cell.tag, section: 0) as IndexPath], with: .automatic)
         self.tableViewHeight -= cell.frame.size.height
         self.tableViewHeightConstraint.constant = self.tableViewHeight

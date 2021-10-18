@@ -9,6 +9,7 @@ import UIKit
 import UserNotifications
 import Firebase
 import FirebaseAuth
+import UserNotifications
 
 class NotificationsViewController: UIViewController, UINavigationControllerDelegate, UINavigationBarDelegate {
 
@@ -24,7 +25,6 @@ class NotificationsViewController: UIViewController, UINavigationControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
-        // Do any additional setup after loading the view.
     }
     
     // MARK: - IBAction Functions
@@ -33,11 +33,28 @@ class NotificationsViewController: UIViewController, UINavigationControllerDeleg
         
     }
     @IBAction func acceptButtonTapped(_ sender: UIButton) {
-        presentMain()
-        print("accept pressed")
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let pushManager = PushNotificationManager(userID: userID)
+            pushManager.registerForPushNotifications()
+        
+        
+        registerForPushNotifications()
     }
     
     // MARK: - Helper Functions
+    
+    func registerForPushNotifications() {
+      //1
+            UNUserNotificationCenter.current()
+              //2
+              .requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                DispatchQueue.main.async {
+                    self.presentMain()
+                }
+                //3
+                print("Permission granted: \(granted)")
+              }
+    }
     
     func updateViews() {
         

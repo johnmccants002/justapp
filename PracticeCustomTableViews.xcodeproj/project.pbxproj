@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		31307A6126D046E4005DA1FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31307A6026D046E4005DA1FC /* Constants.swift */; };
+		31307A6326D046EB005DA1FC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31307A6226D046EB005DA1FC /* Extensions.swift */; };
+		313F7365270D29FC007E6BC8 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */; };
+		313F7367270E6218007E6BC8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 313F7366270E6218007E6BC8 /* GoogleService-Info.plist */; };
+		313F7369270E6EF8007E6BC8 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */; };
 		316CE2F0264BA9500015C145 /* UserProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CE2EF264BA9500015C145 /* UserProfileViewController.swift */; };
 		316CE2F2264BB2AC0015C145 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CE2F1264BB2AC0015C145 /* User.swift */; };
 		31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A44126425042001E7DD6 /* AppDelegate.swift */; };
@@ -14,18 +19,21 @@
 		31B4A44926425042001E7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B4A44726425042001E7DD6 /* Main.storyboard */; };
 		31B4A44B26425045001E7DD6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 31B4A44A26425045001E7DD6 /* Assets.xcassets */; };
 		31B4A44E26425045001E7DD6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B4A44C26425045001E7DD6 /* LaunchScreen.storyboard */; };
-		31B4A45A2642510A001E7DD6 /* PracticeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A4592642510A001E7DD6 /* PracticeTableViewCell.swift */; };
-		31B4A45C2642511E001E7DD6 /* DummyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A45B2642511E001E7DD6 /* DummyData.swift */; };
-		31B4A45E26425412001E7DD6 /* PracticeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A45D26425412001E7DD6 /* PracticeTableViewController.swift */; };
-		31B4A460264256A4001E7DD6 /* JustProof.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31B4A45F264256A4001E7DD6 /* JustProof.xib */; };
-		31B4A46226425DFA001E7DD6 /* JustProofView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A46126425DFA001E7DD6 /* JustProofView.swift */; };
+		31B4A45A2642510A001E7DD6 /* JustTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A4592642510A001E7DD6 /* JustTableViewCell.swift */; };
 		31B4A47926453BC7001E7DD6 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47826453BC7001E7DD6 /* Notifications.swift */; };
 		31B4A47B26455295001E7DD6 /* NetworkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47A26455295001E7DD6 /* NetworkViewController.swift */; };
 		31B4A47D26455310001E7DD6 /* RequestsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47C26455310001E7DD6 /* RequestsTableViewCell.swift */; };
+		31CC0D3126C5FB7A00E5F560 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3026C5FB7A00E5F560 /* Network.swift */; };
+		31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3226C6F54C00E5F560 /* Just.swift */; };
+		31CC0D5026CE410300E5F560 /* ActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D4F26CE410300E5F560 /* ActivityController.swift */; };
+		31CC0D5926CE4C4600E5F560 /* InviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D5726CE4C4600E5F560 /* InviteCell.swift */; };
+		31CC0D5A26CE4C4600E5F560 /* InviteCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31CC0D5826CE4C4600E5F560 /* InviteCell.xib */; };
+		31CC0D6026D0408200E5F560 /* ActivityRespectController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D5F26D0408000E5F560 /* ActivityRespectController.swift */; };
+		31CC0D6326D0442000E5F560 /* ActivityRespectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D6126D0442000E5F560 /* ActivityRespectCell.swift */; };
+		31CC0D6426D0442000E5F560 /* ActivityRespectCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31CC0D6226D0442000E5F560 /* ActivityRespectCell.xib */; };
 		31D29610264E82D800965DD7 /* RespectedByViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2960F264E82D800965DD7 /* RespectedByViewController.swift */; };
 		31D29612264E83E300965DD7 /* RespectByTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D29611264E83E300965DD7 /* RespectByTableViewCell.swift */; };
 		31D29614264E8E1000965DD7 /* NewJustViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D29613264E8E1000965DD7 /* NewJustViewController.swift */; };
-		31D29616264E973A00965DD7 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D29615264E973A00965DD7 /* ProfileViewController.swift */; };
 		31D296182653B14400965DD7 /* SignUp.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31D296172653B14400965DD7 /* SignUp.storyboard */; };
 		31D2961A2653BF9300965DD7 /* MainJustViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D296192653BF9300965DD7 /* MainJustViewController.swift */; };
 		31D2961C2653C2DA00965DD7 /* ResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2961B2653C2DA00965DD7 /* ResultsTableViewController.swift */; };
@@ -35,12 +43,27 @@
 		31D296242653EB5300965DD7 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D296232653EB5300965DD7 /* SignUpViewController.swift */; };
 		31D296262653FCF300965DD7 /* NetworksTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D296252653FCF300965DD7 /* NetworksTableViewCell.swift */; };
 		31D2962D2656730E00965DD7 /* ResultTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2962C2656730E00965DD7 /* ResultTableViewCell.swift */; };
-		31D2962F265E477E00965DD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 31D2962E265E477E00965DD7 /* GoogleService-Info.plist */; };
-		31D29632265E4A7300965DD7 /* FirebaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D29631265E4A7300965DD7 /* FirebaseController.swift */; };
+		31D9D17F26D0796D00954C1D /* NetworkJustsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */; };
+		31D9D18226D07A9600954C1D /* NetworkJustCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D18026D07A9600954C1D /* NetworkJustCell.swift */; };
+		31D9D18326D07A9600954C1D /* NetworkJustCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31D9D18126D07A9600954C1D /* NetworkJustCell.xib */; };
+		31D9D18526D1EF5300954C1D /* UserJustsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D18426D1EF5300954C1D /* UserJustsController.swift */; };
+		31D9D1CB26D4D8A600954C1D /* CurrentUserController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */; };
+		31D9D1CD26D4DAFF00954C1D /* ProfileHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */; };
+		31D9D1D026D5002D00954C1D /* JustViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D9D1CF26D5002D00954C1D /* JustViewModel.swift */; };
+		31DEDDE426C3146200749E41 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31DEDDE326C3146200749E41 /* AuthService.swift */; };
+		31DEDDE626C3147900749E41 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31DEDDE526C3147900749E41 /* UserService.swift */; };
+		31DEDDE826C3148F00749E41 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31DEDDE726C3148F00749E41 /* NetworkService.swift */; };
+		31DEDDEA26C3149D00749E41 /* JustService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31DEDDE926C3149D00749E41 /* JustService.swift */; };
+		31ED1E312700666100E41E76 /* RespectNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31ED1E302700666100E41E76 /* RespectNotification.swift */; };
 		EF2C7E7E79DB00E0270F33FF /* Pods_PracticeCustomTableViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA18FB8B127B9E2C111AA45E /* Pods_PracticeCustomTableViews.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		31307A6026D046E4005DA1FC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = PracticeCustomTableViews/Utilities/Constants.swift; sourceTree = SOURCE_ROOT; };
+		31307A6226D046EB005DA1FC /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = PracticeCustomTableViews/Utilities/Extensions.swift; sourceTree = SOURCE_ROOT; };
+		313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
+		313F7366270E6218007E6BC8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
 		316CE2EF264BA9500015C145 /* UserProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileViewController.swift; sourceTree = "<group>"; };
 		316CE2F1264BB2AC0015C145 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		31B4A43E26425042001E7DD6 /* PracticeCustomTableViews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PracticeCustomTableViews.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,29 +73,43 @@
 		31B4A44A26425045001E7DD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		31B4A44D26425045001E7DD6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		31B4A44F26425045001E7DD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		31B4A4592642510A001E7DD6 /* PracticeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTableViewCell.swift; sourceTree = "<group>"; };
-		31B4A45B2642511E001E7DD6 /* DummyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyData.swift; sourceTree = "<group>"; };
-		31B4A45D26425412001E7DD6 /* PracticeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTableViewController.swift; sourceTree = "<group>"; };
-		31B4A45F264256A4001E7DD6 /* JustProof.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JustProof.xib; sourceTree = "<group>"; };
-		31B4A46126425DFA001E7DD6 /* JustProofView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustProofView.swift; sourceTree = "<group>"; };
+		31B4A4592642510A001E7DD6 /* JustTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustTableViewCell.swift; sourceTree = "<group>"; };
 		31B4A47826453BC7001E7DD6 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		31B4A47A26455295001E7DD6 /* NetworkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkViewController.swift; sourceTree = "<group>"; };
 		31B4A47C26455310001E7DD6 /* RequestsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsTableViewCell.swift; sourceTree = "<group>"; };
+		31CC0D3026C5FB7A00E5F560 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		31CC0D3226C6F54C00E5F560 /* Just.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Just.swift; sourceTree = "<group>"; };
+		31CC0D4F26CE410300E5F560 /* ActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityController.swift; sourceTree = "<group>"; };
+		31CC0D5726CE4C4600E5F560 /* InviteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteCell.swift; sourceTree = "<group>"; };
+		31CC0D5826CE4C4600E5F560 /* InviteCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InviteCell.xib; sourceTree = "<group>"; };
+		31CC0D5F26D0408000E5F560 /* ActivityRespectController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRespectController.swift; sourceTree = "<group>"; };
+		31CC0D6126D0442000E5F560 /* ActivityRespectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRespectCell.swift; sourceTree = "<group>"; };
+		31CC0D6226D0442000E5F560 /* ActivityRespectCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActivityRespectCell.xib; sourceTree = "<group>"; };
 		31D2960F264E82D800965DD7 /* RespectedByViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RespectedByViewController.swift; sourceTree = "<group>"; };
 		31D29611264E83E300965DD7 /* RespectByTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RespectByTableViewCell.swift; sourceTree = "<group>"; };
 		31D29613264E8E1000965DD7 /* NewJustViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewJustViewController.swift; sourceTree = "<group>"; };
-		31D29615264E973A00965DD7 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		31D296172653B14400965DD7 /* SignUp.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SignUp.storyboard; sourceTree = "<group>"; };
 		31D296192653BF9300965DD7 /* MainJustViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainJustViewController.swift; sourceTree = "<group>"; };
 		31D2961B2653C2DA00965DD7 /* ResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsTableViewController.swift; sourceTree = "<group>"; };
 		31D2961D2653C3BD00965DD7 /* TableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableCell.xib; sourceTree = "<group>"; };
 		31D2961F2653EAE700965DD7 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewController.swift; sourceTree = "<group>"; };
-		31D296212653EB4200965DD7 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		31D296232653EB5300965DD7 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		31D296212653EB4200965DD7 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LoginViewController.swift; path = "../New Group/LoginViewController.swift"; sourceTree = "<group>"; };
+		31D296232653EB5300965DD7 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignUpViewController.swift; path = "../New Group/SignUpViewController.swift"; sourceTree = "<group>"; };
 		31D296252653FCF300965DD7 /* NetworksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworksTableViewCell.swift; sourceTree = "<group>"; };
 		31D2962C2656730E00965DD7 /* ResultTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultTableViewCell.swift; sourceTree = "<group>"; };
-		31D2962E265E477E00965DD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		31D29631265E4A7300965DD7 /* FirebaseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseController.swift; sourceTree = "<group>"; };
+		31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkJustsController.swift; sourceTree = "<group>"; };
+		31D9D18026D07A9600954C1D /* NetworkJustCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkJustCell.swift; sourceTree = "<group>"; };
+		31D9D18126D07A9600954C1D /* NetworkJustCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NetworkJustCell.xib; sourceTree = "<group>"; };
+		31D9D18426D1EF5300954C1D /* UserJustsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserJustsController.swift; sourceTree = "<group>"; };
+		31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentUserController.swift; sourceTree = "<group>"; };
+		31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeader.swift; sourceTree = "<group>"; };
+		31D9D1CF26D5002D00954C1D /* JustViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustViewModel.swift; sourceTree = "<group>"; };
+		31DEDDE326C3146200749E41 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		31DEDDE526C3147900749E41 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		31DEDDE726C3148F00749E41 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		31DEDDE926C3149D00749E41 /* JustService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustService.swift; sourceTree = "<group>"; };
+		31ED1E2F26F310D600E41E76 /* PracticeCustomTableViews.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PracticeCustomTableViews.entitlements; sourceTree = "<group>"; };
+		31ED1E302700666100E41E76 /* RespectNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RespectNotification.swift; sourceTree = "<group>"; };
 		791BE72403A7AB644BC85FE9 /* Pods-PracticeCustomTableViews.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PracticeCustomTableViews.debug.xcconfig"; path = "Target Support Files/Pods-PracticeCustomTableViews/Pods-PracticeCustomTableViews.debug.xcconfig"; sourceTree = "<group>"; };
 		DA18FB8B127B9E2C111AA45E /* Pods_PracticeCustomTableViews.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PracticeCustomTableViews.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE0D3FC4E7431D3B8B21B6EE /* Pods-PracticeCustomTableViews.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PracticeCustomTableViews.release.xcconfig"; path = "Target Support Files/Pods-PracticeCustomTableViews/Pods-PracticeCustomTableViews.release.xcconfig"; sourceTree = "<group>"; };
@@ -120,24 +157,49 @@
 		31B4A44026425042001E7DD6 /* PracticeCustomTableViews */ = {
 			isa = PBXGroup;
 			children = (
+				31ED1E2F26F310D600E41E76 /* PracticeCustomTableViews.entitlements */,
 				31D2962B265666F200965DD7 /* Resources */,
 				31D2962A2656662100965DD7 /* Storyboards */,
 				31D29627265665EB00965DD7 /* Model */,
-				31D29630265E4A5100965DD7 /* Model Controllers */,
+				31D9D1CE26D5000F00954C1D /* ViewModel */,
 				31D296282656660100965DD7 /* View Controllers */,
+				31CC0D6926D0465C00E5F560 /* Utilities */,
+				31DEDDE226C3143200749E41 /* API */,
 				31D296292656661100965DD7 /* Views */,
 				31B4A44A26425045001E7DD6 /* Assets.xcassets */,
 				31B4A44F26425045001E7DD6 /* Info.plist */,
-				31D2962E265E477E00965DD7 /* GoogleService-Info.plist */,
+				313F7366270E6218007E6BC8 /* GoogleService-Info.plist */,
 			);
 			path = PracticeCustomTableViews;
+			sourceTree = "<group>";
+		};
+		31CC0D4226C88CBC00E5F560 /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				31D2961F2653EAE700965DD7 /* NotificationsViewController.swift */,
+				31D296232653EB5300965DD7 /* SignUpViewController.swift */,
+				31D296212653EB4200965DD7 /* LoginViewController.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		31CC0D6926D0465C00E5F560 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				31307A6026D046E4005DA1FC /* Constants.swift */,
+				31307A6226D046EB005DA1FC /* Extensions.swift */,
+			);
+			name = Utilities;
+			path = API/Utilities;
 			sourceTree = "<group>";
 		};
 		31D29627265665EB00965DD7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				31B4A45B2642511E001E7DD6 /* DummyData.swift */,
 				316CE2F1264BB2AC0015C145 /* User.swift */,
+				31CC0D3026C5FB7A00E5F560 /* Network.swift */,
+				31CC0D3226C6F54C00E5F560 /* Just.swift */,
+				31ED1E302700666100E41E76 /* RespectNotification.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -145,17 +207,18 @@
 		31D296282656660100965DD7 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				31D296212653EB4200965DD7 /* LoginViewController.swift */,
-				31D296232653EB5300965DD7 /* SignUpViewController.swift */,
-				31D2961F2653EAE700965DD7 /* NotificationsViewController.swift */,
+				31CC0D4226C88CBC00E5F560 /* SignUp */,
 				31D296192653BF9300965DD7 /* MainJustViewController.swift */,
 				31D2961B2653C2DA00965DD7 /* ResultsTableViewController.swift */,
-				31D29615264E973A00965DD7 /* ProfileViewController.swift */,
 				31D29613264E8E1000965DD7 /* NewJustViewController.swift */,
 				31D2960F264E82D800965DD7 /* RespectedByViewController.swift */,
 				316CE2EF264BA9500015C145 /* UserProfileViewController.swift */,
-				31B4A45D26425412001E7DD6 /* PracticeTableViewController.swift */,
 				31B4A47A26455295001E7DD6 /* NetworkViewController.swift */,
+				31CC0D4F26CE410300E5F560 /* ActivityController.swift */,
+				31CC0D5F26D0408000E5F560 /* ActivityRespectController.swift */,
+				31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */,
+				31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */,
+				31D9D18426D1EF5300954C1D /* UserJustsController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -164,13 +227,18 @@
 			isa = PBXGroup;
 			children = (
 				31D29611264E83E300965DD7 /* RespectByTableViewCell.swift */,
+				31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */,
+				31D9D18026D07A9600954C1D /* NetworkJustCell.swift */,
+				31D9D18126D07A9600954C1D /* NetworkJustCell.xib */,
 				31B4A47C26455310001E7DD6 /* RequestsTableViewCell.swift */,
 				31D296252653FCF300965DD7 /* NetworksTableViewCell.swift */,
+				31CC0D6126D0442000E5F560 /* ActivityRespectCell.swift */,
+				31CC0D6226D0442000E5F560 /* ActivityRespectCell.xib */,
 				31D2961D2653C3BD00965DD7 /* TableCell.xib */,
+				31CC0D5726CE4C4600E5F560 /* InviteCell.swift */,
+				31CC0D5826CE4C4600E5F560 /* InviteCell.xib */,
 				31D2962C2656730E00965DD7 /* ResultTableViewCell.swift */,
-				31B4A45F264256A4001E7DD6 /* JustProof.xib */,
-				31B4A46126425DFA001E7DD6 /* JustProofView.swift */,
-				31B4A4592642510A001E7DD6 /* PracticeTableViewCell.swift */,
+				31B4A4592642510A001E7DD6 /* JustTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -191,16 +259,29 @@
 				31B4A44126425042001E7DD6 /* AppDelegate.swift */,
 				31B4A44326425042001E7DD6 /* SceneDelegate.swift */,
 				31B4A47826453BC7001E7DD6 /* Notifications.swift */,
+				313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		31D29630265E4A5100965DD7 /* Model Controllers */ = {
+		31D9D1CE26D5000F00954C1D /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				31D29631265E4A7300965DD7 /* FirebaseController.swift */,
+				31D9D1CF26D5002D00954C1D /* JustViewModel.swift */,
 			);
-			path = "Model Controllers";
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		31DEDDE226C3143200749E41 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				31DEDDE326C3146200749E41 /* AuthService.swift */,
+				31DEDDE526C3147900749E41 /* UserService.swift */,
+				31DEDDE726C3148F00749E41 /* NetworkService.swift */,
+				31DEDDE926C3149D00749E41 /* JustService.swift */,
+				313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */,
+			);
+			path = API;
 			sourceTree = "<group>";
 		};
 		9EDEED78EB9556F46CDF4750 /* Frameworks */ = {
@@ -272,11 +353,13 @@
 			files = (
 				31B4A44E26425045001E7DD6 /* LaunchScreen.storyboard in Resources */,
 				31B4A44B26425045001E7DD6 /* Assets.xcassets in Resources */,
-				31B4A460264256A4001E7DD6 /* JustProof.xib in Resources */,
+				313F7367270E6218007E6BC8 /* GoogleService-Info.plist in Resources */,
 				31D296182653B14400965DD7 /* SignUp.storyboard in Resources */,
+				31CC0D6426D0442000E5F560 /* ActivityRespectCell.xib in Resources */,
+				31D9D18326D07A9600954C1D /* NetworkJustCell.xib in Resources */,
 				31D2961E2653C3BD00965DD7 /* TableCell.xib in Resources */,
+				31CC0D5A26CE4C4600E5F560 /* InviteCell.xib in Resources */,
 				31B4A44926425042001E7DD6 /* Main.storyboard in Resources */,
-				31D2962F265E477E00965DD7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,27 +412,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31CC0D5926CE4C4600E5F560 /* InviteCell.swift in Sources */,
+				31ED1E312700666100E41E76 /* RespectNotification.swift in Sources */,
+				313F7369270E6EF8007E6BC8 /* PushNotificationManager.swift in Sources */,
 				31D2962D2656730E00965DD7 /* ResultTableViewCell.swift in Sources */,
 				31B4A47926453BC7001E7DD6 /* Notifications.swift in Sources */,
+				31CC0D6326D0442000E5F560 /* ActivityRespectCell.swift in Sources */,
+				31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */,
+				31DEDDE626C3147900749E41 /* UserService.swift in Sources */,
 				31D29614264E8E1000965DD7 /* NewJustViewController.swift in Sources */,
 				31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */,
 				31B4A47B26455295001E7DD6 /* NetworkViewController.swift in Sources */,
+				31307A6126D046E4005DA1FC /* Constants.swift in Sources */,
+				31D9D1D026D5002D00954C1D /* JustViewModel.swift in Sources */,
+				31DEDDE826C3148F00749E41 /* NetworkService.swift in Sources */,
+				31DEDDEA26C3149D00749E41 /* JustService.swift in Sources */,
 				31D2961C2653C2DA00965DD7 /* ResultsTableViewController.swift in Sources */,
-				31B4A46226425DFA001E7DD6 /* JustProofView.swift in Sources */,
 				31D296242653EB5300965DD7 /* SignUpViewController.swift in Sources */,
+				31D9D1CD26D4DAFF00954C1D /* ProfileHeader.swift in Sources */,
+				31D9D18226D07A9600954C1D /* NetworkJustCell.swift in Sources */,
+				313F7365270D29FC007E6BC8 /* PushNotificationSender.swift in Sources */,
 				31D2961A2653BF9300965DD7 /* MainJustViewController.swift in Sources */,
-				31B4A45E26425412001E7DD6 /* PracticeTableViewController.swift in Sources */,
-				31D29632265E4A7300965DD7 /* FirebaseController.swift in Sources */,
-				31D29616264E973A00965DD7 /* ProfileViewController.swift in Sources */,
+				31CC0D5026CE410300E5F560 /* ActivityController.swift in Sources */,
 				31D296222653EB4200965DD7 /* LoginViewController.swift in Sources */,
+				31D9D1CB26D4D8A600954C1D /* CurrentUserController.swift in Sources */,
 				316CE2F2264BB2AC0015C145 /* User.swift in Sources */,
-				31B4A45C2642511E001E7DD6 /* DummyData.swift in Sources */,
 				31D296202653EAE700965DD7 /* NotificationsViewController.swift in Sources */,
-				31B4A45A2642510A001E7DD6 /* PracticeTableViewCell.swift in Sources */,
+				31CC0D3126C5FB7A00E5F560 /* Network.swift in Sources */,
+				31D9D17F26D0796D00954C1D /* NetworkJustsController.swift in Sources */,
+				31B4A45A2642510A001E7DD6 /* JustTableViewCell.swift in Sources */,
 				316CE2F0264BA9500015C145 /* UserProfileViewController.swift in Sources */,
 				31D29612264E83E300965DD7 /* RespectByTableViewCell.swift in Sources */,
+				31DEDDE426C3146200749E41 /* AuthService.swift in Sources */,
+				31CC0D6026D0408200E5F560 /* ActivityRespectController.swift in Sources */,
+				31307A6326D046EB005DA1FC /* Extensions.swift in Sources */,
 				31B4A47D26455310001E7DD6 /* RequestsTableViewCell.swift in Sources */,
 				31B4A44426425042001E7DD6 /* SceneDelegate.swift in Sources */,
+				31D9D18526D1EF5300954C1D /* UserJustsController.swift in Sources */,
 				31D296262653FCF300965DD7 /* NetworksTableViewCell.swift in Sources */,
 				31D29610264E82D800965DD7 /* RespectedByViewController.swift in Sources */,
 			);
@@ -499,13 +598,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PracticeCustomTableViews/PracticeCustomTableViews.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S6V29A8HUW;
+				DEVELOPMENT_TEAM = 7HTV4A5W6Y;
 				INFOPLIST_FILE = PracticeCustomTableViews/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -519,13 +620,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PracticeCustomTableViews/PracticeCustomTableViews.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S6V29A8HUW;
+				DEVELOPMENT_TEAM = 7HTV4A5W6Y;
 				INFOPLIST_FILE = PracticeCustomTableViews/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

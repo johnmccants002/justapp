@@ -9,5 +9,12 @@ target 'PracticeCustomTableViews' do
 
   pod 'Firebase/Auth'
   pod 'Firebase/Database'
+  pod 'Firebase/Storage'
+  pod 'SDWebImage'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Core'
+  pod 'Firebase/Messaging'
+
 
 end
+

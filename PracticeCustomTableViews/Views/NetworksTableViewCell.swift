@@ -13,14 +13,40 @@ class NetworksTableViewCell: UITableViewCell {
     @IBOutlet weak var friendsNameLabel: UILabel!
     @IBOutlet weak var checkedImageView: UIImageView!
     @IBOutlet weak var friendsImageView: UIImageView!
+    var user: User? {
+        didSet {
+            configure()
+        }
+    }
     var delegate : NetworkTableViewCellDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
         
     }
     
-    func updateViews() {
+    
+    func configure() {
+        guard let user = user else { return }
+        setupImageTap()
+        friendsNameLabel.text = "\(user.firstName) \(user.lastName)"
+        if let url = user.profileImageUrl {
+            friendsImageView.sd_setImage(with: url, completed: nil)
+        } else {
+            friendsImageView.image = UIImage(named: "blank")
+        }
         
+        friendsImageView.layer.cornerRadius = friendsImageView.viewWidth / 2
+    }
+    
+    func setupImageTap() {
+        let tap = UIGestureRecognizer(target: self, action: #selector(imageTapped))
+        friendsImageView.addGestureRecognizer(tap)
+        friendsImageView.isUserInteractionEnabled = true
+        
+    }
+    
+    @objc func imageTapped() {
+        delegate?.imageTapped(cell: self)
     }
     
     func cellTapped(sender: UITapGestureRecognizer) {
@@ -37,4 +63,5 @@ class NetworksTableViewCell: UITableViewCell {
 
 protocol NetworkTableViewCellDelegate {
     func didTapCell(cell: NetworksTableViewCell)
+    func imageTapped(cell: NetworksTableViewCell)
 }

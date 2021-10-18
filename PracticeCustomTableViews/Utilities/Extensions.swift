@@ -114,6 +114,30 @@ extension UIView {
     }
 }
 
+extension UIButton {
+    func alignTextBelow(spacing: CGFloat) {
+        guard let image = self.imageView?.image else {
+            return
+        }
+        print("passed 1st guard")
+        guard let titleLabel = self.titleLabel else {
+            return
+        }
+        print("passed 2nd guard")
+        guard let titleText = titleLabel.text else {
+            return
+        }
+        print("passed 3rd guard")
+        let titleSize = titleText.size(withAttributes: [
+            NSAttributedString.Key.font: titleLabel.font
+        ])
+        
+        titleEdgeInsets = UIEdgeInsets(top: spacing, left: -image.size.width, bottom: -image.size.height, right: 0)
+        imageEdgeInsets = UIEdgeInsets(top: -(titleSize.height + spacing), left: 0, bottom: 0, right: -titleSize.width)
+    }
+}
+
+
 extension UIView {
     @discardableResult func slideIn(from edge: SimpleAnimationEdge = .none,
                                     x: CGFloat = 0,
@@ -144,6 +168,32 @@ extension UIView {
         }
       }
       return .zero
+    }
+}
+
+extension UIView {
+    enum GlowEffect: Float {
+        case small = 0.4, normal = 2, big = 50
+    }
+
+    func doGlowAnimation(withColor color: UIColor, withEffect effect: GlowEffect = .normal) {
+        layer.masksToBounds = false
+        layer.shadowColor = color.cgColor
+        layer.shadowRadius = 1
+        layer.shadowOpacity = 1.5
+        layer.shadowOffset = .zero
+
+        let glowAnimation = CABasicAnimation(keyPath: "shadowRadius")
+        glowAnimation.fromValue = 0
+        glowAnimation.toValue = effect.rawValue
+        glowAnimation.beginTime = CACurrentMediaTime()+0.3
+        glowAnimation.duration = CFTimeInterval(0.3)
+        glowAnimation.fillMode = .removed
+        
+
+        glowAnimation.autoreverses = true
+        glowAnimation.isRemovedOnCompletion = true
+        layer.add(glowAnimation, forKey: "shadowGlowingAnimation")
     }
 }
 

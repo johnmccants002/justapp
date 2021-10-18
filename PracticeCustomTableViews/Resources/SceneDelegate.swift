@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -15,15 +16,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
        
         let userLoginStatus = UserDefaults.standard.bool(forKey: "isUserLoggedIn")
-        
         if userLoginStatus {
-            let mainStoryBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let centerVC = mainStoryBoard.instantiateViewController(identifier: "MainJustViewController") as! MainJustViewController
-            let nav = UINavigationController(rootViewController: centerVC)
-            self.window?.rootViewController = nav
+        print("We have a current user")
+        guard let scene = scene as? UIWindowScene else { return }
+        window = UIWindow(windowScene: scene)
+        let mainStoryBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        let centerVC = mainStoryBoard.instantiateViewController(identifier: "MainJustViewController") as! MainJustViewController
+        let nav = UINavigationController(rootViewController: centerVC)
+        self.window?.rootViewController = nav
+        self.window?.makeKeyAndVisible()
+        } else {
+            print("We do not have a current user")
+            let signUpStoryboard = UIStoryboard(name: "SignUp", bundle: nil)
+            let signupVC = signUpStoryboard.instantiateViewController(identifier: "LoginViewController") as! LoginViewController
+            self.window?.rootViewController = signupVC
             self.window?.makeKeyAndVisible()
         }
-        guard let _ = (scene as? UIWindowScene) else { return }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

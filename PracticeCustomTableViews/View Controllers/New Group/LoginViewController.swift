@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         guard let emailText = emailTextField.text, !emailText.isEmpty, let passwordText = passwordTextField.text, !passwordText.isEmpty else { return }
             self.loadingIndicator.isHidden = false
             self.loadingIndicator.startAnimating()
-            self.sendInfoToDB()
+        self.sendInfoToDB(email: emailText, password: passwordText)
     }
     
     @IBAction func signUpButtonTapped(_ sender: UIButton) {
@@ -48,20 +48,31 @@ class LoginViewController: UIViewController {
         self.loadingIndicator.isHidden = true
     }
     
-    func sendInfoToDB() {
+    func sendInfoToDB(email: String, password: String) {
         let _ : Timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.myPerformCode), userInfo: nil, repeats: false)
+        
+        AuthService.shared.logUserIn(withEmail: email, password: password) { result, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                self.presentLoginAlert()
+            } else {
+                print("This is the result from firebase")
+                self.presentMain()
+            }
+            
+        }
     }
     
-    func presentMain(user : User) {
+    func presentMain() {
         DispatchQueue.main.async {
             let mainStoryBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let centerVC = mainStoryBoard.instantiateViewController(identifier: "MainJustViewController") as! MainJustViewController
-            centerVC.currentUser = user
-            UserDefaults.standard.set(true, forKey: "isUserLoggedIn")
-            UserDefaults.standard.set("uid", forKey: "uid")
+            
+            UserDefaults.standard.setValue(true, forKey: "isUserLoggedIn")
             UserDefaults.standard.synchronize()
             let nav = UINavigationController(rootViewController: centerVC)
             nav.modalPresentationStyle = .fullScreen
+            self.window?.rootViewController = nav
             self.present(nav, animated: true, completion: nil)
         }
     }
@@ -95,6 +106,31 @@ class LoginViewController: UIViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    }
+}
+
+extension LoginViewController {
+        var appDelegate: AppDelegate {
+        return UIApplication.shared.delegate as! AppDelegate
+    }
+    
+    var sceneDelegate: SceneDelegate? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let delegate = windowScene.delegate as? SceneDelegate else { return nil }
+         return delegate
+    }
+}
+
+extension LoginViewController {
+    var window: UIWindow? {
+        if #available(iOS 13, *) {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                let delegate = windowScene.delegate as? SceneDelegate, let window = delegate.window else { return nil }
+                   return window
+        }
+        
+        guard let delegate = UIApplication.shared.delegate as? AppDelegate, let window = delegate.window else { return nil }
+        return window
     }
 }
 

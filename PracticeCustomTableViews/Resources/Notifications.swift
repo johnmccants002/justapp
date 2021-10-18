@@ -9,8 +9,6 @@ import Foundation
 import UIKit
 
 extension NSNotification.Name {
-    static let shouldShowProof = NSNotification.Name("ShouldShowProof")
-    
-    static let showUserProfile = NSNotification.Name("showUserProfile")
+    static let shouldRefetchNetworks = NSNotification.Name("ShouldRefetchNetworks")
 }
 
