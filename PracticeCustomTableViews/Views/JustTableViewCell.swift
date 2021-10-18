@@ -7,7 +7,9 @@
 
 import UIKit
 
-class PracticeTableViewCell: UITableViewCell {
+class JustTableViewCell: UITableViewCell {
+    
+    var just: Just?
 
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var usernameButton: UIButton!
@@ -50,8 +52,11 @@ class PracticeTableViewCell: UITableViewCell {
     func updateViews() {
         self.respectButton.setImage(UIImage(named: "respecttapped"), for: .normal)
         
-        guard let usernameText = usernameButton.titleLabel?.text else {return}
-        username = usernameText
+        guard let just = self.just else { return }
+        self.justLabel.text = just.justText
+        self.username = "\(just.firstName) \(just.lastName)"
+        
+        self.usernameButton.setTitle(self.username, for: .normal)
     }
     
     func didLongPress(sender: UILongPressGestureRecognizer) {
@@ -65,10 +70,10 @@ class PracticeTableViewCell: UITableViewCell {
 }
 
 protocol PracticeTableViewCellDelegate {
-    func usernameButtonTapped(cell: PracticeTableViewCell)
+    func usernameButtonTapped(cell: JustTableViewCell)
     
-    func respectedByTapped(cell: PracticeTableViewCell)
+    func respectedByTapped(cell: JustTableViewCell)
     
-    func didLongPress(cell: PracticeTableViewCell)
+    func didLongPress(cell: JustTableViewCell)
     
 }

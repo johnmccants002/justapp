@@ -9,6 +9,9 @@ import UIKit
 
 class SignUpViewController: UIViewController {
     
+    
+    // MARK: - Properties
+    
     var user : User?
     var emailString: String?
     var firstNameString: String?
@@ -24,6 +27,8 @@ class SignUpViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var signUpTextField: UITextField!
     
+    // MARK: - Lifecycles
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
@@ -34,6 +39,8 @@ class SignUpViewController: UIViewController {
         setupKeyboard()
         self.signUpTextField.becomeFirstResponder()
     }
+    
+    // MARK: - Helper Functions
     
     func updateViews() {
         self.signUpTextField.delegate = self
@@ -63,6 +70,107 @@ class SignUpViewController: UIViewController {
         self.signUpTextField.inputAccessoryView = keyboardToolbar
         self.nextButton = nextButton
     }
+    
+    func labelAnimation() {
+        label.slideIn(from: .left, x: 50, y: 1, duration: 1, delay: 0) { _ in
+        }
+    }
+    
+    func checkFirstName(firstName: String) -> Bool {
+        if firstName.count < 30 && firstName.count >= 2 {
+        self.firstNameString = firstName
+        count += 1
+        clearTextField()
+        labelAnimation()
+        return true
+        } else {
+            return false
+        }
+    }
+    
+    func checkUsername(username: String) -> Bool {
+        if username.count < 20 && username.count >= 4 {
+            self.usernameString = username
+            clearTextField()
+            labelAnimation()
+            count += 1
+            return true
+        }
+        return false
+    }
+    
+    func checkPassword(password: String) {
+        guard let validPassword = validatePassword(password: password) else {
+            print("Invalid Password Guard142")
+            return
+        }
+        print(passwordValid)
+        self.passwordString = validPassword
+        clearTextField()
+    }
+    
+    func checkLastName(lastName: String) -> Bool {
+        if lastName.count < 30 && lastName.count >= 2 {
+            self.lastNameString = lastName
+            count += 1
+            clearTextField()
+            labelAnimation()
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func checkMatchingPassword(passwordAgain: String) {
+        self.passwordAgainString = passwordAgain
+        guard let password = self.passwordString else { return }
+        
+        if password == passwordAgain {
+            count += 1
+            createUser()
+        } else {
+            self.presentAlert()
+        }
+    }
+    
+    func passwordError(errorMessage: String) {
+        let passwordAlert = UIAlertController(title: "Password Invalid", message: errorMessage, preferredStyle: .alert)
+        let passwordAction = UIAlertAction(title: "Ok", style: .default) { _ in
+            self.signUpTextField.text?.removeAll()
+        }
+        passwordAlert.addAction(passwordAction)
+        
+        self.present(passwordAlert, animated: true, completion: nil)
+    }
+    
+    func clearTextField() {
+        self.signUpTextField.text?.removeAll()
+    }
+    
+    func presentAlert() {
+        let alert = UIAlertController(title: "Invalid Matching Passwords", message: "Please Re-enter Password", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alert.addAction(action)
+        self.present(alert, animated: true) {
+            self.signUpTextField.text?.removeAll()
+        }
+    }
+    
+    func createUser() {
+        guard let email = emailString, let username = usernameString, let firstName = firstNameString, let lastName = lastNameString, let password = passwordString else { return }
+        let credentials = AuthCredentials(email: email, password: password, username: username, firstName: firstName, lastName: lastName)
+        AuthService.shared.registerUser(credentials: credentials) { error, ref in
+            UserDefaults.standard.set(true, forKey: "isUserLoggedIn")
+            self.presentNotificationController()
+        }
+       
+    }
+    
+    func presentNotificationController() {
+        self.performSegue(withIdentifier: "notificationController", sender: self)
+    }
+
+    // MARK: - Selectors
     
     @objc func nextButtonPressed(_: UIBarButtonItem) {
         print("Next Button Pressed")
@@ -98,115 +206,10 @@ class SignUpViewController: UIViewController {
         }
     }
     
-    func labelAnimation() {
-        label.slideIn(from: .left, x: 50, y: 1, duration: 1, delay: 0) { _ in
-        }
-    }
-    
-    func checkFirstName(firstName: String) -> Bool {
-        if firstName.count < 30 && firstName.count >= 2 {
-        self.firstNameString = firstName
-        count += 1
-        clearTextField()
-        labelAnimation()
-        return true
-        } else {
-            return false
-        }
-    }
-    
-    func checkLastName(lastName: String) -> Bool {
-        if lastName.count < 30 && lastName.count >= 2 {
-            self.lastNameString = lastName
-            count += 1
-            clearTextField()
-            labelAnimation()
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    func checkUsername(username: String) -> Bool {
-        if username.count < 20 && username.count >= 4 {
-            self.usernameString = username
-            clearTextField()
-            labelAnimation()
-            count += 1
-            return true
-        }
-        return false
-    }
-    
-    func checkPassword(password: String) {
-        guard let validPassword = validatePassword(password: password) else {
-            print("Invalid Password Guard142")
-            return
-        }
-        print(passwordValid)
-        self.passwordString = validPassword
-        clearTextField()
-    }
-    
-    func checkMatchingPassword(passwordAgain: String) {
-        self.passwordAgainString = passwordAgain
-        guard let password = self.passwordString else { return }
-        
-        if password == passwordAgain {
-            count += 1
-            clearTextField()
-            labelAnimation()
-            createUser()
-        } else {
-            self.presentAlert()
-        }
-    
-        
-    }
-    
-    func passwordError(errorMessage: String) {
-        let passwordAlert = UIAlertController(title: "Password Invalid", message: errorMessage, preferredStyle: .alert)
-        let passwordAction = UIAlertAction(title: "Ok", style: .default) { _ in
-            self.signUpTextField.text?.removeAll()
-        }
-        passwordAlert.addAction(passwordAction)
-        
-        self.present(passwordAlert, animated: true, completion: nil)
-    }
-    
-    
-    
-    func createUser() {
-        
-        guard let email = emailString, let username = usernameString, let firstName = firstNameString, let lastName = lastNameString, let password = passwordString, let passwordAgain = passwordAgainString else { return }
-
-        self.user = User(username: username, email: email, uid: "", aboutText: "", firstName: firstName, lastName: lastName)
-        presentNotificationController()
-       
-    }
-    
-    func presentNotificationController() {
-        self.performSegue(withIdentifier: "notificationController", sender: self)
-    }
-    
-    func clearTextField() {
-        self.signUpTextField.text?.removeAll()
-    }
-    
-    func presentAlert() {
-        let alert = UIAlertController(title: "Invalid Matching Passwords", message: "Please Re-enter Password", preferredStyle: .alert)
-        let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
-        alert.addAction(action)
-        self.present(alert, animated: true) {
-            self.signUpTextField.text?.removeAll()
-        }
-    }
-    
 
     
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "notificationController" {
             let destination = segue.destination as! NotificationsViewController
@@ -220,6 +223,8 @@ class SignUpViewController: UIViewController {
         
 
 }
+
+// MARK: - UITextFieldDelegate
 
 extension SignUpViewController: UITextFieldDelegate {
     
@@ -301,18 +306,6 @@ extension SignUpViewController: UITextFieldDelegate {
             passwordError(errorMessage: errorMsg)
             return nil
         }
-    }
-    
-}
-
-
-extension UIView {
-    public var viewWidth: CGFloat {
-        return self.frame.size.width
-    }
-
-    public var viewHeight: CGFloat {
-        return self.frame.size.height
     }
 }
 
