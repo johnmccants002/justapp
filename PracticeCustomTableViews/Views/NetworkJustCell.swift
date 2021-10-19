@@ -40,14 +40,17 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-//       configure()
         setupShadows()
 
     }
+    
+    // MARK: - Selectors
+    
     @IBAction func imageButtonTapped(_ sender: UIButton) {
         delegate?.imageTapped(cell: self)
     }
+    
+    // MARK: - Helper Functions
     
     func fetchToken() {
         guard let just = just else { return }
@@ -68,28 +71,37 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     func configure() {
-        
         guard let just = just else { return }
         let viewModel = JustViewModel(just: just)
         contentView.isUserInteractionEnabled = true
         justLabel.attributedText = viewModel.userInfoText
-        let tap = UIGestureRecognizer(target: self, action: #selector(labelTapped))
-        self.respectLabel.addGestureRecognizer(tap)
-        self.respectLabel.isUserInteractionEnabled = true
-        let imageName = just.didRespect ? "Fistbump4" : "Fistbump1"
-        let blue = UIColor.blue
-        let lightGray = UIColor.lightGray
-        let labelColor = just.didRespect ? blue : lightGray
-        respectButton.setImage(UIImage(named: imageName), for: .normal)
-        respectLabel.textColor = labelColor
-        respectLabel.text = "Respect"
         
     }
     
     func setupRespectButton() {
-        self.respectButton.imageView?.clipsToBounds = true
-        self.respectButton.imageView?.contentMode = .scaleAspectFit
+        
+        guard let just = just else { return }
+        if just.uid == currentUserId {
+            self.respectButton.isHidden = true
+            self.respectLabel.isHidden = true
+            setupRespectCountButton()
+        } else {
+            let tap = UIGestureRecognizer(target: self, action: #selector(labelTapped))
+            self.respectLabel.addGestureRecognizer(tap)
+            self.respectLabel.isUserInteractionEnabled = true
+            let imageName = just.didRespect ? "Fistbump4" : "Fistbump1"
+            let blue = UIColor.blue
+            let lightGray = UIColor.lightGray
+            let labelColor = just.didRespect ? blue : lightGray
+            respectButton.setImage(UIImage(named: imageName), for: .normal)
+            respectLabel.textColor = labelColor
+            respectLabel.text = "Respect"
+            self.respectButton.imageView?.clipsToBounds = true
+            self.respectButton.imageView?.contentMode = .scaleAspectFit
+        }
+        
     }
+    
     
     @IBAction func respectButtonTapped(_ sender: UIButton) {
         guard var just = just else { return }
@@ -204,7 +216,8 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             print("Passed the two guards and if statement")
             JustService.shared.fetchJustRespects(just: just) { respectCount in
                 if let respectCount = respectCount {
-                    self.respectCountButton.setTitle("\(respectCount) respects", for: .normal)
+                    let count = Int(respectCount)
+                    self.respectCountButton.setTitle("\(count) respects", for: .normal)
                 }
             }
 

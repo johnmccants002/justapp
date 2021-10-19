@@ -125,6 +125,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "networkJustCell", for: indexPath) as! NetworkJustCell
             cell.just = lastJusts[indexPath.row]
             cell.delegate = self
+            cell.currentUserId = self.currentUser.uid
         
         
         return cell

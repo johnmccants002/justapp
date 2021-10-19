@@ -248,6 +248,8 @@ extension CurrentUserController: ProfileHeaderDelegate {
         collectionView.reloadData()
     }
     
+    // MARK: - Long Press Alert
+    
     func longPressAlert(currentUser: Bool, cell: NetworkJustCell) -> UIAlertController {
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         if currentUser == true {

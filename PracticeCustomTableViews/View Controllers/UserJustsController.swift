@@ -130,6 +130,8 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         cell.just = userJusts[indexPath.row]
         cell.delegate = self
         cell.imageView.isUserInteractionEnabled = true
+        cell.currentUserId = self.currentUser.uid
+        
         
         return cell
     }
