@@ -260,7 +260,7 @@ extension CurrentUserController: ProfileHeaderDelegate {
             alert.addAction(deleteAction)
             alert.addAction(cancelAction)
             return alert
-            print("jjfkwljfewj")
+            print("jjfkwljfewjsffwefw")
         } else {
             let alert = UIAlertController(title: "Report", message: "Would you like to report this just?", preferredStyle: .alert)
             let reportAction = UIAlertAction(title: "Report Just", style: .default, handler: nil)
