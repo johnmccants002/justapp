@@ -163,6 +163,9 @@ extension UserJustsController: UICollectionViewDelegateFlowLayout {
 // MARK: NetworkJustCellDelegate
 
 extension UserJustsController: NetworkJustCellDelegate {
+    func respectCountTapped(cell: NetworkJustCell) {
+    }
+    
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         print("just.uid \(just.uid) and currentUser.uid: \(currentUser.uid)")

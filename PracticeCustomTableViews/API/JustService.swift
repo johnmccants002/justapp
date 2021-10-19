@@ -173,5 +173,26 @@ struct JustService {
             
         }
     }
+    
+    func fetchRespectedBy(just: Just, completion: @escaping([User]) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        var users: [User] = []
+        let myGroup = DispatchGroup()
+        REF_JUST_RESPECTS.child(just.justID).observeSingleEvent(of: .value) { snapshot in
+            guard let dict = snapshot.value as? [String: Any] else { return }
+            
+            for (key, value) in dict {
+                myGroup.enter()
+                UserService.shared.fetchUser(uid: key) { user in
+                    myGroup.leave()
+                    users.append(user)
+                }
+            }
+            myGroup.notify(queue: .main) {
+                print("These are the users networks we got \(users)")
+            completion(users)
+            }
+        }
+    }
 }
 

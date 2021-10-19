@@ -19,11 +19,11 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         didSet {
             print("Just did set called")
             configure()
+            setupRespectButton()
             setupImageView()
             setupLongPressGesture()
             fetchToken()
             fetchUserImage()
-            checkRespect()
             
         }
     }
@@ -41,6 +41,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         setupShadows()
+        self.respectCountButton.isHidden = true
 
     }
     
@@ -79,13 +80,16 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     }
     
     func setupRespectButton() {
-        
         guard let just = just else { return }
         if just.uid == currentUserId {
             self.respectButton.isHidden = true
             self.respectLabel.isHidden = true
+            self.respectCountButton.isHidden = false
             setupRespectCountButton()
         } else {
+            self.respectButton.isHidden = false
+            self.respectLabel.isHidden = false
+            self.respectCountButton.isHidden = true
             let tap = UIGestureRecognizer(target: self, action: #selector(labelTapped))
             self.respectLabel.addGestureRecognizer(tap)
             self.respectLabel.isUserInteractionEnabled = true
@@ -100,6 +104,10 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             self.respectButton.imageView?.contentMode = .scaleAspectFit
         }
         
+    }
+    
+    @objc func respectCountTapped() {
+        delegate?.respectCountTapped(cell: self)
     }
     
     
@@ -195,29 +203,26 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         addGestureRecognizer(longPressGesture)
     }
     
-    func checkRespect() {
-        guard let just = just else { return }
-        JustService.shared.fetchJustRespects(just: just) { count in
-            print("This is the \(count)")
-            if let count = count {
-                if count != 0 {
-                    self.respectCountButton.setTitle("\(count) respect", for: .normal)
-                }
-            }
-        }
-    }
     
     func setupRespectCountButton() {
-        print("setupRespectCountButton called")
-        self.respectCountButton.isHidden = false
         guard let just = just, let currentUserId = currentUserId else { return }
-    
+        let tap = UITapGestureRecognizer(target: self, action: #selector(respectCountTapped))
+        self.respectCountButton.addGestureRecognizer(tap)
+        self.respectCountButton.isUserInteractionEnabled = true
         if just.uid == currentUserId {
             print("Passed the two guards and if statement")
             JustService.shared.fetchJustRespects(just: just) { respectCount in
                 if let respectCount = respectCount {
                     let count = Int(respectCount)
-                    self.respectCountButton.setTitle("\(count) respects", for: .normal)
+                    switch count {
+                    case 1:
+                        self.respectCountButton.setTitle("\(count) respect", for: .normal)
+                    case _ where count >= 2:
+                        self.respectCountButton.setTitle("\(count) respects", for: .normal)
+                    default:
+                        self.respectCountButton.isHidden = true
+                    }
+                    
                 }
             }
 
@@ -231,4 +236,5 @@ protocol NetworkJustCellDelegate {
     func imageTapped(cell: NetworkJustCell)
     func respectTapped(cell: NetworkJustCell)
     func didLongPress(cell: NetworkJustCell)
+    func respectCountTapped(cell: NetworkJustCell)
 }

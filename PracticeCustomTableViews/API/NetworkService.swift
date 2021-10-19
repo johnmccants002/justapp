@@ -99,14 +99,31 @@ struct NetworkService {
         REF_NETWORK_DETAILS.child(networkId).updateChildValues(values)
     }
     
-    func checkIfUsersInNetwork(networkId: String, userId: String, completion: @escaping(Bool) -> Void ) {
+    func checkIfUsersInNetwork(networkId: String, userId: String, completion: @escaping(String) -> Void ) {
         guard let currentUser = Auth.auth().currentUser else { return }
         
         REF_NETWORK_USERS.child(networkId).child(userId).observeSingleEvent(of: .value) { snapshot in
             if snapshot.exists() {
-                completion(true)
+                completion("Already in the Network")
             } else {
-                completion(false)
+                NetworkService.shared.checkIfUserInvited(toUid: userId, fromUid: currentUser.uid) { string in
+                    if string == "Invite Exists" {
+                        completion(string)
+                    } else {
+                        completion("Not in Network")
+                    }
+                }
+            }
+        }
+    }
+    
+    func checkIfUserInvited(toUid: String, fromUid: String, completion: @escaping(String) -> Void) {
+        guard let currentUser = Auth.auth().currentUser else { return }
+        print("checkifUserInvited called")
+        REF_NETWORK_INVITES.child(toUid).child(fromUid).observeSingleEvent(of: .value) { snapshot in
+            
+            if snapshot.exists() {
+                completion("Invite Exists")
             }
         }
     }

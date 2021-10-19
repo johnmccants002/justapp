@@ -260,7 +260,7 @@ extension CurrentUserController: ProfileHeaderDelegate {
             alert.addAction(deleteAction)
             alert.addAction(cancelAction)
             return alert
-            print("jjfkwljfewjsffwefwffwffeww")
+            
         } else {
             let alert = UIAlertController(title: "Report", message: "Would you like to report this just?", preferredStyle: .alert)
             let reportAction = UIAlertAction(title: "Report Just", style: .default, handler: nil)
@@ -318,6 +318,14 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
 // MARK: NetworkJustCellDelegate
 
 extension CurrentUserController: NetworkJustCellDelegate {
+    func respectCountTapped(cell: NetworkJustCell) {
+        guard let just = cell.just else { return }
+        let controller = RespectedByViewController(just: just, currentUser: currentUser)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         

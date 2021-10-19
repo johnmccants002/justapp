@@ -127,6 +127,10 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
         
+        if lastJusts[indexPath.row].uid == currentUser.uid {
+            cell.setupRespectButton()
+        }
+        
         
         return cell
     }
@@ -160,6 +164,9 @@ extension NetworkJustsController: UICollectionViewDelegateFlowLayout {
 }
 
 extension NetworkJustsController: NetworkJustCellDelegate {
+    func respectCountTapped(cell: NetworkJustCell) {
+    }
+    
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         print("just.uid \(just.uid) and currentUser.uid: \(currentUser.uid)")

@@ -28,6 +28,11 @@ class ResultsTableViewController: UITableViewController {
             self.tableView.reloadData()
         }
     }
+    var status: String? {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
     
     var userExists : Bool? {
         didSet {
@@ -91,6 +96,10 @@ class ResultsTableViewController: UITableViewController {
         
         cell.delegate = self
         cell.selectionStyle = .none
+        if let status = status {
+            cell.status = status
+        }
+        
         if let userExists = userExists {
             cell.userExists = userExists
         }
@@ -101,14 +110,15 @@ class ResultsTableViewController: UITableViewController {
         if let toUser = toUser {
             cell.user = toUser
                 if currentUser.uid == toUser.uid {
+                    print("CurrentUser Uid == toUser Uid")
                     cell.inviteButton.isHidden = true
                     cell.userImage.setRounded()
                     return cell
                 }
             
-            if let inNetwork = inNetwork {
-                cell.inNetwork = inNetwork
-            }
+//            if let inNetwork = inNetwork {
+//                cell.inNetwork = inNetwork
+//            }
                 cell.userImage.setRounded()
                 return cell
         

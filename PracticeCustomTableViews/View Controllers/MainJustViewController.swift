@@ -492,15 +492,14 @@ extension MainJustViewController: UISearchBarDelegate {
                 
                 resultsController.userExists = userExists
                 if let toUser = toUser, toUser != nil {
-                    NetworkService.shared.checkIfUsersInNetwork(networkId: currentUser.networkId, userId: toUser.uid) { inNetwork in
-                        resultsController.inNetwork = inNetwork
-                        resultsController.tableView.reloadData()
-                        print("\(toUser.username) is in your network: \(inNetwork)")
-                        }
+                    NetworkService.shared.checkIfUsersInNetwork(networkId: currentUser.networkId, userId: toUser.uid) { string in
+                        print("String from Firebase: \(string)")
+                        resultsController.status = string
+                        
+                    }
                     resultsController.toUser = toUser
                     
                 }
-//                resultsController.toUser = toUser
                 resultsController.tableView.isHidden = false
                 
             }

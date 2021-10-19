@@ -13,7 +13,7 @@ class ResultTableViewCell: UITableViewCell {
     @IBOutlet weak var inviteButton: UIButton!
     @IBOutlet weak var userImage: UIImageView!
     @IBOutlet weak var usernameLabel: UILabel!
-    var inNetwork: Bool? {
+    var status: String? {
         didSet {
             checkUserNetwork()
         }
@@ -67,14 +67,25 @@ class ResultTableViewCell: UITableViewCell {
     }
     
     func checkUserNetwork() {
-        guard let inNetwork = inNetwork else { return }
-        if inNetwork == true {
+        guard let status = status else { return }
+        switch status {
+        case "Already in the Network":
             inviteButton.setTitle("In Network", for: .normal)
+            inviteButton.isHidden = false
             inviteButton.isEnabled = false
-        } else {
+        case "Not in Network":
             inviteButton.setTitle("Invite", for: .normal)
+            inviteButton.isHidden = false
             inviteButton.isEnabled = true
+        case "Invite Exists":
+            inviteButton.setTitle("Invited", for: .normal)
+            inviteButton.isHidden = false
+            inviteButton.isEnabled = false
+            
+        default:
+            break
         }
+
         
     }
     
