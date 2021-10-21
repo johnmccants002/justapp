@@ -33,6 +33,7 @@
 		31CC0D6426D0442000E5F560 /* ActivityRespectCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31CC0D6226D0442000E5F560 /* ActivityRespectCell.xib */; };
 		31CE99DC271EC17000324501 /* RespectedByCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE99DA271EC17000324501 /* RespectedByCell.swift */; };
 		31CE99DD271EC17000324501 /* RespectedByCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31CE99DB271EC17000324501 /* RespectedByCell.xib */; };
+		31CE99DF271FAD1E00324501 /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE99DE271FAD1E00324501 /* SettingsController.swift */; };
 		31D29610264E82D800965DD7 /* RespectedByViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D2960F264E82D800965DD7 /* RespectedByViewController.swift */; };
 		31D29614264E8E1000965DD7 /* NewJustViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D29613264E8E1000965DD7 /* NewJustViewController.swift */; };
 		31D296182653B14400965DD7 /* SignUp.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31D296172653B14400965DD7 /* SignUp.storyboard */; };
@@ -88,6 +89,7 @@
 		31CC0D6226D0442000E5F560 /* ActivityRespectCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActivityRespectCell.xib; sourceTree = "<group>"; };
 		31CE99DA271EC17000324501 /* RespectedByCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RespectedByCell.swift; sourceTree = "<group>"; };
 		31CE99DB271EC17000324501 /* RespectedByCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RespectedByCell.xib; sourceTree = "<group>"; };
+		31CE99DE271FAD1E00324501 /* SettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		31D2960F264E82D800965DD7 /* RespectedByViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RespectedByViewController.swift; sourceTree = "<group>"; };
 		31D29613264E8E1000965DD7 /* NewJustViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewJustViewController.swift; sourceTree = "<group>"; };
 		31D296172653B14400965DD7 /* SignUp.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SignUp.storyboard; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				31B4A47A26455295001E7DD6 /* NetworkViewController.swift */,
 				31CC0D4F26CE410300E5F560 /* ActivityController.swift */,
 				31CC0D5F26D0408000E5F560 /* ActivityRespectController.swift */,
+				31CE99DE271FAD1E00324501 /* SettingsController.swift */,
 				31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */,
 				31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */,
 				31D9D18426D1EF5300954C1D /* UserJustsController.swift */,
@@ -432,6 +435,7 @@
 				31DEDDE826C3148F00749E41 /* NetworkService.swift in Sources */,
 				31DEDDEA26C3149D00749E41 /* JustService.swift in Sources */,
 				31D2961C2653C2DA00965DD7 /* ResultsTableViewController.swift in Sources */,
+				31CE99DF271FAD1E00324501 /* SettingsController.swift in Sources */,
 				31D296242653EB5300965DD7 /* SignUpViewController.swift in Sources */,
 				31D9D1CD26D4DAFF00954C1D /* ProfileHeader.swift in Sources */,
 				31D9D18226D07A9600954C1D /* NetworkJustCell.swift in Sources */,
@@ -610,7 +614,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -632,7 +636,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

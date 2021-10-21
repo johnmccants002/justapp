@@ -198,20 +198,21 @@ class ProfileHeader: UICollectionReusableView {
     }
     
     @objc func handleSettingsTapped() {
-        print("editProfileButtonTapped")
-        if editProfileButton.title(for: .normal) == "Done" {
-            print("editProfileButton == Done")
-            self.editProfileImageButton.isHidden = true
-            self.editProfileButton.setTitle("Settings", for: .normal)
-            self.updateAboutText()
-            self.biotTextView.isEditable = false
-            delegate?.handleDoneTapped(self, bioText: biotTextView.text, newImage: pickedImage)
-            
-            
-        } else if editProfileButton.title(for: .normal) == "Settings" {
-            delegate?.handleSettingsTapped(self)
-            
-        }
+        delegate?.handleSettingsTapped(self)
+//        print("editProfileButtonTapped")
+//        if editProfileButton.title(for: .normal) == "Done" {
+//            print("editProfileButton == Done")
+//            self.editProfileImageButton.isHidden = true
+//            self.editProfileButton.setTitle("Settings", for: .normal)
+//            self.updateAboutText()
+//            self.biotTextView.isEditable = false
+//            delegate?.handleDoneTapped(self, bioText: biotTextView.text, newImage: pickedImage)
+//
+//
+//        } else if editProfileButton.title(for: .normal) == "Settings" {
+//            delegate?.handleSettingsTapped(self)
+//
+//        }
             
     }
     

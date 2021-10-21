@@ -215,8 +215,10 @@ extension CurrentUserController: ProfileHeaderDelegate {
     }
     
     func handleSettingsTapped(_ header: ProfileHeader) {
-        let alert = self.setupSettings()
-        self.present(alert, animated: true, completion: nil)
+        let controller = SettingsController(currentUser: currentUser)
+        self.navigationController?.pushViewController(controller, animated: true)
+        //        let alert = self.setupSettings()
+//        self.present(alert, animated: true, completion: nil)
         
     }
     
