@@ -42,8 +42,9 @@ struct AuthService {
                     guard let networkID = network.key else { return }
                     let values = ["email": email, "username": username, "firstName": firstName, "lastName": lastName,  "networkID": networkID, "aboutText": aboutText]
                     
-                    REF_USERS.child(uid).updateChildValues(values, withCompletionBlock: completion)
-//                        NetworkService.shared.createNetworkDetails(networkId: networkID, user: User(uid: uid, dictionary: values), completion: completion)
+                    REF_USERS.child(uid).updateChildValues(values) { err, ref in
+                        
+                    }
  
                 }
     }

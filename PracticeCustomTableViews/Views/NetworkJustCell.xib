@@ -75,17 +75,28 @@
                                     <constraint firstAttribute="width" constant="66" id="z8A-1z-dvd"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                <state key="normal" title="Button"/>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1jq-Yi-tWJ">
+                                <rect key="frame" x="367" y="24" width="28" height="14"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="2hI-hL-1Hs"/>
+                                    <constraint firstAttribute="height" constant="14" id="Q86-fp-foI"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="1jq-Yi-tWJ" secondAttribute="trailing" constant="20" id="1tU-Mr-jZI"/>
                             <constraint firstItem="k3f-In-kEW" firstAttribute="leading" secondItem="n1a-eh-f82" secondAttribute="leading" constant="8" id="20n-9f-csI"/>
                             <constraint firstItem="KkB-6m-Z9t" firstAttribute="top" secondItem="n1a-eh-f82" secondAttribute="top" constant="14" id="6sx-hy-HiZ"/>
                             <constraint firstItem="AHe-Gv-aiA" firstAttribute="top" secondItem="S1Q-qz-cx6" secondAttribute="bottom" constant="1" id="7xX-fR-ghH"/>
                             <constraint firstAttribute="bottom" secondItem="1fn-rd-nVF" secondAttribute="bottom" constant="14" id="BhJ-aa-jT4"/>
                             <constraint firstAttribute="trailing" secondItem="AHe-Gv-aiA" secondAttribute="trailing" constant="28.5" id="BwZ-I7-FT7"/>
                             <constraint firstItem="k3f-In-kEW" firstAttribute="top" secondItem="n1a-eh-f82" secondAttribute="top" constant="14" id="FPz-Wu-8yB"/>
+                            <constraint firstItem="1jq-Yi-tWJ" firstAttribute="centerY" secondItem="KkB-6m-Z9t" secondAttribute="centerY" id="T09-Nd-Mlj"/>
                             <constraint firstAttribute="trailing" secondItem="KkB-6m-Z9t" secondAttribute="trailing" constant="8" id="TMe-uy-7Cc"/>
                             <constraint firstAttribute="bottom" secondItem="AHe-Gv-aiA" secondAttribute="bottom" constant="16" id="UM0-gm-xxE"/>
                             <constraint firstAttribute="trailing" secondItem="S1Q-qz-cx6" secondAttribute="trailing" constant="41" id="WO0-68-DgK"/>
@@ -109,6 +120,7 @@
                 <outlet property="respectButton" destination="S1Q-qz-cx6" id="fC2-zY-b3T"/>
                 <outlet property="respectCountButton" destination="1fn-rd-nVF" id="ett-d9-riv"/>
                 <outlet property="respectLabel" destination="AHe-Gv-aiA" id="MMD-v9-UT8"/>
+                <outlet property="timestampLabel" destination="1jq-Yi-tWJ" id="BP2-Tb-8e2"/>
                 <outlet property="view" destination="n1a-eh-f82" id="0FU-eE-2vv"/>
             </connections>
             <point key="canvasLocation" x="402.17391304347831" y="106.47321428571428"/>

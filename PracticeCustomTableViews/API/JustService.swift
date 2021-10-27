@@ -13,7 +13,7 @@ typealias DatabaseCompletion = ((Error?, DatabaseReference) -> Void)
 struct JustService {
     static let shared = JustService()
     
-    func uploadJust(user: User, justText: String, networkId: String, friendsNetworks: Bool, networkIds: [String]?, completion: @escaping(Error?) -> Void) {
+    func uploadJust(user: User, justText: String, networks: [Network]?, friendsNetworks: Bool, completion: @escaping(Error?) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let ref = REF_USER_JUSTS.childByAutoId()
         guard let justID = ref.key else { return }
@@ -22,18 +22,18 @@ struct JustService {
         
         
         ref.updateChildValues(values)
+        print("this is the user network id : \(user.networkId)")
             REF_NETWORK_JUSTS.document(user.networkId).collection("justs").document(justID).setData(values)
             REF_NETWORK_JUSTS.document(user.networkId).collection("last-justs").document(uid).setData(values)
         
    
             if friendsNetworks == true {
-                guard let networkIds = networkIds else { return }
+                guard let networks = networks else { return }
                 print("passed the first loop guard")
-            for id in networkIds {
+            for network in networks {
                 print("in the first loop")
-                    print("adding last just to \(id)")
-                REF_NETWORK_JUSTS.document(id).collection("last-justs").document(uid).setData(values) { err in
-                    REF_NETWORK_JUSTS.document(id).collection("justs").document(justID).setData(values)
+                REF_NETWORK_JUSTS.document(network.networkID).collection("last-justs").document(uid).setData(values) { err in
+                    REF_NETWORK_JUSTS.document(network.networkID).collection("justs").document(justID).setData(values)
                 }
             }
                 completion(nil)
@@ -106,7 +106,6 @@ struct JustService {
             
         } else {
             print("adding respect to db")
-        
             REF_JUST_RESPECTS.child(just.justID).updateChildValues([uid: 1]) { error, ref in
                 if just.uid != currentUser.uid {
                     postToUserRespects(just: just, currentUser: currentUser)
@@ -157,7 +156,7 @@ struct JustService {
                                      "username": currentUser.username,
                                      "firstName": currentUser.firstName,
                                      "justID": just.justID]
-        REF_USER_RESPECTS.child(just.uid).child(uid).updateChildValues(values)
+        REF_USER_RESPECTS.child(just.uid).childByAutoId().updateChildValues(values)
     }
     
     

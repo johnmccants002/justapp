@@ -68,6 +68,7 @@ class ResultTableViewCell: UITableViewCell {
     
     func checkUserNetwork() {
         guard let status = status else { return }
+        print("This is the current status \(status)")
         switch status {
         case "Already in the Network":
             inviteButton.setTitle("In Network", for: .normal)

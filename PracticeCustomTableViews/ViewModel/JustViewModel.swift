@@ -18,15 +18,18 @@ struct JustViewModel {
     
     var timestamp: String {
         let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.second, .minute, .hour, .day, .weekOfMonth]
+        formatter.allowedUnits = [.day, .weekOfMonth]
         formatter.maximumUnitCount = 1
         let now = Date()
+        if formatter.string(from: just.timestamp, to: now) == "0" {
+            return "Today"
+        }
         return formatter.string(from: just.timestamp, to: now) ?? "2m"
     }
     
     var userInfoText: NSAttributedString {
         let title = NSMutableAttributedString(string: "\(just.firstName) \(just.lastName) ", attributes: [.font: UIFont.boldSystemFont(ofSize: 14)])
-        title.append(NSAttributedString(string: "just \(just.justText)", attributes: [.font: UIFont.systemFont(ofSize: 14)]))
+        title.append(NSAttributedString(string: "\(just.justText)", attributes: [.font: UIFont.systemFont(ofSize: 14)]))
         
         return title
     }

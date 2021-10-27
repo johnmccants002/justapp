@@ -41,6 +41,7 @@ struct UserService {
                         if username == username {
                             let user = User(uid: item.key, dictionary: dict)
                             completion(user, true)
+                            print("This is the usernames first and last name: \(user.firstName) \(user.lastName)")
                         } else {
                             completion(nil, false)
                         }

@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct Just {
+class Just {
     var justText: String
     var uid: String
     var timestamp: Date!

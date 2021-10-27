@@ -11,6 +11,12 @@ import UIKit
 class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     var currentUser: User
+    var originalImage: UIImage?
+    var newImage: UIImage? {
+        didSet {
+            saveButton.isEnabled = true
+        }
+    }
     
     private let profileImageView: UIImageView = {
         let iv = UIImageView()
@@ -24,13 +30,9 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
 
     }()
     
-//    private let cancelButton: UIBarButtonItem = {
-//        let cb = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancelButtonTapped))
-//        return cb
-//    }()
-    
-    private let saveButton: UIBarButtonItem = {
+    let saveButton: UIBarButtonItem = {
         let cb = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveButtonTapped))
+        cb.tag = 1
         return cb
     }()
     
@@ -69,13 +71,15 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("Settings View Did Load Called")
         setupStack()
         configure()
         setupUserInfo()
-        
     }
     
     func configure() {
+        self.view.isUserInteractionEnabled = true
+        self.navigationController?.navigationBar.isUserInteractionEnabled = true
         self.view.backgroundColor = .white
         self.navigationController?.delegate = self
         self.navigationItem.title = "Edit Profile"
@@ -115,11 +119,9 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         aboutTextView.anchor(top: profileImageView.bottomAnchor, left: self.view.safeAreaLayoutGuide.leftAnchor, right: self.view.safeAreaLayoutGuide.rightAnchor, paddingTop: 20, paddingLeft: 20, paddingRight: 20, height: 100)
         
         // Right Bar Button Item
-        self.navigationItem.rightBarButtonItem = saveButton
-        saveButton.isEnabled = false
-        
-        // Left Bar Button Item
-//        self.navigationItem.leftBarButtonItem = cancelButton
+        self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .save
+                                                              , target: self, action: #selector(saveButtonTapped)), animated: true)
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
         
         // Logout Button
         view.addSubview(logoutButton)
@@ -140,14 +142,27 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         
     }
     
+    
     @objc func saveButtonTapped() {
         // Firebase Function To
-        guard let profileImage = self.profileImageView.image, let aboutText = self.aboutTextView.text else { return }
-        AuthService.shared.updateUserImage(image: profileImage) { err, ref in
-            AuthService.shared.updateAboutText(aboutText: aboutText) { err, ref in
-                self.saveButton.isEnabled = false
+        print("Save Button Tapped")
+        if let newImage = newImage {
+            AuthService.shared.updateUserImage(image: newImage) { err, ref in
+                if err == nil {
+                    print("Success Saving Image")
+                }
             }
         }
+        
+        if let aboutText = self.aboutTextView.text, !aboutText.isEmpty {
+            AuthService.shared.updateAboutText(aboutText: aboutText) { err, ref in
+                if err == nil {
+                    print("Success Updating Text")
+                }
+            }
+        }
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
+        self.aboutTextView.resignFirstResponder()
         
     }
     
@@ -166,35 +181,32 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         self.present(imagePicker, animated: true, completion: nil)
         
     }
-    
- 
-    
-    
-    
-    
-    
+
 }
 
 extension SettingsController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        self.saveButton.isEnabled = true
         
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             self.profileImageView.image = pickedImage
+            self.newImage = pickedImage
+         
         }
-        picker.dismiss(animated: true, completion: nil)
+        picker.dismiss(animated: true) {
+            self.navigationItem.rightBarButtonItem?.isEnabled.toggle()
+        }
         
     }
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
+        self.newImage = nil
     }
 }
 
 extension SettingsController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
-        saveButton.isEnabled = true
-        
+        self.saveButton.isEnabled = true
     }
     
 }

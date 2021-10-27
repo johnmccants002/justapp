@@ -48,6 +48,9 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     var photoSelected = false
     var imagePicker = UIImagePickerController()
     
+    private let cache = NSCache<NSNumber, Just>()
+    private let utilityQueue = DispatchQueue.global(qos: .utility)
+    
     
     // MARK - Initializer
     
@@ -65,7 +68,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateViews()
+//        updateViews()
         fetchUserJusts()
     }
     
@@ -74,7 +77,13 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         super.viewWillAppear(animated)
         navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.isHidden = true
+        updateViews()
         
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.cache.removeAllObjects()
     }
     
     
@@ -150,6 +159,10 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         return settingsAlert
     }
     
+    func loadJust(completion: @escaping(Just?) -> ()) {
+        
+    }
+    
     
     // MARK: UICollectionView Functions
 
@@ -171,9 +184,18 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! NetworkJustCell
             
+        let itemNumber = NSNumber(value: indexPath.row)
         cell.currentUserId = currentUser.uid
         cell.delegate = self
-        cell.just = justs[indexPath.row]
+        
+        if let cachedJust = self.cache.object(forKey: itemNumber) {
+            cell.just = cachedJust
+            print("we have cachedJust")
+        } else {
+            print("we do not have cachedJust")
+            cell.just = justs[indexPath.row]
+            self.cache.setObject(justs[indexPath.row], forKey: itemNumber)
+        }
         cell.tag = indexPath.row
         
         if justs[indexPath.row].uid == currentUser.uid {
@@ -185,6 +207,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return justs.count
     }
+    
     
 }
 

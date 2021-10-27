@@ -123,6 +123,10 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         }
     }
     
+    func loadMoreJusts() {
+        
+    }
+    
     // MARK: - UICollectionViewDelegate Functions
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -131,7 +135,11 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         cell.delegate = self
         cell.imageView.isUserInteractionEnabled = true
         cell.currentUserId = self.currentUser.uid
+        cell.tag = indexPath.row
         
+        if userJusts[indexPath.row].uid == currentUser.uid {
+            cell.setupRespectButton()
+        }
         
         return cell
     }
@@ -146,6 +154,12 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         cell.delegate = self
         let tap = UIGestureRecognizer(target: self, action: #selector(cell.imageTapped))
         cell.imageView.addGestureRecognizer(tap)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if (indexPath.row == userJusts.count - 1) {
+            loadMoreJusts()
+        }
     }
 }
 

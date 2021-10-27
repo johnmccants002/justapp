@@ -39,9 +39,17 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     private var searchController: UISearchController!
     private var resultsTableController: ResultsTableViewController!
     @IBOutlet weak var invitesLabel: UILabel!
-    var networkUsers: [User]? {
+    var networkUsers: [User]?
+//        didSet {
+//            friendsTableView.reloadData()
+//        }
+   
+    
+    
+    var networks: [Network]? {
         didSet {
             friendsTableView.reloadData()
+            print("Networks set")
         }
     }
     
@@ -60,6 +68,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     var currentUserNetworkId: String?
     var invitedUsers: [User]?
     let cellSpacingHeight: CGFloat = 10
+    var networkIdArray: [String]?
     
     // MARK: - Lifecycles
     
@@ -117,9 +126,11 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         NetworkService.shared.fetchCurrentUserNetworks(currentUser: currentUser) { users in
             self.networkUsers = users
             print("These are your networks \(users)")
-            for user in users {
-                currentUser.userNetworks.append(user.networkId)
+            NetworkService.shared.checkedUncheckedNetworks(users: users, currentUser: currentUser) { networks in
+                self.networks = networks
+                print("These are the networks we got \(networks)")
             }
+       
             print("Fetch User Networks called")
         }
     }
@@ -132,7 +143,6 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
             let pushManager = PushNotificationManager(userID: user.uid)
             self.pushManager = pushManager
             print("This is the current user networkId \(user.networkId) and the uid: \(user.uid)")
-            
             if let url = user.profileImageUrl {
                 self.myImageView.sd_setImage(with: url, completed: nil) }
          else {
@@ -197,6 +207,25 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         guard let pushManager = pushManager else { return }
         pushManager.registerForPushNotifications()
     }
+    
+    func logoutButtonTapped() {
+        AuthService.shared.logoutUser()
+            self.presentLogin()
+    }
+    
+    func presentLogin() {
+        let storyboard = UIStoryboard(name: "SignUp", bundle: nil)
+        UserDefaults.standard.set(false, forKey: "isUserLoggedIn")
+        UserDefaults.standard.set("", forKey: "uid")
+        UserDefaults.standard.synchronize()
+        let loginVC = storyboard.instantiateViewController(identifier: "LoginViewController") as! LoginViewController
+        loginVC.modalPresentationStyle = .fullScreen
+        self.present(loginVC, animated: true) {
+        }
+    }
+    
+    
+    
     
 
     // MARK: - Selectors
@@ -320,6 +349,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         let destinationVC = segue.destination as! NewJustViewController
             destinationVC.currentUser = currentUser
             
+            if let networks = networks {
+                destinationVC.networks = networks
+            }
             guard let networkUsers = networkUsers else { return }
             destinationVC.networkIds = setupNetworkIds(networkUsers: networkUsers)
         }
@@ -354,7 +386,7 @@ func setupNetworkIds(networkUsers: [User]) -> [String]? {
 extension MainJustViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return networkUsers?.count ?? 1
+        return networks?.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -375,8 +407,14 @@ extension MainJustViewController: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "friends", for: indexPath) as! NetworksTableViewCell
         
-        guard let networkUsers = networkUsers else { return UITableViewCell() }
-        cell.user = networkUsers[indexPath.section]
+        
+        if let networks = networks {
+            cell.user = networks[indexPath.section].user
+            cell.network = networks[indexPath.section]
+        } else {
+            cell.user = networkUsers?[indexPath.section] ?? nil
+        }
+        
         cell.layer.borderWidth = 1
         cell.layer.shadowOpacity = 0.5
         cell.layer.cornerRadius = self.myNetworkView.layer.cornerRadius
@@ -399,6 +437,10 @@ extension MainJustViewController: UITableViewDelegate, UITableViewDataSource {
             cell.delegate = self
             self.detail = cell.friendsNameLabel.text
             cell.cellTapped(sender: gestureRecognizer)
+            if let network = cell.network {
+                NetworkService.shared.checkNetwork(network: network)
+            }
+           
         }
     }
     }
@@ -417,6 +459,7 @@ extension MainJustViewController: NetworkTableViewCellDelegate {
         guard let currentUser = currentUser else { return }
         let titleText = "\(user.firstName) \(user.lastName)'s Network"
         let controller = NetworkJustsController(currentUser: currentUser, titleText: titleText, networkId: user.networkId)
+        cell.network?.checked = 0
         navigationController?.pushViewController(controller, animated: true)
         
     }
@@ -487,20 +530,27 @@ extension MainJustViewController: UISearchBarDelegate {
             resultsController.currentUser = currentUser
             resultsController.searchController = self.searchController
             resultsController.searchDelegate = self
+            
             UserService.shared.searchUsername(username: searchText.lowercased()) { toUser, userExists in
                 print("userExists = \(userExists)")
                 
                 resultsController.userExists = userExists
-                if let toUser = toUser, toUser != nil {
+                
+                if userExists == false {
+                    resultsController.tableView.isHidden = false
+                }
+                if let toUser = toUser {
+                    print("CheckIfUsersInNetwork called")
                     NetworkService.shared.checkIfUsersInNetwork(networkId: currentUser.networkId, userId: toUser.uid) { string in
                         print("String from Firebase: \(string)")
                         resultsController.status = string
-                        
+                        resultsController.tableView.isHidden = false
+                        resultsController.toUser = toUser
                     }
-                    resultsController.toUser = toUser
+//                    resultsController.toUser = toUser
                     
                 }
-                resultsController.tableView.isHidden = false
+//                resultsController.tableView.isHidden = false
                 
             }
         }

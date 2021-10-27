@@ -20,6 +20,8 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var countLabel: UILabel!
     var networkIds: [String]?
     var currentUser: User?
+    var networks: [Network]?
+    var yourNetworkUserIds: [String]?
     
     var postButtonKeyboard: UIBarButtonItem {
         let nextButton = UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(self.postButtonPressed(_:)))
@@ -52,6 +54,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.justTextView.delegate = self
         updateViews()
         self.imagePicker.delegate = self
+        fetchCurrentUserNetworkUsers()
        
     }
     
@@ -105,8 +108,11 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
             self.widthConstraint = widthPlus
             
         }
-            alert.addAction(action)
+        
+        if let networks = networks {
             alert.addAction(action2)
+        }
+            alert.addAction(action)
         
         self.present(alert, animated: true, completion: nil)
     }
@@ -114,6 +120,14 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     func sendInfoToDB() {
         let _ : Timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.myPerformCode), userInfo: nil, repeats: false)
+    }
+    
+    func fetchCurrentUserNetworkUsers() {
+        guard let currentUser = currentUser else { return }
+        NetworkService.shared.fetchCurrentUserNetworkUsers { userIds in
+            self.yourNetworkUserIds = userIds
+            print("These are the userIds \(userIds)")
+        }
     }
     
     // MARK: - Selectors
@@ -132,18 +146,18 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     @objc func myPerformCode() {
         print(friendsNetwork)
         guard let justText = justTextView.text else { return }
-        guard let networkId = self.currentUser?.networkId else { return }
         guard let user = self.currentUser else { return }
-        if let networkIds = networkIds {
-            JustService.shared.uploadJust(user: user, justText: justText, networkId: networkId, friendsNetworks: friendsNetwork, networkIds: networkIds) { error in
+        if let networks = networks {
+            JustService.shared.uploadJust(user: user, justText: justText, networks: networks, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
+                self.uncheckNetworks()
                 self.navigationController?.popViewController(animated: true)
                 self.loadingIndicator.stopAnimating()
             }
         } else {
-            JustService.shared.uploadJust(user: user, justText: justText, networkId: networkId, friendsNetworks: friendsNetwork, networkIds: nil) { error in
+            JustService.shared.uploadJust(user: user, justText: justText, networks: nil, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
@@ -151,6 +165,20 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
                 self.loadingIndicator.stopAnimating()
             }
         }
+    }
+    
+    func uncheckNetworks() {
+       if friendsNetwork == true {
+            if let networks = networks, let yourNetworkUserIds = yourNetworkUserIds {
+                NetworkService.shared.uncheckNetworks(networks: networks, yourNetworkUserIds: yourNetworkUserIds)
+            }
+        
+       }
+        
+    }
+    
+    func fetchYourNetworkUserIds() {
+        
     }
 
 }

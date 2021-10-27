@@ -13,9 +13,12 @@ class NetworksTableViewCell: UITableViewCell {
     @IBOutlet weak var friendsNameLabel: UILabel!
     @IBOutlet weak var checkedImageView: UIImageView!
     @IBOutlet weak var friendsImageView: UIImageView!
-    var user: User? {
+    var checked: Int?
+    var user: User? 
+    var network: Network? {
         didSet {
             configure()
+            checkNetworkActivity()
         }
     }
     var delegate : NetworkTableViewCellDelegate?
@@ -36,6 +39,15 @@ class NetworksTableViewCell: UITableViewCell {
         }
         
         friendsImageView.layer.cornerRadius = friendsImageView.viewWidth / 2
+    }
+    
+    func checkNetworkActivity() {
+        guard let network = network else { return }
+        if network.checked == 1 {
+            checkedImageView.isHidden = false
+        } else if network.checked == 0 {
+            checkedImageView.isHidden = true
+        }
     }
     
     func setupImageTap() {

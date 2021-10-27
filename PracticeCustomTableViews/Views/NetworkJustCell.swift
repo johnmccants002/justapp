@@ -10,6 +10,7 @@ import UIKit
 
 class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
+    @IBOutlet weak var timestampLabel: UILabel!
     @IBOutlet weak var respectCountButton: UIButton!
     @IBOutlet weak var view: UIView!
     @IBOutlet weak var justLabel: UILabel!
@@ -42,7 +43,15 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         super.awakeFromNib()
         setupShadows()
         self.respectCountButton.isHidden = true
+        self.respectButton.isHidden = true
+        self.respectLabel.isHidden = true
 
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.just = nil
     }
     
     // MARK: - Selectors
@@ -76,6 +85,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         let viewModel = JustViewModel(just: just)
         contentView.isUserInteractionEnabled = true
         justLabel.attributedText = viewModel.userInfoText
+        timestampLabel.text = viewModel.timestamp
         
     }
     
