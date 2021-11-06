@@ -52,6 +52,7 @@ struct NetworkService {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let dict = [uid: fromUser.networkId] as [String: AnyObject]
         REF_NETWORK_INVITES.child(toUserUid).updateChildValues(dict)
+        UserService.shared.checkUncheckInvites(string: "uncheck", uid: toUserUid)
         completion()
     }
     

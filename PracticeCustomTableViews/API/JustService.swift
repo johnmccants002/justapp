@@ -109,6 +109,8 @@ struct JustService {
             REF_JUST_RESPECTS.child(just.justID).updateChildValues([uid: 1]) { error, ref in
                 if just.uid != currentUser.uid {
                     postToUserRespects(just: just, currentUser: currentUser)
+                    UserService.shared.checkUncheckRespects(string: "uncheck", uid: just.uid)
+                    
                 }
             }
             }
@@ -128,8 +130,8 @@ struct JustService {
     func fetchLastJusts(networkID: String, completion: @escaping([Just]) -> Void) {
         var lastJusts : [Just] = []
         REF_NETWORK_JUSTS.document(networkID).collection("last-justs").getDocuments { snapshot, error in
-            print(snapshot)
-            for document in snapshot!.documents {
+            guard let snapshot = snapshot else { return }
+            for document in snapshot.documents {
                 let dict = document.data() as [String: AnyObject]
                 let just = Just(justID: dict["justID"] as! String, dictionary: dict)
                 lastJusts.append(just)

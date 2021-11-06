@@ -42,10 +42,11 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         setupShadows()
-        self.respectCountButton.isHidden = true
-        self.respectButton.isHidden = true
-        self.respectLabel.isHidden = true
 
+    }
+    
+    override func layoutSubviews() {
+        self.setupRespectButton()
     }
     
     override func prepareForReuse() {
@@ -124,15 +125,18 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     @IBAction func respectButtonTapped(_ sender: UIButton) {
         guard var just = just else { return }
         if just.didRespect == false {
-            imageView.animationImages = animatedImages(for: "Fistbump")
-            imageView.animationDuration = 0.2
-            imageView.animationRepeatCount = 1
-            imageView.startAnimating()
+            self.respectButton.imageView!.animationImages = animatedImages(for: "Fistbump")
+//            imageView.animationImages = animatedImages(for: "Fistbump")
+            self.respectButton.imageView!.animationDuration = 0.2
+            self.respectButton.imageView!.animationRepeatCount = 1
+            self.respectButton.imageView!.startAnimating()
             self.respectButton.setImage(UIImage(named: "Fistbump4"), for: .normal)
+            self.respectLabel.textColor = .black
             delegate?.respectTapped(cell: self)
             self.just?.didRespect.toggle()
         } else if just.didRespect == true {
             self.respectButton.setImage(UIImage(named:"Fistbump1"), for: .normal)
+            self.respectLabel.textColor = .lightGray
             delegate?.respectTapped(cell: self)
             self.just?.didRespect.toggle()
         }
@@ -157,6 +161,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     @objc func labelTapped() {
         print("Label Tapped")
+        self.respectButtonTapped(respectButton)
     }
     
     func setupImageView() {
@@ -219,6 +224,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(respectCountTapped))
         self.respectCountButton.addGestureRecognizer(tap)
         self.respectCountButton.isUserInteractionEnabled = true
+        self.respectCountButton.setTitleColor(.black, for: .normal)
         if just.uid == currentUserId {
             print("Passed the two guards and if statement")
             JustService.shared.fetchJustRespects(just: just) { respectCount in

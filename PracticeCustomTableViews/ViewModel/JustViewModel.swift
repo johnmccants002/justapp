@@ -20,8 +20,9 @@ struct JustViewModel {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.day, .weekOfMonth]
         formatter.maximumUnitCount = 1
+        
         let now = Date()
-        if formatter.string(from: just.timestamp, to: now) == "0" {
+        if formatter.string(from: just.timestamp, to: now) == "0d" {
             return "Today"
         }
         return formatter.string(from: just.timestamp, to: now) ?? "2m"

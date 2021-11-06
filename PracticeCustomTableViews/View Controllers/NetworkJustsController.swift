@@ -43,6 +43,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         super.viewDidLoad()
         fetchLastJusts()
         updateViews()
+        addObservers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -90,6 +91,14 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         }
     }
     
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadNetworkJusts), name: NSNotification.Name.init("reloadNetworkJusts"), object: nil)
+    }
+    
+    @objc func reloadNetworkJusts() {
+        fetchLastJusts()
+    }
+    
     // MARK: - Firebase Functions
     
     func fetchLastJusts() {
@@ -101,12 +110,20 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     }
     
     func checkIfUserRespectedJusts(justs: [Just]) {
+        let myGroup = DispatchGroup()
         for (index, just) in justs.enumerated() {
+            myGroup.enter()
             JustService.shared.checkIfUserRespected(just: just) {
                 didRespect in
+                myGroup.leave()
                 guard didRespect == true else { return }
                 self.lastJusts[index].didRespect = true
+                
             }
+            
+        }
+        myGroup.notify(queue: .main) {
+            self.collectionView.reloadData()
         }
     }
     
@@ -127,9 +144,9 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
         
-        if lastJusts[indexPath.row].uid == currentUser.uid {
-            cell.setupRespectButton()
-        }
+//        if lastJusts[indexPath.row].uid == currentUser.uid {
+//            cell.setupRespectCountButton()
+//        }
         
         
         return cell
@@ -147,7 +164,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         let titleText = "\(just.firstName) \(just.lastName)"
         let userUid = just.uid
         let controller = UserJustsController(currentUser: currentUser, userUid: userUid, titleText: titleText, networkId: networkId)
-        
+        controller.lastJust = just
         navigationController?.pushViewController(controller, animated: true)
     }
     
@@ -165,7 +182,13 @@ extension NetworkJustsController: UICollectionViewDelegateFlowLayout {
 
 extension NetworkJustsController: NetworkJustCellDelegate {
     func respectCountTapped(cell: NetworkJustCell) {
+        guard let just = cell.just else { return }
+        let controller = RespectedByViewController(just: just, currentUser: currentUser)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+
+        self.navigationController?.pushViewController(controller, animated: true)
     }
+
     
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }

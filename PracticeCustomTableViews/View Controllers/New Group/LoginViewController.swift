@@ -25,6 +25,7 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
+        self.hideKeyboardWhenTappedAround()
         // Do any additional setup after loading the view.
     }
     
@@ -46,6 +47,8 @@ class LoginViewController: UIViewController {
     
     func updateViews() {
         self.loadingIndicator.isHidden = true
+        self.emailTextField.autocorrectionType = .no
+        self.passwordTextField.autocorrectionType = .no
     }
     
     func sendInfoToDB(email: String, password: String) {

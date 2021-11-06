@@ -20,7 +20,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         
-        FirebaseApp.configure()
+//        FirebaseApp.configure()
+        let options = FirebaseOptions(googleAppID: "1:155572442941:ios:b1be7105ca3a0001e79754", gcmSenderID: "155572442941")
+        options.bundleID = "com.john.JustAppBeta"
+        options.apiKey = "AIzaSyAUW3uulJnJu626EMzYHHgAPNzlKmXFxOU"
+        options.projectID = "justapp-e9937"
+        options.clientID = "155572442941-qhvlsf6bjut13j8oca5je9gjkpg95uob.apps.googleusercontent.com"
+        FirebaseApp.configure(options: options)
 
         
         return true
@@ -61,6 +67,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
       didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         print("APNs token retrieved: \(deviceToken)")
+        guard var apnsToken = Messaging.messaging().apnsToken else { return }
+        apnsToken = deviceToken
+        print("This is the token: \(apnsToken)")
     }
     
     func application(

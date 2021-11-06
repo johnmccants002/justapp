@@ -28,6 +28,8 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
             collectionView.reloadData()
         }
     }
+    
+    var lastJust : Just?
     var titleText: String
     let userUid: String
     let justNibName = "NetworkJustCell"
@@ -114,15 +116,20 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
     }
     
     func checkIfUserRespectedJusts(justs: [Just]) {
+        let myGroup = DispatchGroup()
         for (index, just) in justs.enumerated() {
+            myGroup.enter()
             JustService.shared.checkIfUserRespected(just: just) {
                 didRespect in
+                myGroup.leave()
                 guard didRespect == true else { return }
                 self.userJusts[index].didRespect = true
             }
         }
+        myGroup.notify(queue: .main) {
+            self.collectionView.reloadData()
+        }
     }
-    
     func loadMoreJusts() {
         
     }
@@ -178,7 +185,13 @@ extension UserJustsController: UICollectionViewDelegateFlowLayout {
 
 extension UserJustsController: NetworkJustCellDelegate {
     func respectCountTapped(cell: NetworkJustCell) {
+        guard let just = cell.just else { return }
+        let controller = RespectedByViewController(just: just, currentUser: currentUser)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+
+        self.navigationController?.pushViewController(controller, animated: true)
     }
+
     
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
@@ -202,8 +215,15 @@ extension UserJustsController: NetworkJustCellDelegate {
     
     func respectTapped(cell: NetworkJustCell) {
         let title = "New Respect"
+        
+       
         let body = "\(currentUser.firstName) \(currentUser.lastName) respected your just."
         guard var just = cell.just else { return }
+        if let lastJust = lastJust {
+            if lastJust.justID == just.justID {
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadNetworkJusts"), object: nil)
+            }
+        }
         JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
             guard let token = cell.token else { return }
             PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body)

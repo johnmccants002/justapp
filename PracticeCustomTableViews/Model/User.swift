@@ -8,7 +8,6 @@
 import Foundation
 import Firebase
 
-
 struct User {
     var username: String
     var email: String
@@ -24,6 +23,8 @@ struct User {
     var respectCount: Int = 0
     var inviteCount: Int = 0
     var changedImage: Bool = false
+    var twitterUsername: String?
+    var instagramUsername: String?
     
     init(uid: String, dictionary: [String: Any]) {
         self.uid = uid
@@ -35,6 +36,8 @@ struct User {
         self.networkId = dictionary["networkID"] as? String ?? ""
         self.respectCount = dictionary["respectCount"] as? Int ?? 0
         self.inviteCount = dictionary["inviteCount"] as? Int ?? 0
+        self.instagramUsername = dictionary["instagram"] as? String ?? ""
+        self.twitterUsername = dictionary["twitter"] as? String ?? ""
         
         
         if let profileImageUrl = dictionary["profileImageUrl"] as? String {

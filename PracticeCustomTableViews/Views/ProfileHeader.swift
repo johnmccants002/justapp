@@ -8,14 +8,13 @@
 import Foundation
 import UIKit
 import Firebase
+import ImageViewer_swift
 
 protocol ProfileHeaderDelegate: AnyObject {
+
+    func imageViewTapped(_ header: ProfileHeader, url: URL)
     func handleSettingsTapped(_ header: ProfileHeader)
     func handleBackTapped(_ header: ProfileHeader)
-    func handleDoneTapped(_ header: ProfileHeader, bioText: String?, newImage: UIImage?)
-    func handleEditTapped(_ header: ProfileHeader)
-    func handleLogout(_ header: ProfileHeader)
-    func imageViewTapped(_ header: ProfileHeader)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -33,21 +32,11 @@ class ProfileHeader: UICollectionReusableView {
             if isUser == false {
                 editProfileButton.isHidden = false
             }
+        
         }
     }
-    var pickedImage: UIImage? {
-        didSet {
-            print("pickedImage set")
-            setPickedImage()
-        }
-    }
-    var photoSelected: Bool = false
-    var editMode: Bool? {
-        didSet {
-            configureEditMode()
-        }
-    }
-    var pickerDelegate: UIImagePickerControllerDelegate?
+
+
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -79,7 +68,7 @@ class ProfileHeader: UICollectionReusableView {
     
     lazy var editProfileButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Loading", for: .normal)
+        button.setTitle("Settings", for: .normal)
         button.layer.borderColor = UIColor.blue.cgColor
         button.layer.borderWidth = 1.25
         button.setTitleColor(.blue, for: .normal)
@@ -90,13 +79,31 @@ class ProfileHeader: UICollectionReusableView {
         return button
     }()
     
-    lazy var editProfileImageButton: UIButton = {
+    let viewProfileImageButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "addPhoto"), for: .normal)
-        button.addTarget(self, action: #selector(editProfileImageTapped), for: .touchUpInside)
-        button.layer.opacity = 0.5
-        button.imageView?.layer.opacity = 0.5
-        button.isHidden = true
+        return button
+    }()
+    
+    var instagramButton : UIButton = {
+        var button = UIButton()
+        button.backgroundColor = .white
+        button.layer.borderWidth = 0.75
+        button.layer.borderColor = UIColor.blue.cgColor
+        button.setTitle("Instagram", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(instagramButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    var twitterButton: UIButton = {
+        var button = UIButton()
+        button.backgroundColor = .white
+        button.layer.borderWidth = 0.75
+        button.layer.borderColor = UIColor.blue.cgColor
+        button.setTitle("Twitter", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(twitterButtonTapped), for: .touchUpInside)
+        
         return button
     }()
     
@@ -107,11 +114,16 @@ class ProfileHeader: UICollectionReusableView {
         fullnameLabel.text = "\(user.firstName) \(user.lastName)"
         usernameLabel.text = "@" + user.username
         biotTextView.text = self.user?.aboutText
-        if let pickedImage = pickedImage {
-            self.profileImageView.image = pickedImage
-        } else {
-            setProperImage()
+        if let url = user.profileImageUrl {
+            profileImageView.sd_setImage(with: url, completed: nil)
+            if isUser == true {
+                profileImageView.setupImageViewer()
+            }
         }
+        
+        setupSocialButtons(user: user)
+       
+        
         print("User is \(user.username)")
     }
     
@@ -150,26 +162,8 @@ class ProfileHeader: UICollectionReusableView {
         
     }
     
-    func configureEditMode() {
-        editProfileButton.isHidden = false
-        if editMode == false {
-        editProfileButton.setTitle("Settings", for: .normal)
-            editProfileImageButton.isHidden = true
-            print("Edit mode false in profile header configure")
-        } else if editMode == true {
-            print("Edit mode true in profile header configure")
-        enterEditMode()
-        }
-        
-//        if let pickedImage = pickedImage {
-//            profileImageView.image = pickedImage
-//        }
-    }
-    
-    func setPickedImage() {
-        guard let pickedImage = pickedImage else { return }
-        self.profileImageView.image = pickedImage
-    }
+
+
     
     private let fullnameLabel: UILabel = {
         let label = UILabel()
@@ -192,47 +186,64 @@ class ProfileHeader: UICollectionReusableView {
         return attributedTitle
     }
     
-    @objc func editProfileImageTapped() {
-        delegate?.imageViewTapped(self)
-        print("editProfileButtonTapped")
+    @objc func imageViewTapped() {
+        guard let url = user?.profileImageUrl else { return }
+        delegate?.imageViewTapped(self, url: url)
+        print("imageviewtapped")
+        
     }
     
     @objc func handleSettingsTapped() {
         delegate?.handleSettingsTapped(self)
-//        print("editProfileButtonTapped")
-//        if editProfileButton.title(for: .normal) == "Done" {
-//            print("editProfileButton == Done")
-//            self.editProfileImageButton.isHidden = true
-//            self.editProfileButton.setTitle("Settings", for: .normal)
-//            self.updateAboutText()
-//            self.biotTextView.isEditable = false
-//            delegate?.handleDoneTapped(self, bioText: biotTextView.text, newImage: pickedImage)
-//
-//
-//        } else if editProfileButton.title(for: .normal) == "Settings" {
-//            delegate?.handleSettingsTapped(self)
-//
-//        }
             
     }
     
     @objc func handleBackTapped() {
         delegate?.handleBackTapped(self)
     }
+
     
-    @objc func handleDoneTapped() {
-        updateAboutText()
-        markChangedImage()
-       
+    @objc func twitterButtonTapped() {
+        guard let user = user, let twitterUsername = user.twitterUsername else { return }
+        let appURL = URL(string: "twitter://user?screen_name=\(twitterUsername)")!
+                let application = UIApplication.shared
+                
+                if application.canOpenURL(appURL)
+                {
+                    application.open(appURL)
+                }
+                else
+                {
+                    let webURL = URL(string: "https://twitter.com/\(twitterUsername)")!
+                    application.open(webURL)
+                }
+    }
+    
+    @objc func instagramButtonTapped() {
+        print("Instagram button tapped")
+        guard let user = user, let instagramUsername = user.instagramUsername else { return }
+        let appURL = URL(string: "instagram://user?username=\(instagramUsername)")!
+                let application = UIApplication.shared
+                
+                if application.canOpenURL(appURL)
+                {
+                    application.open(appURL)
+                }
+                else
+                {
+                    let webURL = URL(string: "https://instagram.com/\(instagramUsername)")!
+                    application.open(webURL)
+                }
+        
     }
     
     var biotTextView : UITextView = {
-        let label = UITextView()
-        label.font = UIFont.systemFont(ofSize: 16)
-//        label.numberOfLines = 3
-        label.isEditable = false
+        let tv = UITextView()
+        tv.font = UIFont.systemFont(ofSize: 16)
+        tv.isEditable = false
+        tv.isScrollEnabled = false
     
-        return label
+        return tv
     }()
     
     private let underLineView: UIView = {
@@ -244,24 +255,24 @@ class ProfileHeader: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.biotTextView.delegate = self
-        
+        self.isUserInteractionEnabled = true
         addSubview(containerView)
         containerView.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 108)
-        
+        containerView.isUserInteractionEnabled = true
         addSubview(profileImageView)
         profileImageView.anchor(top: containerView.bottomAnchor, paddingTop: -24)
         profileImageView.centerX(inView: self)
         profileImageView.setDimensions(width: 120, height: 120)
         profileImageView.layer.cornerRadius = 120/2
         
-        addSubview(editProfileImageButton)
-        editProfileImageButton.centerX(inView: profileImageView)
-        editProfileImageButton.centerY(inView: profileImageView)
-        editProfileImageButton.setDimensions(width: 80, height: 80)
-        editProfileImageButton.layer.cornerRadius = 80/2
-//        editProfileImageButton.isHidden = true
-        
+
+//        self.addSubview(viewProfileImageButton)
+//        viewProfileImageButton.anchor(top: containerView.bottomAnchor, paddingTop: -24)
+//        viewProfileImageButton.centerX(inView: self)
+//        viewProfileImageButton.setDimensions(width: 120, height: 120)
+//        viewProfileImageButton.layer.cornerRadius = 120/2
+//        viewProfileImageButton.isUserInteractionEnabled = true
+//        viewProfileImageButton.addTarget(self, action: #selector(imageViewTapped), for: .touchUpInside)
         
         let userDetailsStack = UIStackView(arrangedSubviews: [fullnameLabel, usernameLabel, biotTextView])
         userDetailsStack.axis = .vertical
@@ -281,37 +292,66 @@ class ProfileHeader: UICollectionReusableView {
         editProfileButton.anchor(top: containerView.bottomAnchor, left: leftAnchor, paddingTop: 12, paddingLeft: 20)
         editProfileButton.setDimensions(width: 80, height: 36)
         editProfileButton.layer.cornerRadius = 36/2
-     
-//        
-//        addSubview(underLineView)
-//        underLineView.anchor(top: userDetailsStack.bottomAnchor, left: leftAnchor, width: frame.width / 3, height: 2)
+        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        instagramButton.setRoundedView()
+        twitterButton.setRoundedView()
+        self.isUserInteractionEnabled = true
+        self.containerView.isUserInteractionEnabled = true
+        self.profileImageView.isUserInteractionEnabled = true
+        
+    }
+    
+ 
+    
     func setupBioTextView() {
         guard let bioText = biotTextView.text else { return }
         self.user?.aboutText = bioText
     }
-    
-    func enterEditMode() {
-        editProfileImageButton.isHidden = false
-        editProfileImageButton.isUserInteractionEnabled = true
-        biotTextView.isEditable = true
-        self.editProfileButton.setTitle("Done", for: .normal)
-        guard let pickedImage = pickedImage else {
-            return
-        }
-        self.profileImageView.image = pickedImage
 
+    func setupSocialButtons(user: User) {
+            if user.instagramUsername != "" && user.twitterUsername != "" {
+                setupBothSocialButtons()
+            } else if user.instagramUsername != "" && user.twitterUsername == "" {
+                setupInstagramButton()
+            } else if user.instagramUsername == "" && user.twitterUsername != "" {
+                setupTwitterButton()
+            }
+        
+   
+    }
+    
+    func setupBothSocialButtons() {
+        self.addSubview(instagramButton)
+        instagramButton.anchor(top: biotTextView.bottomAnchor, left: self.leftAnchor, right: self.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20, height: 40)
+        self.addSubview(twitterButton)
+        
+        instagramButton.titleLabel?.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
+        twitterButton.anchor(top: instagramButton.bottomAnchor, left: self.leftAnchor, right: self.rightAnchor, paddingTop: 10, paddingLeft: 20, paddingRight: 20, height: 40)
+        twitterButton.titleLabel?.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
+    }
+    
+    func setupInstagramButton() {
+        self.addSubview(instagramButton)
+        instagramButton.anchor(top: biotTextView.bottomAnchor, left: self.leftAnchor, right: self.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20, height: 40)
+        instagramButton.titleLabel?.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
+        
+    }
+    
+    func setupTwitterButton() {
+        self.addSubview(twitterButton)
+        twitterButton.anchor(top: biotTextView.bottomAnchor, left: self.leftAnchor, right: self.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20, height: 40)
+        twitterButton.titleLabel?.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
     }
     
 }
 
-extension ProfileHeader: UITextViewDelegate {
-    func textViewDidChange(_ textView: UITextView) {
-        self.biotTextView.text = textView.text
-    }
-}
+

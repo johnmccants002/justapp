@@ -98,4 +98,58 @@ struct UserService {
         
     }
     
+    func checkUncheckInvites(string: String, uid: String) {
+        if string == "check" {
+            REF_CHECKED_INVITES.child(uid).setValue(true)
+            
+        } else if string == "uncheck" {
+            REF_CHECKED_INVITES.child(uid).setValue(false)
+        }
+        
+    }
+    
+    func checkUncheckRespects(string: String, uid: String) {
+        if string == "check" {
+            REF_CHECKED_RESPECT.child(uid).setValue(true)
+        } else if string == "uncheck" {
+            REF_CHECKED_RESPECT.child(uid).setValue(false)
+        }
+        
+    }
+    
+    func fetchCheckedRespect(uid: String, completion: @escaping(String) -> Void) {
+        REF_CHECKED_RESPECT.child(uid).observeSingleEvent(of: .value) { snapshot in
+            let value = snapshot.value as? Bool
+            
+            if value == false {
+                completion("New Respects!")
+            } else if value == true {
+                completion("Respects")
+            }
+        }
+        
+    }
+    
+    func fetchCheckedInvites(uid: String, completion: @escaping(String) -> Void) {
+        REF_CHECKED_INVITES.child(uid).observeSingleEvent(of: .value) { snapshot in
+            let value = snapshot.value as? Bool
+            
+            if value == false {
+                completion("New Invites!")
+            } else if value == true {
+                completion("Invites")
+            }
+        }
+        
+    }
+    
+    func fetchTotalRespect(uid: String, completion:@escaping(String) -> Void) {
+        REF_USER_RESPECTS.child(uid).observeSingleEvent(of: .value) { snapshot in
+            let count = snapshot.childrenCount
+            
+            let countString = "\(count)"
+            completion(countString)
+        }
+    }
+    
 }

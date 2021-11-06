@@ -37,14 +37,17 @@ struct AuthService {
                     if let error = error {
                         print("DEBUG: Error creating user: \(error)")
                     }
+                    print("in create user firebase function")
                     guard let uid = result?.user.uid else { return }
                     let network = REF_USERS.child(uid).childByAutoId()
                     guard let networkID = network.key else { return }
+                    print("passed networkID guard statement")
                     let values = ["email": email, "username": username, "firstName": firstName, "lastName": lastName,  "networkID": networkID, "aboutText": aboutText]
                     
                     REF_USERS.child(uid).updateChildValues(values) { err, ref in
-                        
+                        completion(err, ref)
                     }
+                    
  
                 }
     }
@@ -81,6 +84,19 @@ struct AuthService {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         REF_USERS.child(uid).updateChildValues(["aboutText": aboutText])
+    }
+    
+    func updateTwitterUsername(username: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        REF_USERS.child(uid).updateChildValues(["twitter": username])
+        
+    }
+    
+    func updateInstagramUsername(username: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        REF_USERS.child(uid).updateChildValues(["instagram": username])
     }
     
     func checkIfUsernameExists(username: String, completion: @escaping(Int) -> Void) {

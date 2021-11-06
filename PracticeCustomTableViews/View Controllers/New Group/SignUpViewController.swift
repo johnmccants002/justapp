@@ -68,6 +68,7 @@ class SignUpViewController: UIViewController {
         keyboardToolbar.items = [nextButton]
         keyboardToolbar.layer.borderWidth = 1
         keyboardToolbar.layer.borderColor = UIColor.black.cgColor
+        self.signUpTextField.autocorrectionType = .no
         self.signUpTextField.inputAccessoryView = keyboardToolbar
         self.nextButton = nextButton
     }
@@ -165,6 +166,7 @@ class SignUpViewController: UIViewController {
     
     func createUser() {
         guard let email = emailString, let username = usernameString, let firstName = firstNameString, let lastName = lastNameString, let password = passwordString else { return }
+        print("passed the guard to create a user")
         let credentials = AuthCredentials(email: email, password: password, username: username, firstName: firstName, lastName: lastName)
         AuthService.shared.registerUser(credentials: credentials) { error, ref in
             UserDefaults.standard.set(true, forKey: "isUserLoggedIn")

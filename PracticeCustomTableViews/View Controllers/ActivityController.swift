@@ -18,7 +18,7 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         }
     }
     let inviteNib : String = "InviteCell"
-    
+    var loadingIndicator = UIActivityIndicatorView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +27,7 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         collectionView.register(nib, forCellWithReuseIdentifier: "inviteCell")
      
         updateViews()
+        setupLoadingIndicator()
         
     }
     
@@ -39,6 +40,16 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupLoadingIndicator() {
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.isHidden = true
+        
+        self.view.addSubview(loadingIndicator)
+        loadingIndicator.centerX(inView: self.view)
+        loadingIndicator.centerY(inView: self.view)
+        
     }
     
     func updateViews() {
@@ -119,16 +130,20 @@ extension ActivityController: UICollectionViewDelegateFlowLayout {
 
 extension ActivityController: InviteCellDelegate {
     func acceptButtonTapped(cell: InviteCell) {
+        loadingIndicator.startAnimating()
         guard let user = cell.user else { return }
-        NetworkService.shared.handleInvite(user: user, choice: true, currentUser: currentUser) { error, ref in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            NetworkService.shared.handleInvite(user: user, choice: true, currentUser: self.currentUser) { error, ref in
+                self.loadingIndicator.stopAnimating()
             if let error = error {
                 print("DEBUG Accepting Invite Error: \(error)")
             }
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
             guard let token = cell.token else { return }
             PushNotificationSender.shared.sendPushNotification(to: token, title: "Your network", body: "\(self.currentUser.username) accepted your invite!")
             self.collectionView.reloadData()
             self.removeCell(sender: cell.acceptButton)
-            NotificationCenter.default.post(name: .shouldRefetchNetworks, object: nil)
+        }
         }
     }
     

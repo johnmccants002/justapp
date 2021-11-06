@@ -29,7 +29,6 @@
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TUL-Qj-pH6">
                                 <rect key="frame" x="59" y="21" width="197" height="30"/>
-                                <state key="normal" title="Button"/>
                                 <connections>
                                     <action selector="userButtonTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="kv8-bL-QlS"/>
                                 </connections>

@@ -14,6 +14,7 @@ target 'PracticeCustomTableViews' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
+  pod 'ImageViewer.swift', '~> 3.0'
 
 
 end

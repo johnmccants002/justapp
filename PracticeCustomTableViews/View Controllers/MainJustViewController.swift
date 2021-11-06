@@ -30,6 +30,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     var pushManager : PushNotificationManager? {
         didSet {
             self.registerForPushNotifications()
+            print(Messaging.messaging().fcmToken)
         }
     }
     @IBOutlet weak var respectLabel: UILabel!
@@ -57,6 +58,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     var currentUser : User? {
         didSet {
             self.fetchUserNetworks()
+            self.checkedUncheckedActivity()
             print("This is Current User UID: \(currentUser?.uid)")
            
         }
@@ -80,7 +82,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         setUpViewGestureRecognizer()
         fetchUser()
         getNotificationSettings()
+        addObservers()
 
+        
     }
     
     
@@ -193,6 +197,29 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         self.respectLabel.text = "Respects"
     }
     
+    func checkedUncheckedActivity() {
+        guard let uid = currentUser?.uid else { return }
+        UserService.shared.fetchCheckedRespect(uid: uid) { respectString in
+            self.respectLabel.text = respectString
+            if respectString == "New Respects!" {
+                self.respectLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 14)
+            } else {
+                self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+            }
+            
+        }
+        
+        UserService.shared.fetchCheckedInvites(uid: uid) { invitesString in
+            self.invitesLabel.text = invitesString
+            if invitesString == "New Invites!" {
+                self.invitesLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 14)
+            } else {
+                self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+            }
+            
+        }
+    }
+    
     func getNotificationSettings() {
       UNUserNotificationCenter.current().getNotificationSettings { settings in
         print("Notification settings: \(settings)")
@@ -224,6 +251,14 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         }
     }
     
+    func addObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(refetchUser), name: NSNotification.Name.init(rawValue: "refetchUser"), object: nil)
+    }
+    
+    @objc func refetchUser() {
+        fetchUser()
+    }
+    
     
     
     
@@ -232,6 +267,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         
     @objc func handleInvitesTapped() {
         guard let user = self.currentUser else { return }
+        UserService.shared.checkUncheckInvites(string: "check", uid: user.uid)
+        self.invitesLabel.text = "Invites"
+        self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
         let controller = ActivityController(currentUser: user)
         let nav = UINavigationController(rootViewController: controller)
         nav.modalPresentationStyle = .fullScreen
@@ -241,6 +279,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     
     @objc func handleRespectsTapped() {
         guard let user = self.currentUser else { return }
+        UserService.shared.checkUncheckRespects(string: "check", uid: user.uid)
+        self.respectLabel.text = "Respects"
+        self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
         let controller = ActivityRespectController(currentUser: user)
         let nav = UINavigationController(rootViewController: controller)
         nav.modalPresentationStyle = .fullScreen

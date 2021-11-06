@@ -17,6 +17,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             saveButton.isEnabled = true
         }
     }
+    var loadingIndicator = UIActivityIndicatorView()
     
     private let profileImageView: UIImageView = {
         let iv = UIImageView()
@@ -46,6 +47,40 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         return tv
     }()
     
+    private let instagramLabel: UILabel = {
+       let lb = UILabel()
+        lb.text = "Instagram"
+        lb.font = UIFont(name: "Helvetica-Medium", size: 14)
+    
+        return lb
+    }()
+    
+    private let instagramTextField: UITextField = {
+        let tf = UITextField()
+        tf.font = UIFont(name: "Helvetica-Medium", size: 14)
+        tf.autocorrectionType = .no
+        tf.placeholder = "Instagram Username"
+        tf.borderStyle = .roundedRect
+        
+        return tf
+    }()
+    
+    private let twitterLabel: UILabel = {
+        let lb = UILabel()
+        lb.text = "Twitter"
+        lb.font = UIFont(name: "Helvetica-Medium", size: 14)
+        return lb
+    }()
+    
+    private let twitterTextField: UITextField = {
+        let tf = UITextField()
+        tf.font = UIFont(name: "Helvetica-Medium", size: 14)
+        tf.autocorrectionType = .no
+        tf.placeholder = "Twitter Username"
+        tf.borderStyle = .roundedRect
+        return tf
+    }()
+    
     private let logoutButton: UIButton = {
         let lb = UIButton()
         lb.setTitle("Logout", for: .normal)
@@ -54,7 +89,6 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         lb.layer.cornerRadius = lb.viewWidth / 2
         lb.layer.backgroundColor = UIColor.systemRed.cgColor
         lb.setTitleColor(UIColor.white, for: .normal)
-        
         return lb
     }()
     
@@ -75,6 +109,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         setupStack()
         configure()
         setupUserInfo()
+        loadingIndicator.hidesWhenStopped = true
+        self.hideKeyboardWhenTappedAround()
     }
     
     func configure() {
@@ -85,7 +121,9 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         self.navigationItem.title = "Edit Profile"
         self.view.isUserInteractionEnabled = true
         self.aboutTextView.delegate = self
+        self.aboutTextView.autocorrectionType = .no
         self.imagePicker.delegate = self
+        self.imagePicker.allowsEditing = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.profileImageViewTapped))
         self.profileImageView.addGestureRecognizer(tap)
         self.navigationController?.navigationBar.isHidden = false
@@ -127,7 +165,30 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         view.addSubview(logoutButton)
         logoutButton.anchor(left: self.view.safeAreaLayoutGuide.leftAnchor, bottom: self.view.bottomAnchor, right: self.view.safeAreaLayoutGuide.rightAnchor, paddingLeft: 20, paddingBottom: 40, paddingRight: 20, height: 40)
         
+        setupLabelsTextFields()
         
+        view.addSubview(loadingIndicator)
+        loadingIndicator.isHidden = true
+        loadingIndicator.centerX(inView: self.view)
+        loadingIndicator.centerY(inView: self.view)
+        
+    }
+    
+    func setupLabelsTextFields() {
+        twitterTextField.delegate = self
+        instagramTextField.delegate = self
+        if currentUser.twitterUsername != "" {
+            twitterTextField.text = currentUser.twitterUsername
+        }
+        if currentUser.instagramUsername != "" {
+            instagramTextField.text = currentUser.instagramUsername
+        }
+        let stack = UIStackView(arrangedSubviews: [instagramLabel, instagramTextField, twitterLabel, twitterTextField])
+        view.addSubview(stack)
+        stack.spacing = 5
+        stack.axis = .vertical
+        stack.distribution = .fillEqually
+        stack.anchor(top: self.aboutTextView.bottomAnchor, left: self.view.leftAnchor, right: self.view.rightAnchor, paddingTop: 20, paddingLeft: 20, paddingRight: 20)
     }
     
     func presentLogin() {
@@ -146,10 +207,14 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     @objc func saveButtonTapped() {
         // Firebase Function To
         print("Save Button Tapped")
+        loadingIndicator.isHidden = false
+        loadingIndicator.startAnimating()
         if let newImage = newImage {
             AuthService.shared.updateUserImage(image: newImage) { err, ref in
                 if err == nil {
                     print("Success Saving Image")
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
+                    print("Refetch User called")
                 }
             }
         }
@@ -161,6 +226,22 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
                 }
             }
         }
+        
+        if let instagramUsername = self.instagramTextField.text, !instagramUsername.isEmpty {
+            AuthService.shared.updateInstagramUsername(username: instagramUsername.lowercased())
+        }
+        
+        if let twitterUsername = self.twitterTextField.text, !twitterUsername.isEmpty {
+            AuthService.shared.updateTwitterUsername(username: twitterUsername.lowercased())
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchCurrentUser"), object: nil)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
+            self.loadingIndicator.stopAnimating()
+        }
+        
+        
         self.navigationItem.rightBarButtonItem?.isEnabled = false
         self.aboutTextView.resignFirstResponder()
         
@@ -181,7 +262,12 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         self.present(imagePicker, animated: true, completion: nil)
         
     }
-
+    
+    @objc func updateObserver() {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchCurrentUser"), object: nil)
+        loadingIndicator.stopAnimating()
+       
+    }
 }
 
 extension SettingsController: UIImagePickerControllerDelegate {
@@ -193,7 +279,7 @@ extension SettingsController: UIImagePickerControllerDelegate {
          
         }
         picker.dismiss(animated: true) {
-            self.navigationItem.rightBarButtonItem?.isEnabled.toggle()
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
         }
         
     }
@@ -206,7 +292,53 @@ extension SettingsController: UIImagePickerControllerDelegate {
 extension SettingsController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
-        self.saveButton.isEnabled = true
+        self.navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        var newText = textView.text!
+        newText.removeAll { (character) -> Bool in
+            return character == " " || character == "\n"
+        }
+
+        return (newText.count + text.count) <= 140
+    }
+    
+}
+
+extension SettingsController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        self.navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            
+            let maxLength : Int
+            
+            if textField == instagramTextField{
+                maxLength = 30
+                let currentString: NSString = textField.text! as NSString
+                
+                let newString: NSString =  currentString.replacingCharacters(in: range, with: string) as NSString
+                return newString.length <= maxLength
+            } else if textField == twitterTextField{
+                maxLength = 15
+                let currentString: NSString = textField.text! as NSString
+                
+                let newString: NSString =  currentString.replacingCharacters(in: range, with: string) as NSString
+                return newString.length <= maxLength
+            } else {
+                
+            maxLength = 40
+        
+        let currentString: NSString = textField.text! as NSString
+        
+        let newString: NSString =  currentString.replacingCharacters(in: range, with: string) as NSString
+        return newString.length <= maxLength
+            
+            }
+        }
+    
+   
 }

@@ -24,5 +24,7 @@ let REF_USER_RESPECTS = DB_REF.child("user-respects")
 let REF_JUST_RESPECTS = DB_REF.child("just-respects")
 //let REF_USER_NETWORKS = DB_REF.child("user-networks")
 let REF_NETWORK_DETAILS = DB_REF.child("network-details")
+let REF_CHECKED_RESPECT = DB_REF.child("checked-respect")
+let REF_CHECKED_INVITES = DB_REF.child("checked-invites")
 
 

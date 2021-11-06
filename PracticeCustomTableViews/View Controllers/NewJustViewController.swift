@@ -72,6 +72,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.justTextView.autocapitalizationType = .none
         self.justTextView.isScrollEnabled = false
         self.justTextView.inputAccessoryView = keyboardToolBar
+        self.justTextView.autocorrectionType = .no
         self.keyboardToolBar.isHidden = true
       
     }

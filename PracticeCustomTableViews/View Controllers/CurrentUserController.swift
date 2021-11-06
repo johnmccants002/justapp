@@ -7,50 +7,72 @@
 
 import Foundation
 import UIKit
+import QuickLook
 
 private let reuseIdentifier = "networkJustCell"
 private let headerIdentifier = "ProfileHeader"
 
-class CurrentUserController: UICollectionViewController, UINavigationControllerDelegate {
+class CurrentUserController: UICollectionViewController, UINavigationControllerDelegate, QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        1
+    }
+    
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        guard let url = previewURL else { return fatalError() as! QLPreviewItem }
+        
+        return url as QLPreviewItem
+    }
+    
     
     // MARK - Properties
+    
+    
     
     var currentUser: User {
         didSet {
             collectionView.reloadData()
+            print("Current user didset called")
         }
     }
+    
+    var previewURL: URL?
     var justs = [Just]() {
         didSet {
             collectionView.reloadData()
         }
     }
     let justNibName = "NetworkJustCell"
-    var editMode : Bool = false {
-        didSet {
-            collectionView.reloadData()
-            print("just set editMode to true")
-        }
-    }
-    var pickedImage: UIImage? {
-        didSet {
-            collectionView.reloadData()
-        }
-    }
+
     
     var user: User? {
         didSet {
             collectionView.reloadData()
         }
     }
-    var isUser: Bool?
-    
-    var photoSelected = false
-    var imagePicker = UIImagePickerController()
+    var isUser: Bool
     
     private let cache = NSCache<NSNumber, Just>()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
     
+    var instagramButton : UIButton = {
+        var button = UIButton()
+        button.backgroundColor = .brown
+        button.setTitle("Instagram", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.addTarget(self, action: #selector(instagramButtonTapped), for: .touchUpInside)
+//        button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
+        return button
+    }()
+    
+    var twitterButton: UIButton = {
+        var button = UIButton()
+        button.backgroundColor = .twitterBlue
+        button.setTitle("Twitter", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.addTarget(self, action: #selector(twitterButtonTapped), for: .touchUpInside)
+        
+        return button
+    }()
     
     // MARK - Initializer
     
@@ -70,12 +92,14 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         super.viewDidLoad()
 //        updateViews()
         fetchUserJusts()
+        addObservers()
+        
+        print("Is User is == to \(isUser)")
     }
     
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.isHidden = true
         updateViews()
         
@@ -86,6 +110,13 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         self.cache.removeAllObjects()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.isHidden = false
+    }
+    
+    
     
     // MARK: - Firebase Functions
     
@@ -95,11 +126,13 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
             JustService.shared.fetchUserJusts(networkId: user.networkId, userUid: user.uid) { justs in
                 self.justs = justs
                 self.checkIfUserRespectedJusts(justs: self.justs)
+                self.justs.reverse()
             }
         } else if isUser == false {
             JustService.shared.fetchUserJusts(networkId: currentUser.networkId, userUid: currentUser.uid) { justs in
                 self.justs = justs
                 self.checkIfUserRespectedJusts(justs: self.justs)
+                self.justs.reverse()
         }
         }
     }
@@ -124,7 +157,6 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     
     func updateViews() {
         configureCollectionView()
-        imagePicker.delegate = self
         
     }
     
@@ -140,28 +172,59 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         
     }
     
-    func setupSettings() -> UIAlertController {
-        let settingsAlert = UIAlertController(title: "Settings", message: nil, preferredStyle: .actionSheet)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        let logoutAction = UIAlertAction(title: "Logout", style: .destructive) { logoutAction in
-            AuthService.shared.logoutUser()
-            self.presentLogin()
-            
-        }
-        let editProfile = UIAlertAction(title: "Edit Profile", style: .default) { editProfile in
-            self.editMode = true
-            self.collectionView.reloadData()
-        }
-        settingsAlert.addAction(cancelAction)
-        settingsAlert.addAction(logoutAction)
-        settingsAlert.addAction(editProfile)
-        
-        return settingsAlert
-    }
-    
     func loadJust(completion: @escaping(Just?) -> ()) {
         
     }
+    
+    func setupSocialButtons() {
+        if isUser == false {
+            guard let user = user else { return }
+            collectionView.isHidden = true
+            
+            if user.instagramUsername != "" && user.twitterUsername != "" {
+                setupSocialButtons()
+            } else if user.instagramUsername != "" && user.twitterUsername == "" {
+                setupInstagramButton()
+            } else if user.instagramUsername == "" && user.twitterUsername != "" {
+                setupTwitterButton()
+            }
+        }
+   
+    }
+    
+    func setupBothSocialButtons() {
+        view.addSubview(instagramButton)
+        instagramButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
+        view.addSubview(twitterButton)
+        twitterButton.anchor(top: instagramButton.bottomAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 10, paddingLeft: 20, paddingRight: 20)
+    }
+    
+    func setupInstagramButton() {
+        view.addSubview(instagramButton)
+        instagramButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
+        
+    }
+    
+    func setupTwitterButton() {
+        view.addSubview(twitterButton)
+        twitterButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
+    }
+    
+    func addObservers() {
+            NotificationCenter.default.addObserver(self, selector: #selector(refetchCurrentUser), name: NSNotification.Name.init("refetchCurrentUser"), object: nil)
+        
+    }
+    
+    @objc func refetchCurrentUser() {
+        print("refetchCurrentUser called")
+            UserService.shared.fetchUser(uid: self.currentUser.uid) { user in
+                self.currentUser = user
+            
+
+        }
+    }
+    
+    
     
     
     // MARK: UICollectionView Functions
@@ -214,28 +277,11 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
 // MARK: - ProfileHeaderDelegate
 
 extension CurrentUserController: ProfileHeaderDelegate {
-    
-    func handleEditTapped(_ header: ProfileHeader) {
-    }
-    
-    func handleDoneTapped(_ header: ProfileHeader, bioText: String?, newImage: UIImage?) {
-        print("CurrentUserController: handleDoneTapped")
-        if let bioText = bioText, !bioText.isEmpty {
-            print("handleDoneTapped -> Passed bioText iflet")
-            header.biotTextView.text = bioText
-            AuthService.shared.updateAboutText(aboutText: bioText) { error, ref in
-                print("handled updating about text")
-            }
-            
-        }
+    func imageViewTapped(_ header: ProfileHeader, url: URL) {
         
-        if let newImage = newImage {
-            AuthService.shared.updateUserImage(image: newImage) { error, ref in
-                print("handled updating image")
-            }
-        }
-        self.editMode = false
     }
+    
+
     
     func handleSettingsTapped(_ header: ProfileHeader) {
         let controller = SettingsController(currentUser: currentUser)
@@ -255,22 +301,43 @@ extension CurrentUserController: ProfileHeaderDelegate {
         self.navigationController?.popViewController(animated: true)
     }
     
-    func handleLogout(_ header: ProfileHeader) {
-        AuthService.shared.logoutUser()
-            self.presentLogin()
-    
-    }
-    
-    func imageViewTapped(_ header: ProfileHeader) {
-        self.present(imagePicker, animated: true) {
-            print("Done with image picker")
-        }
-    }
-    
     @objc func removeCell(cell: NetworkJustCell) {
         let i = cell.tag
         justs.remove(at: i)
         collectionView.reloadData()
+    }
+    
+    @objc func instagramButtonTapped() {
+        guard let user = user, let instagramUsername = user.instagramUsername else { return }
+        let appURL = URL(string: "instagram://user?username=\(instagramUsername)")!
+                let application = UIApplication.shared
+                
+                if application.canOpenURL(appURL)
+                {
+                    application.open(appURL)
+                }
+                else
+                {
+                    let webURL = URL(string: "https://instagram.com/\(instagramUsername)")!
+                    application.open(webURL)
+                }
+        
+    }
+    
+    @objc func twitterButtonTapped() {
+        guard let user = user, let twitterUsername = user.twitterUsername else { return }
+        let appURL = URL(string: "twitter://user?screen_name=\(twitterUsername)")!
+                let application = UIApplication.shared
+                
+                if application.canOpenURL(appURL)
+                {
+                    application.open(appURL)
+                }
+                else
+                {
+                    let webURL = URL(string: "https://twitter.com/\(twitterUsername)")!
+                    application.open(webURL)
+                }
     }
     
     // MARK: - Long Press Alert
@@ -313,21 +380,27 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
         } else if isUser == false {
             print("isUser == not true")
             header.isUser = false
-            header.editMode = editMode
             header.user = self.currentUser
-            header.pickerDelegate = self
             header.delegate = self
-            if let pickedImage = pickedImage {
-                header.pickedImage = pickedImage
-                print("We have picked image in the current user controller")
-                header.delegate = self
-            }
+       
         }
         return header
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 300)
+        if isUser == false {
+            return CGSize(width: view.frame.width, height: 420)
+        }
+        
+        if let user = user {
+            if user.instagramUsername != "" {
+                return CGSize(width: view.frame.width, height: 420)
+            } else {
+                print("returned 300")
+                return CGSize(width: view.frame.width, height: 300)
+            }
+        }
+        return CGSize(width: view.frame.width, height: 420)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -347,7 +420,7 @@ extension CurrentUserController: NetworkJustCellDelegate {
         guard let just = cell.just else { return }
         let controller = RespectedByViewController(just: just, currentUser: currentUser)
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-
+        
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
@@ -372,28 +445,6 @@ extension CurrentUserController: NetworkJustCellDelegate {
     
 }
 
-// MARK: - UImagePickerControllerDelegate
 
-extension CurrentUserController: UIImagePickerControllerDelegate {
-    
-func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-    if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-        print("image picked")
-//        self.profileImageView.contentMode = .scaleAspectFit
-//        self.profileImageView.image = pickedImage
-        self.pickedImage = pickedImage
-        photoSelected = true
-    }
-    picker.dismiss(animated: true) {
-        self.collectionView.reloadData()
-    }
-    
-    
-}
-
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        photoSelected = false
-    }
-}
 
 

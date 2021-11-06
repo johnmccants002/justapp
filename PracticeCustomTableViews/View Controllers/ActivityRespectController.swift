@@ -21,6 +21,7 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
     var justIDs : [String]?
     let currentUser : User
     let respectNibName = "ActivityRespectCell"
+    var respectCount : String? 
     
     
     // MARK: - Initializer
@@ -42,7 +43,11 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         updateViews()
         fetchRespect()
         setupLeftBarItem()
+        fetchTotalRespect()
+        setupRightBarItem()
     }
+    
+   
     
     // MARK: Helper Functions
     
@@ -56,6 +61,11 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
     func setupLeftBarItem() {
         let backButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissController))
         self.navigationItem.leftBarButtonItem = backButton
+    }
+    
+    func setupRightBarItem() {
+        let rightButton = UIBarButtonItem(title: "", style: .plain, target: self, action: #selector(respectCountTapped))
+        self.navigationItem.rightBarButtonItem = rightButton
     }
     
     func fetchRespect() {
@@ -74,10 +84,25 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         }
     }
     
+    func fetchTotalRespect() {
+        UserService.shared.fetchTotalRespect(uid: currentUser.uid) { countString in
+            self.navigationItem.rightBarButtonItem?.title = countString
+            self.respectCount = countString
+        }
+    }
+    
     // MARK: - Selectors
     
     @objc func dismissController() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func respectCountTapped() {
+        guard let respectCount = respectCount else { return }
+        let alertController = UIAlertController(title: "Total Respect", message: "Your total respect received is \(respectCount). Keep doing more to get more respect.", preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Will do", style: .default, handler: nil)
+        alertController.addAction(alertAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     
@@ -105,10 +130,10 @@ extension ActivityRespectController: ActivityRespectCellDelegate {
         print("cell image tapped")
         guard let user = cell.user else { return }
         let fullName = "\(user.firstName) \(user.lastName)"
-        let controller = UserProfileViewController(titleText: fullName, userUid: user.uid, currentUser: self.currentUser)
-        controller.user = user
-        let nav = UINavigationController(rootViewController: controller)
-        self.present(nav, animated: true, completion: nil)
+        let profileController = CurrentUserController(currentUser: currentUser, isUser: true)
+        profileController.user = user
+        self.navigationController?.pushViewController(profileController, animated: true)
+
     }
     
 }
