@@ -66,6 +66,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     func fetchToken() {
         guard let just = just else { return }
         UserService.shared.fetchUserToken(uid: just.uid) { token in
+            print("success fetching token: \(token)")
             self.token = token
         }
     }
@@ -105,9 +106,9 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             self.respectLabel.addGestureRecognizer(tap)
             self.respectLabel.isUserInteractionEnabled = true
             let imageName = just.didRespect ? "Fistbump4" : "Fistbump1"
-            let blue = UIColor.blue
+            let black = UIColor.black
             let lightGray = UIColor.lightGray
-            let labelColor = just.didRespect ? blue : lightGray
+            let labelColor = just.didRespect ? black : lightGray
             respectButton.setImage(UIImage(named: imageName), for: .normal)
             respectLabel.textColor = labelColor
             respectLabel.text = "Respect"

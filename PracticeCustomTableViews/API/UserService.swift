@@ -152,4 +152,31 @@ struct UserService {
         }
     }
     
+    func fetchSharedNetworks(currentUserArray: [User], user: User, completion:@escaping([User]) -> Void) {
+      
+        var sharedArray: [User] = []
+     
+        
+        NetworkService.shared.fetchCurrentUserNetworks(currentUser: user) { users in
+            if users.isEmpty {
+                completion(sharedArray)
+            }
+            for user in currentUserArray {
+                
+                if users.contains(user) {
+                    sharedArray.append(user)
+                }
+           
+            }
+            completion(sharedArray)
+            
+        }
+   
+            print("This is the shared array: \(sharedArray)")
+            
+        
+        
+        
+    }
+    
 }

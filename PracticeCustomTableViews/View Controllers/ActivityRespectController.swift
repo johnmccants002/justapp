@@ -21,7 +21,8 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
     var justIDs : [String]?
     let currentUser : User
     let respectNibName = "ActivityRespectCell"
-    var respectCount : String? 
+    var respectCount : String?
+    var refreshControl = UIRefreshControl()
     
     
     // MARK: - Initializer
@@ -45,6 +46,7 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         setupLeftBarItem()
         fetchTotalRespect()
         setupRightBarItem()
+        setupRefreshControl()
     }
     
    
@@ -70,7 +72,11 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
     
     func fetchRespect() {
         UserService.shared.fetchUserRespect(uid: currentUser.uid) { respectNotifications in
+            if respectNotifications.isEmpty {
+                self.collectionView.refreshControl?.endRefreshing()
+            }
             self.respectNotifications = respectNotifications
+            self.collectionView.refreshControl?.endRefreshing()
             print("These are the respectNotfications: \(respectNotifications)")
         }
     }
@@ -90,11 +96,21 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
             self.respectCount = countString
         }
     }
+     
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadRespects), for: .valueChanged)
+        self.collectionView.refreshControl = refreshControl
+    }
     
     // MARK: - Selectors
     
     @objc func dismissController() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func reloadRespects() {
+        fetchRespect()
+        fetchTotalRespect()
     }
     
     @objc func respectCountTapped() {

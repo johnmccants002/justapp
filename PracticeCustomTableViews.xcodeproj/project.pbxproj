@@ -12,6 +12,9 @@
 		313F7365270D29FC007E6BC8 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */; };
 		313F7367270E6218007E6BC8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 313F7366270E6218007E6BC8 /* GoogleService-Info.plist */; };
 		313F7369270E6EF8007E6BC8 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */; };
+		316A98C827396694006CAA3A /* SharedNetworksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316A98C727396694006CAA3A /* SharedNetworksController.swift */; };
+		316A98CB2739E90E006CAA3A /* SharedNetworkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316A98C92739E90E006CAA3A /* SharedNetworkCell.swift */; };
+		316A98CC2739E90E006CAA3A /* SharedNetworkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 316A98CA2739E90E006CAA3A /* SharedNetworkCell.xib */; };
 		316CE2F2264BB2AC0015C145 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CE2F1264BB2AC0015C145 /* User.swift */; };
 		31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A44126425042001E7DD6 /* AppDelegate.swift */; };
 		31B4A44426425042001E7DD6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A44326425042001E7DD6 /* SceneDelegate.swift */; };
@@ -65,6 +68,9 @@
 		313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
 		313F7366270E6218007E6BC8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
+		316A98C727396694006CAA3A /* SharedNetworksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedNetworksController.swift; sourceTree = "<group>"; };
+		316A98C92739E90E006CAA3A /* SharedNetworkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedNetworkCell.swift; sourceTree = "<group>"; };
+		316A98CA2739E90E006CAA3A /* SharedNetworkCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SharedNetworkCell.xib; sourceTree = "<group>"; };
 		316CE2F1264BB2AC0015C145 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		31B4A43E26425042001E7DD6 /* PracticeCustomTableViews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PracticeCustomTableViews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B4A44126425042001E7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -221,6 +227,7 @@
 				31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */,
 				31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */,
 				31D9D18426D1EF5300954C1D /* UserJustsController.swift */,
+				316A98C727396694006CAA3A /* SharedNetworksController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -230,6 +237,8 @@
 			children = (
 				31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */,
 				31CE99DA271EC17000324501 /* RespectedByCell.swift */,
+				316A98C92739E90E006CAA3A /* SharedNetworkCell.swift */,
+				316A98CA2739E90E006CAA3A /* SharedNetworkCell.xib */,
 				31CE99DB271EC17000324501 /* RespectedByCell.xib */,
 				31D9D18026D07A9600954C1D /* NetworkJustCell.swift */,
 				31D9D18126D07A9600954C1D /* NetworkJustCell.xib */,
@@ -354,6 +363,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				316A98CC2739E90E006CAA3A /* SharedNetworkCell.xib in Resources */,
 				31B4A44E26425045001E7DD6 /* LaunchScreen.storyboard in Resources */,
 				31B4A44B26425045001E7DD6 /* Assets.xcassets in Resources */,
 				31CE99DD271EC17000324501 /* RespectedByCell.xib in Resources */,
@@ -425,12 +435,14 @@
 				31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */,
 				31DEDDE626C3147900749E41 /* UserService.swift in Sources */,
 				31D29614264E8E1000965DD7 /* NewJustViewController.swift in Sources */,
+				316A98C827396694006CAA3A /* SharedNetworksController.swift in Sources */,
 				31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */,
 				31B4A47B26455295001E7DD6 /* NetworkViewController.swift in Sources */,
 				31307A6126D046E4005DA1FC /* Constants.swift in Sources */,
 				31D9D1D026D5002D00954C1D /* JustViewModel.swift in Sources */,
 				31DEDDE826C3148F00749E41 /* NetworkService.swift in Sources */,
 				31DEDDEA26C3149D00749E41 /* JustService.swift in Sources */,
+				316A98CB2739E90E006CAA3A /* SharedNetworkCell.swift in Sources */,
 				31D2961C2653C2DA00965DD7 /* ResultsTableViewController.swift in Sources */,
 				31CE99DF271FAD1E00324501 /* SettingsController.swift in Sources */,
 				31D296242653EB5300965DD7 /* SignUpViewController.swift in Sources */,
@@ -610,7 +622,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.6.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -632,7 +644,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.6.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

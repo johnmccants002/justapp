@@ -22,6 +22,12 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     let justNibName = "NetworkJustCell"
     var networkId: String
     var titleText: String
+    var refreshControl = UIRefreshControl()
+    var currentUserArray : [User]? {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
     
     // MARK: - Initializer
     
@@ -44,6 +50,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         fetchLastJusts()
         updateViews()
         addObservers()
+        setupRefreshControl()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -99,6 +106,23 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         fetchLastJusts()
     }
     
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadNetworkJusts), for: .valueChanged)
+        self.collectionView.refreshControl = self.refreshControl
+    }
+    
+    func setupCurrentUserArray() {
+        var currentUserArray : [User] = []
+        if let currentUserNetworks = currentUser.networks {
+            for network in currentUserNetworks {
+                currentUserArray.append(network.user)
+            }
+            self.currentUserArray = currentUserArray
+            
+        }
+    }
+
+    
     // MARK: - Firebase Functions
     
     func fetchLastJusts() {
@@ -106,6 +130,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             print(justs)
             self.lastJusts = justs
             self.checkIfUserRespectedJusts(justs: self.lastJusts)
+            self.collectionView.refreshControl?.endRefreshing()
         }
     }
     
@@ -118,6 +143,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
                 myGroup.leave()
                 guard didRespect == true else { return }
                 self.lastJusts[index].didRespect = true
+                self.collectionView.refreshControl?.endRefreshing()
                 
             }
             
@@ -143,6 +169,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             cell.just = lastJusts[indexPath.row]
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
+            cell.fetchToken()
         
 //        if lastJusts[indexPath.row].uid == currentUser.uid {
 //            cell.setupRespectCountButton()
@@ -165,6 +192,9 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         let userUid = just.uid
         let controller = UserJustsController(currentUser: currentUser, userUid: userUid, titleText: titleText, networkId: networkId)
         controller.lastJust = just
+        if let currentUserArray = self.currentUserArray {
+        controller.currentUserArray = currentUserArray
+        }
         navigationController?.pushViewController(controller, animated: true)
     }
     
@@ -203,19 +233,32 @@ extension NetworkJustsController: NetworkJustCellDelegate {
     }
     
     func imageTapped(cell: NetworkJustCell) {
-        let controller = CurrentUserController(currentUser: currentUser, isUser: true)
         guard let uid = cell.just?.uid else { return }
-        controller.fetchUser(uid: uid)
-        self.navigationController?.pushViewController(controller, animated: true)
+        if currentUser.uid == uid {
+            let controller = CurrentUserController(currentUser: currentUser, isUser: false)
+            self.navigationController?.pushViewController(controller, animated: true)
+        } else {
+            let controller = CurrentUserController(currentUser: currentUser, isUser: true)
+            controller.fetchUser(uid: uid)
+            if let currentUserArray = self.currentUserArray {
+                controller.currentUserArray = currentUserArray
+            }
+            self.navigationController?.pushViewController(controller, animated: true)
+        }
+        
+        
     }
     
     func respectTapped(cell: NetworkJustCell) {
         let title = "New Respect"
         let body = "\(currentUser.firstName) \(currentUser.lastName) respected your just."
         guard var just = cell.just else { return }
-        JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
+        if just.didRespect == false {
             guard let token = cell.token else { return }
-            PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body)
+            PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body, id: self.currentUser.uid)
+        }
+
+        JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
         }
         
     }

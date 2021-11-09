@@ -29,11 +29,14 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         }
     }
     
+    var currentUserArray: [User]?
+    
     var lastJust : Just?
     var titleText: String
     let userUid: String
     let justNibName = "NetworkJustCell"
     let networkId: String
+    var refreshControl = UIRefreshControl()
     
     // MARK: - Initializer
     
@@ -56,6 +59,7 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         updateViews()
         fetchUserJusts()
         collectionView.isUserInteractionEnabled = true
+        setupRefreshControl()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -124,14 +128,26 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
                 myGroup.leave()
                 guard didRespect == true else { return }
                 self.userJusts[index].didRespect = true
+               
             }
         }
         myGroup.notify(queue: .main) {
             self.collectionView.reloadData()
+            self.collectionView.refreshControl?.endRefreshing()
         }
     }
     func loadMoreJusts() {
         
+    }
+    
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadJusts), for: .valueChanged)
+        self.collectionView.refreshControl = self.refreshControl
+    }
+    
+    @objc func reloadJusts() {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadNetworkJusts"), object: nil)
+        fetchUserJusts()
     }
     
     // MARK: - UICollectionViewDelegate Functions
@@ -142,6 +158,7 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         cell.delegate = self
         cell.imageView.isUserInteractionEnabled = true
         cell.currentUserId = self.currentUser.uid
+        cell.fetchToken()
         cell.tag = indexPath.row
         
         if userJusts[indexPath.row].uid == currentUser.uid {
@@ -207,10 +224,18 @@ extension UserJustsController: NetworkJustCellDelegate {
     }
     
     func imageTapped(cell: NetworkJustCell) {
-        let controller = CurrentUserController(currentUser: currentUser, isUser: true)
         guard let uid = cell.just?.uid else { return }
-        controller.fetchUser(uid: uid)
-        self.navigationController?.pushViewController(controller, animated: true)
+        if currentUser.uid == uid {
+            let controller = CurrentUserController(currentUser: currentUser, isUser: false)
+            self.navigationController?.pushViewController(controller, animated: true)
+        } else {
+            let controller = CurrentUserController(currentUser: currentUser, isUser: true)
+            controller.fetchUser(uid: uid)
+            if let currentUserArray = self.currentUserArray {
+                controller.currentUserArray = currentUserArray
+            }
+            self.navigationController?.pushViewController(controller, animated: true)
+        }
     }
     
     func respectTapped(cell: NetworkJustCell) {
@@ -224,9 +249,19 @@ extension UserJustsController: NetworkJustCellDelegate {
                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadNetworkJusts"), object: nil)
             }
         }
+        
+        guard let token = cell.token else { return }
+        print("this is the token \(token)")
+        if just.didRespect == false {
+            PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body, id: self.currentUser.uid)
+        }
+        
         JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
-            guard let token = cell.token else { return }
-            PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body)
+//            guard let token = cell.token else { return }
+//            print("this is the token \(token)")
+//                PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body, id: self.currentUser.uid)
+            
+            
         }
     }
     

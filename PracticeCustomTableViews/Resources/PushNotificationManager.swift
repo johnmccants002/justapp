@@ -27,7 +27,7 @@ class PushNotificationManager: NSObject, MessagingDelegate, UNUserNotificationCe
                 options: authOptions,
                 completionHandler: {_, _ in })
             // For iOS 10 data message (sent via FCM)
-            Messaging.messaging().delegate = self
+//            Messaging.messaging().delegate = self
         } else {
             let settings: UIUserNotificationSettings =
                 UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)

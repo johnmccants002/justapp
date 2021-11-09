@@ -47,8 +47,8 @@ class SignUpViewController: UIViewController {
         self.signUpTextField.delegate = self
         self.signUpTextField.autocorrectionType = .no
         self.signUpTextField.spellCheckingType = .no
-        self.view.backgroundColor = .blue
-        self.signUpTextField.backgroundColor = .blue
+        self.view.backgroundColor = .black
+        self.signUpTextField.backgroundColor = .black
         self.signUpTextField.borderStyle = .none
         self.label.text = "Enter Email"
         self.label.textColor = .white
@@ -64,7 +64,7 @@ class SignUpViewController: UIViewController {
         
         let nextButton = UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(self.nextButtonPressed(_:)))
         nextButton.width = self.view.viewWidth
-        nextButton.tintColor = UIColor.blue
+        nextButton.tintColor = UIColor.black
         keyboardToolbar.items = [nextButton]
         keyboardToolbar.layer.borderWidth = 1
         keyboardToolbar.layer.borderColor = UIColor.black.cgColor

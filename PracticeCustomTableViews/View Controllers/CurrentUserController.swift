@@ -12,16 +12,8 @@ import QuickLook
 private let reuseIdentifier = "networkJustCell"
 private let headerIdentifier = "ProfileHeader"
 
-class CurrentUserController: UICollectionViewController, UINavigationControllerDelegate, QLPreviewControllerDataSource {
-    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
-        1
-    }
-    
-    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-        guard let url = previewURL else { return fatalError() as! QLPreviewItem }
-        
-        return url as QLPreviewItem
-    }
+class CurrentUserController: UICollectionViewController, UINavigationControllerDelegate {
+
     
     
     // MARK - Properties
@@ -45,6 +37,18 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
 
     
     var user: User? {
+        didSet {
+            collectionView.reloadData()
+            fetchSharedNetworks()
+        }
+    }
+    var currentUserArray: [User]? {
+        didSet {
+            fetchSharedNetworks()
+        }
+    }
+    
+    var sharedArray: [User]? {
         didSet {
             collectionView.reloadData()
         }
@@ -93,6 +97,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
 //        updateViews()
         fetchUserJusts()
         addObservers()
+        setupCurrentUserArray()
         
         print("Is User is == to \(isUser)")
     }
@@ -158,6 +163,33 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     func updateViews() {
         configureCollectionView()
         
+    }
+    
+    func setupCurrentUserArray() {
+        var currentUserArray : [User] = []
+        if let currentUserNetworks = currentUser.networks {
+            for network in currentUserNetworks {
+                currentUserArray.append(network.user)
+            }
+            self.currentUserArray = currentUserArray
+            
+        }
+    }
+    
+    func fetchSharedNetworks() {
+        guard let currentUserArray = self.currentUserArray else { return }
+        if isUser == true {
+            if let user = user {
+                UserService.shared.fetchSharedNetworks(currentUserArray: currentUserArray, user: user) { users in
+                    if users.count >= 1 {
+                    self.sharedArray = users
+                    }
+                    for user in users {
+                        print("Current user and user are in \(user.username) network")
+                    }
+                }
+            }
+        }
     }
     
     func presentLogin() {
@@ -277,6 +309,13 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
 // MARK: - ProfileHeaderDelegate
 
 extension CurrentUserController: ProfileHeaderDelegate {
+    func handleSharedNetworksTapped(_ header: ProfileHeader) {
+        guard let sharedArray = sharedArray else { return }
+        let controller = SharedNetworksController(users: sharedArray, currentUser: currentUser)
+        
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
     func imageViewTapped(_ header: ProfileHeader, url: URL) {
         
     }
@@ -377,10 +416,14 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
             header.user = self.user
             header.isUser = true
             header.delegate = self
+            if let sharedArray = self.sharedArray {
+                print("we have a shared array")
+                header.sharedArray = sharedArray
+            }
         } else if isUser == false {
             print("isUser == not true")
             header.isUser = false
-            header.user = self.currentUser
+            header.currentUser = currentUser
             header.delegate = self
        
         }

@@ -25,6 +25,7 @@ struct User {
     var changedImage: Bool = false
     var twitterUsername: String?
     var instagramUsername: String?
+    var networks: [Network]?
     
     init(uid: String, dictionary: [String: Any]) {
         self.uid = uid
@@ -47,3 +48,13 @@ struct User {
         
     }
 }
+
+extension User: Equatable {
+    static func == (lhs: User, rhs: User) -> Bool {
+        return lhs.uid == rhs.uid
+    }
+    
+    
+}
+
+

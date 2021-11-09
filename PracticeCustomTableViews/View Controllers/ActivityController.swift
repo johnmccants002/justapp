@@ -19,13 +19,14 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
     }
     let inviteNib : String = "InviteCell"
     var loadingIndicator = UIActivityIndicatorView()
+    var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         let nib = UINib(nibName: self.inviteNib, bundle: nil)
         
         collectionView.register(nib, forCellWithReuseIdentifier: "inviteCell")
-     
+        setupRefreshControl()
         updateViews()
         setupLoadingIndicator()
         
@@ -52,6 +53,15 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         
     }
     
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadInvites), for: .valueChanged)
+        self.collectionView.refreshControl = self.refreshControl
+    }
+    
+    @objc func reloadInvites() {
+        fetchInvites()
+    }
+    
     func updateViews() {
         navigationController?.navigationBar.topItem?.title = "Invites"
         collectionView.backgroundColor = .white
@@ -69,7 +79,11 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
     
     func fetchInvites() {
         NetworkService.shared.fetchInvites(uid: currentUser.uid) { users in
+            if users.isEmpty {
+                self.collectionView.refreshControl?.endRefreshing()
+            }
             self.invites = users
+            self.collectionView.refreshControl?.endRefreshing()
         }
     }
     
@@ -140,7 +154,7 @@ extension ActivityController: InviteCellDelegate {
             }
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
             guard let token = cell.token else { return }
-            PushNotificationSender.shared.sendPushNotification(to: token, title: "Your network", body: "\(self.currentUser.username) accepted your invite!")
+                PushNotificationSender.shared.sendPushNotification(to: token, title: "New friend in your Network!", body: "\(self.currentUser.firstName) \(self.currentUser.lastName) accepted your invite!", id: self.currentUser.uid)
             self.collectionView.reloadData()
             self.removeCell(sender: cell.acceptButton)
         }

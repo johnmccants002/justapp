@@ -130,7 +130,11 @@ struct JustService {
     func fetchLastJusts(networkID: String, completion: @escaping([Just]) -> Void) {
         var lastJusts : [Just] = []
         REF_NETWORK_JUSTS.document(networkID).collection("last-justs").getDocuments { snapshot, error in
+          
             guard let snapshot = snapshot else { return }
+            if snapshot.isEmpty {
+                completion([])
+            }
             for document in snapshot.documents {
                 let dict = document.data() as [String: AnyObject]
                 let just = Just(justID: dict["justID"] as! String, dictionary: dict)
@@ -180,6 +184,9 @@ struct JustService {
         var users: [User] = []
         let myGroup = DispatchGroup()
         REF_JUST_RESPECTS.child(just.justID).observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists() == false {
+                completion([])
+            }
             guard let dict = snapshot.value as? [String: Any] else { return }
             
             for (key, value) in dict {

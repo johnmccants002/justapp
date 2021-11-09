@@ -15,6 +15,7 @@ protocol ProfileHeaderDelegate: AnyObject {
     func imageViewTapped(_ header: ProfileHeader, url: URL)
     func handleSettingsTapped(_ header: ProfileHeader)
     func handleBackTapped(_ header: ProfileHeader)
+    func handleSharedNetworksTapped(_ header: ProfileHeader)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -35,12 +36,24 @@ class ProfileHeader: UICollectionReusableView {
         
         }
     }
+    
+    var sharedArray: [User]? {
+        didSet {
+            setupSharedNetworksButton()
+        }
+    }
+    
+    var currentUser: User? {
+        didSet {
+            setupCurrentUserProfile()
+        }
+    }
 
 
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .blue
+        view.backgroundColor = .black
         view.addSubview(backButton)
         backButton.anchor(top: view.topAnchor, left: view.leftAnchor, paddingTop: 42, paddingLeft: 16)
         backButton.setDimensions(width: 30, height: 30)
@@ -69,13 +82,21 @@ class ProfileHeader: UICollectionReusableView {
     lazy var editProfileButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Settings", for: .normal)
-        button.layer.borderColor = UIColor.blue.cgColor
+        button.layer.borderColor = UIColor.black.cgColor
         button.layer.borderWidth = 1.25
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
         button.isHidden = true
         button.addTarget(self, action: #selector(handleSettingsTapped), for: .touchUpInside)
         
+        return button
+    }()
+    
+    var sharedNetworksButton: UIButton = {
+        var button = UIButton()
+        button.addTarget(self, action: #selector(sharedNetworksTapped), for: .touchUpInside)
+        button.titleLabel?.font = UIFont.italicSystemFont(ofSize: 12)
+        button.setTitleColor(.twitterBlue, for: .normal)
         return button
     }()
     
@@ -88,7 +109,7 @@ class ProfileHeader: UICollectionReusableView {
         var button = UIButton()
         button.backgroundColor = .white
         button.layer.borderWidth = 0.75
-        button.layer.borderColor = UIColor.blue.cgColor
+        button.layer.borderColor = UIColor.black.cgColor
         button.setTitle("Instagram", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(instagramButtonTapped), for: .touchUpInside)
@@ -99,7 +120,7 @@ class ProfileHeader: UICollectionReusableView {
         var button = UIButton()
         button.backgroundColor = .white
         button.layer.borderWidth = 0.75
-        button.layer.borderColor = UIColor.blue.cgColor
+        button.layer.borderColor = UIColor.black.cgColor
         button.setTitle("Twitter", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(twitterButtonTapped), for: .touchUpInside)
@@ -117,7 +138,7 @@ class ProfileHeader: UICollectionReusableView {
         if let url = user.profileImageUrl {
             profileImageView.sd_setImage(with: url, completed: nil)
             if isUser == true {
-                profileImageView.setupImageViewer()
+                profileImageView.setupImageViewer(options: [.theme(.dark)], from: nil)
             }
         }
         
@@ -125,6 +146,20 @@ class ProfileHeader: UICollectionReusableView {
        
         
         print("User is \(user.username)")
+    }
+    
+    func setupCurrentUserProfile() {
+        guard let currentUser = currentUser else { return }
+        fullnameLabel.text = "\(currentUser.firstName) \(currentUser.lastName)"
+        usernameLabel.text = "@" + currentUser.username
+        biotTextView.text = self.currentUser?.aboutText
+        
+        if let url = currentUser.profileImageUrl {
+            profileImageView.sd_setImage(with: url, completed: nil)
+        }
+        
+//        setupSocialButtons(user: currentUser)
+        
     }
     
     func markChangedImage() {
@@ -158,6 +193,16 @@ class ProfileHeader: UICollectionReusableView {
                     }
                 }
             }
+        }
+        
+    }
+    
+    func setupSharedNetworksButton() {
+        guard let sharedArray = self.sharedArray else { return }
+        if sharedArray.count == 1 {
+            self.sharedNetworksButton.setTitle("\(sharedArray.count) shared network", for: .normal)
+        } else {
+            self.sharedNetworksButton.setTitle("\(sharedArray.count) shared networks", for: .normal)
         }
         
     }
@@ -237,6 +282,11 @@ class ProfileHeader: UICollectionReusableView {
         
     }
     
+    @objc func sharedNetworksTapped() {
+        print("Shared Networks Tapped")
+        delegate?.handleSharedNetworksTapped(self)
+    }
+    
     var biotTextView : UITextView = {
         let tv = UITextView()
         tv.font = UIFont.systemFont(ofSize: 16)
@@ -255,43 +305,35 @@ class ProfileHeader: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.isUserInteractionEnabled = true
-        addSubview(containerView)
-        containerView.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 108)
-        containerView.isUserInteractionEnabled = true
-        addSubview(profileImageView)
-        profileImageView.anchor(top: containerView.bottomAnchor, paddingTop: -24)
-        profileImageView.centerX(inView: self)
-        profileImageView.setDimensions(width: 120, height: 120)
-        profileImageView.layer.cornerRadius = 120/2
-        
-
-//        self.addSubview(viewProfileImageButton)
-//        viewProfileImageButton.anchor(top: containerView.bottomAnchor, paddingTop: -24)
-//        viewProfileImageButton.centerX(inView: self)
-//        viewProfileImageButton.setDimensions(width: 120, height: 120)
-//        viewProfileImageButton.layer.cornerRadius = 120/2
-//        viewProfileImageButton.isUserInteractionEnabled = true
-//        viewProfileImageButton.addTarget(self, action: #selector(imageViewTapped), for: .touchUpInside)
-        
-        let userDetailsStack = UIStackView(arrangedSubviews: [fullnameLabel, usernameLabel, biotTextView])
-        userDetailsStack.axis = .vertical
-        userDetailsStack.distribution = .fillProportionally
-        userDetailsStack.spacing = 4
-        
-        addSubview(userDetailsStack)
-        fullnameLabel.textAlignment = .center
-        usernameLabel.textAlignment = .center
-        biotTextView.textAlignment = .center
-        
-        biotTextView.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        userDetailsStack.anchor(top: profileImageView.bottomAnchor, paddingTop: 8, paddingLeft: 20, paddingRight: 20, width: self.viewWidth)
-        userDetailsStack.centerX(inView: self)
-        
-        addSubview(editProfileButton)
-        editProfileButton.anchor(top: containerView.bottomAnchor, left: leftAnchor, paddingTop: 12, paddingLeft: 20)
-        editProfileButton.setDimensions(width: 80, height: 36)
-        editProfileButton.layer.cornerRadius = 36/2
+//        self.isUserInteractionEnabled = true
+//        addSubview(containerView)
+//        containerView.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 108)
+//        containerView.isUserInteractionEnabled = true
+//        addSubview(profileImageView)
+//        profileImageView.anchor(top: containerView.bottomAnchor, paddingTop: -24)
+//        profileImageView.centerX(inView: self)
+//        profileImageView.setDimensions(width: 120, height: 120)
+//        profileImageView.layer.cornerRadius = 120/2
+//
+//        let userDetailsStack = UIStackView(arrangedSubviews: [fullnameLabel, usernameLabel, biotTextView])
+//        userDetailsStack.axis = .vertical
+//        userDetailsStack.distribution = .fillProportionally
+//        userDetailsStack.spacing = 4
+//
+//
+//        addSubview(userDetailsStack)
+//        fullnameLabel.textAlignment = .center
+//        usernameLabel.textAlignment = .center
+//        biotTextView.textAlignment = .center
+//
+//        biotTextView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+//        userDetailsStack.anchor(top: profileImageView.bottomAnchor, paddingTop: 8, paddingLeft: 20, paddingRight: 20, width: self.viewWidth)
+//        userDetailsStack.centerX(inView: self)
+//
+//        addSubview(editProfileButton)
+//        editProfileButton.anchor(top: containerView.bottomAnchor, left: leftAnchor, paddingTop: 12, paddingLeft: 20)
+//        editProfileButton.setDimensions(width: 80, height: 36)
+//        editProfileButton.layer.cornerRadius = 36/2
         
     }
     
@@ -307,6 +349,56 @@ class ProfileHeader: UICollectionReusableView {
         self.isUserInteractionEnabled = true
         self.containerView.isUserInteractionEnabled = true
         self.profileImageView.isUserInteractionEnabled = true
+        self.isUserInteractionEnabled = true
+        addSubview(containerView)
+        containerView.anchor(top: topAnchor, left: leftAnchor, right: rightAnchor, height: 108)
+        containerView.isUserInteractionEnabled = true
+        addSubview(profileImageView)
+        profileImageView.anchor(top: containerView.bottomAnchor, paddingTop: -24)
+        profileImageView.centerX(inView: self)
+        profileImageView.setDimensions(width: 120, height: 120)
+        profileImageView.layer.cornerRadius = 120/2
+        
+        let userDetailsStack = UIStackView(arrangedSubviews: [fullnameLabel, usernameLabel, sharedNetworksButton, biotTextView])
+        if sharedArray == nil {
+            userDetailsStack.removeArrangedSubview(sharedNetworksButton)
+        } else if let currentUser = currentUser {
+            userDetailsStack.removeArrangedSubview(sharedNetworksButton)
+        }
+        userDetailsStack.axis = .vertical
+        userDetailsStack.distribution = .fillProportionally
+        userDetailsStack.spacing = 4
+        
+//        if ((sharedArray?.isEmpty) != nil) {
+//            userDetailsStack.removeArrangedSubview(sharedNetworksButton)
+//        }
+        addSubview(userDetailsStack)
+        
+       
+        sharedNetworksButton.titleLabel?.textAlignment = .center
+      
+        fullnameLabel.textAlignment = .center
+        usernameLabel.textAlignment = .center
+        biotTextView.textAlignment = .center
+        
+        
+        
+        biotTextView.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        userDetailsStack.anchor(top: profileImageView.bottomAnchor, paddingTop: 8, paddingLeft: 20, paddingRight: 20, width: self.viewWidth)
+        userDetailsStack.centerX(inView: self)
+        
+        addSubview(editProfileButton)
+        editProfileButton.anchor(top: containerView.bottomAnchor, left: leftAnchor, paddingTop: 12, paddingLeft: 20)
+        editProfileButton.setDimensions(width: 80, height: 36)
+        editProfileButton.layer.cornerRadius = 36/2
+        
+        if let user = user {
+            setupSocialButtons(user: user)
+        }
+        
+        if let currentUser = currentUser {
+            setupSocialButtons(user: currentUser)
+        }
         
     }
     

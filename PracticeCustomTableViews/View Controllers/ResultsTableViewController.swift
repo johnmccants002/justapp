@@ -138,7 +138,7 @@ extension ResultsTableViewController: ResultTableViewCellDelegate {
         guard let toUserUid = cell.user?.uid else { return }
         NetworkService.shared.inviteUserToNetwork(toUserUid: toUserUid, fromUser: currentUser) {
             guard let token = cell.token else { return }
-            PushNotificationSender.shared.sendPushNotification(to: token, title: "New Invite", body: "\(currentUser.firstName) \(currentUser.lastName) invited you to join their network.")
+            PushNotificationSender.shared.sendPushNotification(to: token, title: "New Invite", body: "\(currentUser.firstName) \(currentUser.lastName) invited you to join their network.", id: toUserUid)
             
         }
         self.present(joinAlert(), animated: true, completion: nil)

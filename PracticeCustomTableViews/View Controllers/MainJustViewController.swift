@@ -41,9 +41,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     private var resultsTableController: ResultsTableViewController!
     @IBOutlet weak var invitesLabel: UILabel!
     var networkUsers: [User]?
-//        didSet {
-//            friendsTableView.reloadData()
-//        }
+
    
     
     
@@ -57,12 +55,15 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     private var restoredState = SearchControllerRestorableState()
     var currentUser : User? {
         didSet {
-            self.fetchUserNetworks()
-            self.checkedUncheckedActivity()
-            print("This is Current User UID: \(currentUser?.uid)")
+            if currentUser?.networks == nil {
+                self.fetchUserNetworks()
+                self.checkedUncheckedActivity()
+                print("This is Current User UID: \(currentUser?.uid)")
+            }
            
         }
     }
+    var refreshControl = UIRefreshControl()
     var searchResult : String?
     var delegate : UINavigationControllerDelegate?
     var delegate2 : UINavigationBarDelegate?
@@ -83,7 +84,10 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         fetchUser()
         getNotificationSettings()
         addObservers()
-
+        setupRefreshControl()
+//        logoutButtonTapped()
+        
+        
         
     }
     
@@ -132,6 +136,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
             print("These are your networks \(users)")
             NetworkService.shared.checkedUncheckedNetworks(users: users, currentUser: currentUser) { networks in
                 self.networks = networks
+                self.currentUser?.networks = networks
+                self.friendsTableView.refreshControl?.endRefreshing()
                 print("These are the networks we got \(networks)")
             }
        
@@ -235,6 +241,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         pushManager.registerForPushNotifications()
     }
     
+ 
+    
     func logoutButtonTapped() {
         AuthService.shared.logoutUser()
             self.presentLogin()
@@ -251,8 +259,25 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         }
     }
     
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadNetworks), for: .valueChanged)
+        self.friendsTableView.refreshControl = refreshControl
+        
+    }
+    
+    @objc func reloadNetworks() {
+        self.fetchUserNetworks()
+        
+    }
+    
     func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(refetchUser), name: NSNotification.Name.init(rawValue: "refetchUser"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppDidBecomeActiveNotification(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+    
+    @objc func handleAppDidBecomeActiveNotification(_ notification: NSNotification) {
+        fetchUser()
     }
     
     @objc func refetchUser() {
@@ -419,7 +444,12 @@ func setupNetworkIds(networkUsers: [User]) -> [String]? {
     return nil
     }
 }
+    @objc func handleAppDidBecomeActiveNotification(notification: Notification) {
+        self.fetchUser()
+    }
 }
+
+
 
 
 // MARK: - UITableViewDataSource

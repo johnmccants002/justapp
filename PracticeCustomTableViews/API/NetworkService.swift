@@ -17,6 +17,9 @@ struct NetworkService {
         let myGroup = DispatchGroup()
         REF_CURRENT_USER_NETWORKS.child(currentUser.uid).observeSingleEvent(of: .value) { snapshot in
             print("This is the snapshot \(snapshot)")
+            if snapshot.exists() == false {
+                completion([])
+            }
             guard let dictionary = snapshot.value as? [String: Any] else { return }
             for (key, value) in dictionary {
                 myGroup.enter()
@@ -60,8 +63,11 @@ struct NetworkService {
         var users: [User] = []
         let myGroup = DispatchGroup()
         REF_NETWORK_INVITES.child(uid).observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists() == false {
+                completion([])
+            }
+
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
-     
             for (key, value) in dictionary {
                 myGroup.enter()
                 UserService.shared.fetchUser(uid: key) { user in
@@ -74,6 +80,7 @@ struct NetworkService {
             }
             
         }
+        
         
     }
     
