@@ -16,6 +16,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     @IBOutlet weak var justLabel: UILabel!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var respectButton: UIButton!
+    var justImageView = UIImageView()
     var just: Just? {
         didSet {
             print("Just did set called")
@@ -25,6 +26,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             setupLongPressGesture()
             fetchToken()
             fetchUserImage()
+            setupLabelTapJustImageView()
             
         }
     }
@@ -47,6 +49,11 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     override func layoutSubviews() {
         self.setupRespectButton()
+        self.addSubview(justImageView)
+        justImageView.isHidden = true
+        justImageView.centerX(inView: self)
+        justImageView.centerY(inView: self)
+        justImageView.setDimensions(width: 20, height: 20)
     }
     
     override func prepareForReuse() {
@@ -88,6 +95,12 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         contentView.isUserInteractionEnabled = true
         justLabel.attributedText = viewModel.userInfoText
         timestampLabel.text = viewModel.timestamp
+        
+        if let justImageUrl = just.justImageUrl {
+            justImageView.sd_setImage(with: justImageUrl) { img, err, cache, url in
+                self.justImageView.setupImageViewer(options: [.theme(.dark)], from: nil)
+            }
+        }
         
     }
     
@@ -177,12 +190,14 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         imageView.layer.borderWidth = 4
     }
     
-    func setupLabels() {
+    func setupLabelTapJustImageView() {
         guard let just = just else { return }
-        let title = NSMutableAttributedString(string: "\(just.firstName) \(just.lastName) ", attributes: [.font: UIFont.boldSystemFont(ofSize: 14)])
-        title.append(NSAttributedString(string: "just \(just.justText)", attributes: [.font: UIFont.systemFont(ofSize: 14)]))
-        
-        justLabel.attributedText = title
+            let tapAction = UITapGestureRecognizer(target: self, action: #selector(self.tapLabel(gesture:)))
+            justLabel.isUserInteractionEnabled = true
+            self.contentView.isUserInteractionEnabled = true
+            
+            justLabel.addGestureRecognizer(tapAction)
+            
         
         
     }
@@ -246,6 +261,20 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         }
     }
     
+    @objc func tapLabel(gesture: UITapGestureRecognizer) {
+        guard let postText = justLabel.text else { return }
+        guard let just = just else { return }
+        if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: "\(just.firstName) \(just.lastName)") {
+            delegate?.imageTapped(cell: self)
+        } else if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: " (Photo 🖼)") {
+                self.justImageView.showImageViewerWithoutTap(iv: self.justImageView)
+                print(" Photo 🖼")
+            } else {
+                print("Idk")
+            }
+
+}
+    
     
 }
 
@@ -254,4 +283,5 @@ protocol NetworkJustCellDelegate {
     func respectTapped(cell: NetworkJustCell)
     func didLongPress(cell: NetworkJustCell)
     func respectCountTapped(cell: NetworkJustCell)
+    
 }

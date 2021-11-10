@@ -344,6 +344,20 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kLr-q1-xXm">
+                                <rect key="frame" x="324" y="369" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="pmK-G9-2t0"/>
+                                    <constraint firstAttribute="height" constant="60" id="rZe-fs-vog"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="10"/>
+                                <state key="normal" title="Add Photo">
+                                    <color key="titleColor" systemColor="labelColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="addPhotoButtonTapped:" destination="ieZ-qY-N3C" eventType="touchUpInside" id="AUo-AT-LaV"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="KmE-Zh-MRB"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -351,8 +365,10 @@
                             <constraint firstItem="KmE-Zh-MRB" firstAttribute="trailing" secondItem="OfA-48-mIE" secondAttribute="trailing" constant="20" id="0XU-Hl-Ag9"/>
                             <constraint firstItem="tCR-gO-Ml6" firstAttribute="centerY" secondItem="MbU-UM-kGg" secondAttribute="centerY" id="QUK-fq-4Ay"/>
                             <constraint firstItem="KmE-Zh-MRB" firstAttribute="trailing" secondItem="HMp-vH-VhO" secondAttribute="trailing" constant="20" id="Qv9-bn-FYu"/>
+                            <constraint firstItem="KmE-Zh-MRB" firstAttribute="trailing" secondItem="kLr-q1-xXm" secondAttribute="trailing" constant="30" id="Tjo-Hb-UHN"/>
                             <constraint firstItem="HMp-vH-VhO" firstAttribute="leading" secondItem="KmE-Zh-MRB" secondAttribute="leading" constant="20" id="ZNT-K1-mTu"/>
                             <constraint firstItem="OfA-48-mIE" firstAttribute="top" secondItem="HMp-vH-VhO" secondAttribute="bottom" constant="8" symbolic="YES" id="cg0-Wj-Uoy"/>
+                            <constraint firstItem="kLr-q1-xXm" firstAttribute="top" secondItem="OfA-48-mIE" secondAttribute="bottom" constant="74" id="dhu-dx-HyY"/>
                             <constraint firstItem="OfA-48-mIE" firstAttribute="leading" secondItem="KmE-Zh-MRB" secondAttribute="leading" constant="20" id="s3V-pD-6xC"/>
                             <constraint firstItem="tCR-gO-Ml6" firstAttribute="centerX" secondItem="MbU-UM-kGg" secondAttribute="centerX" id="tS7-6O-BYe"/>
                             <constraint firstItem="HMp-vH-VhO" firstAttribute="top" secondItem="KmE-Zh-MRB" secondAttribute="top" constant="102" id="unA-P2-7lH"/>
@@ -371,6 +387,7 @@
                         </button>
                     </navigationItem>
                     <connections>
+                        <outlet property="addPhotoButton" destination="kLr-q1-xXm" id="Obj-F1-HDr"/>
                         <outlet property="justTextView" destination="OfA-48-mIE" id="q2d-OU-wDu"/>
                         <outlet property="loadingIndicator" destination="tCR-gO-Ml6" id="nfc-n2-EHw"/>
                         <outlet property="navigation" destination="p8q-nW-56S" id="wf1-gP-JOT"/>

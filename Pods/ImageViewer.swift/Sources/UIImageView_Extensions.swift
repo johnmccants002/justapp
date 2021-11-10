@@ -3,14 +3,14 @@ import UIKit
 extension UIImageView {
     
     // Data holder tap recognizer
-    private class TapWithDataRecognizer:UITapGestureRecognizer {
+    public class TapWithDataRecognizer:UITapGestureRecognizer {
         weak var from:UIViewController?
         var imageDatasource:ImageDataSource?
         var initialIndex:Int = 0
         var options:[ImageViewerOption] = []
     }
     
-    private var vc:UIViewController? {
+    public var vc:UIViewController? {
         guard let rootVC = UIApplication.shared.keyWindow?.rootViewController
             else { return nil }
         return rootVC.presentedViewController != nil ? rootVC.presentedViewController : rootVC
@@ -138,4 +138,30 @@ extension UIImageView {
         let presentFromVC = sender.from ?? vc
         presentFromVC?.present(imageCarousel, animated: true)
     }
+    
+    public func showImageViewerWithoutTap(iv: UIImageView
+     ) {
+         
+         let imageCarousel = ImageCarouselViewController.init(
+             sourceView: iv,
+             imageDataSource: iv,
+             options: [],
+             initialIndex: 0)
+         let presentFromVC = vc
+         presentFromVC?.present(imageCarousel, animated: true)
+     }
 }
+
+extension UIImageView: ImageDataSource {
+    public func numberOfImages() -> Int {
+        1
+    }
+    
+    public func imageItem(at index: Int) -> ImageItem {
+        guard let image = self.image else { return ImageItem.image(nil) }
+        return ImageItem.image(image)
+    }
+    
+    
+}
+

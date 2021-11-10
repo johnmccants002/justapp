@@ -14,6 +14,7 @@ let FIRESTORE_DB_REF = Firestore.firestore()
 let REF_USERS = DB_REF.child("users")
 let STORAGE_REF = Storage.storage().reference()
 let STORAGE_PROFILE_IMAGES = STORAGE_REF.child("profile_images")
+let STORAGE_JUST_IMAGES = STORAGE_REF.child("just_images")
 let REF_USER_JUSTS = DB_REF.child("user-justs")
 let REF_CURRENT_USER_NETWORKS = DB_REF.child("user-networks")
 let REF_NETWORK_USERS = DB_REF.child("network-users")
@@ -26,5 +27,6 @@ let REF_JUST_RESPECTS = DB_REF.child("just-respects")
 let REF_NETWORK_DETAILS = DB_REF.child("network-details")
 let REF_CHECKED_RESPECT = DB_REF.child("checked-respect")
 let REF_CHECKED_INVITES = DB_REF.child("checked-invites")
+
 
 

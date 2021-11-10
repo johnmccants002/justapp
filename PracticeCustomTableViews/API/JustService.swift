@@ -13,7 +13,7 @@ typealias DatabaseCompletion = ((Error?, DatabaseReference) -> Void)
 struct JustService {
     static let shared = JustService()
     
-    func uploadJust(user: User, justText: String, networks: [Network]?, friendsNetworks: Bool, completion: @escaping(Error?) -> Void) {
+    func uploadJust(user: User, justText: String, justImage: UIImage?, networks: [Network]?, friendsNetworks: Bool, completion: @escaping(Error?) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let ref = REF_USER_JUSTS.childByAutoId()
         guard let justID = ref.key else { return }
@@ -26,6 +26,12 @@ struct JustService {
             REF_NETWORK_JUSTS.document(user.networkId).collection("justs").document(justID).setData(values)
             REF_NETWORK_JUSTS.document(user.networkId).collection("last-justs").document(uid).setData(values)
         
+        if let justImage = justImage {
+            print("we have justimage")
+            uploadJustImage(image: justImage, friendsNetworks: friendsNetworks, networks: networks, justID: justID, user: user) { err in
+                print(err)
+            }
+        }
    
             if friendsNetworks == true {
                 guard let networks = networks else { return }
@@ -44,6 +50,41 @@ struct JustService {
         
      
 
+    }
+    
+    func uploadJustImage(image: UIImage, friendsNetworks: Bool, networks: [Network]?, justID: String, user: User, completion: @escaping(Error?) -> Void) {
+        guard let compressedImage = image.jpegData(compressionQuality: 0.3) else { return }
+        let filename = NSUUID().uuidString
+        let storageRef = STORAGE_JUST_IMAGES.child(filename)
+        
+        storageRef.putData(compressedImage, metadata: nil) { (meta, error) in
+            if let error = error {
+                print("DEBUG: Error putting image data to database \(error)")
+            }
+            storageRef.downloadURL { url, error in
+                guard let justImageUrl = url?.absoluteString else { return }
+                guard let uid = Auth.auth().currentUser?.uid else { return }
+                let values = ["justImageUrl": justImageUrl]
+                
+                REF_NETWORK_JUSTS.document(user.networkId).collection("justs").document(justID).updateData(values)
+                REF_NETWORK_JUSTS.document(user.networkId).collection("last-justs").document(uid).updateData(values)
+                
+                if friendsNetworks == true {
+                    guard let networks = networks else { return }
+                    print("passed the first loop guard")
+                for network in networks {
+                    print("in the first loop")
+                    REF_NETWORK_JUSTS.document(network.networkID).collection("last-justs").document(uid).updateData(values) { err in
+                        REF_NETWORK_JUSTS.document(network.networkID).collection("justs").document(justID).updateData(values)
+                    }
+                }
+                    completion(nil)
+                } else {
+                    completion(nil)
+                }
+                
+            }
+        }
     }
     
     func fetchJusts(networkID: String, completion:@escaping ([Just], Error?) -> Void) {

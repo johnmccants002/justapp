@@ -60,8 +60,6 @@ class ResultsTableViewController: UITableViewController {
        
     }
     
- 
-    
     // MARK: - Helper Functions
     
     func checkUser() {
@@ -115,10 +113,6 @@ class ResultsTableViewController: UITableViewController {
                     cell.userImage.setRounded()
                     return cell
                 }
-            
-//            if let inNetwork = inNetwork {
-//                cell.inNetwork = inNetwork
-//            }
                 cell.userImage.setRounded()
                 return cell
         

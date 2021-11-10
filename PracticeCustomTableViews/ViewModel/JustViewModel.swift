@@ -32,6 +32,14 @@ struct JustViewModel {
         let title = NSMutableAttributedString(string: "\(just.firstName) \(just.lastName) ", attributes: [.font: UIFont.boldSystemFont(ofSize: 14)])
         title.append(NSAttributedString(string: "\(just.justText)", attributes: [.font: UIFont.systemFont(ofSize: 14)]))
         
+        if let justImageUrl = just.justImageUrl {
+            let text = (" (Photo 🖼)")
+            let underlineAttriString = NSMutableAttributedString(string: text, attributes: [.font: UIFont.boldSystemFont(ofSize: 12)])
+            let photoRange = (text as NSString).range(of: " (Photo 🖼)")
+            underlineAttriString.addAttribute(.foregroundColor, value: UIColor.blue, range: photoRange)
+            title.append(NSAttributedString(attributedString: underlineAttriString))
+        }
+        
         return title
     }
     

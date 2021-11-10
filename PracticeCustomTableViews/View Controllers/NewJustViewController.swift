@@ -14,6 +14,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
     
+    @IBOutlet weak var addPhotoButton: UIButton!
     @IBOutlet weak var navigation: UINavigationItem!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     @IBOutlet var selectButton : UIButton!
@@ -22,6 +23,8 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     var currentUser: User?
     var networks: [Network]?
     var yourNetworkUserIds: [String]?
+    var justImage: UIImage?
+    var imagePicker = UIImagePickerController()
     
     var postButtonKeyboard: UIBarButtonItem {
         let nextButton = UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(self.postButtonPressed(_:)))
@@ -39,10 +42,23 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         keyboardToolbar.layer.borderColor = UIColor.black.cgColor
         return keyboardToolbar
     }
+    
+    var xButton : UIButton = {
+        let button = UIButton()
+        button.setTitle("X", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.backgroundColor = .white
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.black.cgColor
+        button.setDimensions(width: 15, height: 15)
+        button.titleLabel?.textAlignment = .center
+        button.addTarget(self, action: #selector(xButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     @IBOutlet weak var justTextView: UITextView!
     var widthConstraint : NSLayoutConstraint?
     let justMaxLength = 150
-    let imagePicker = UIImagePickerController()
     var photoSelected = false
     var friendsNetwork = false
     
@@ -74,6 +90,14 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.justTextView.inputAccessoryView = keyboardToolBar
         self.justTextView.autocorrectionType = .no
         self.keyboardToolBar.isHidden = true
+        
+        self.view.addSubview(xButton)
+        xButton.setRoundedView()
+        addPhotoButton.setRoundedView()
+        
+        xButton.anchor(top: self.addPhotoButton.topAnchor, right: addPhotoButton.rightAnchor, paddingTop: -4)
+        xButton.isHidden = true
+        self.imagePicker.allowsEditing = true
       
     }
     
@@ -145,11 +169,10 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     
     @objc func myPerformCode() {
-        print(friendsNetwork)
         guard let justText = justTextView.text else { return }
         guard let user = self.currentUser else { return }
         if let networks = networks {
-            JustService.shared.uploadJust(user: user, justText: justText, networks: networks, friendsNetworks: friendsNetwork) { error in
+            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, networks: networks, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
@@ -158,7 +181,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
                 self.loadingIndicator.stopAnimating()
             }
         } else {
-            JustService.shared.uploadJust(user: user, justText: justText, networks: nil, friendsNetworks: friendsNetwork) { error in
+            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, networks: nil, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
@@ -176,6 +199,14 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         
        }
         
+    }
+    @IBAction func addPhotoButtonTapped(_ sender: UIButton) {
+        self.present(imagePicker, animated: true, completion: nil)
+    }
+    
+    @objc func xButtonTapped() {
+        self.addPhotoButton.setImage(nil, for: .normal)
+        self.xButton.isHidden = true
     }
     
     func fetchYourNetworkUserIds() {
@@ -219,6 +250,11 @@ extension NewJustViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             print("image picked")
+            addPhotoButton.setImage(pickedImage, for: .normal)
+            justImage = pickedImage
+            self.addPhotoButton.imageView?.contentMode = .scaleAspectFit
+            xButton.isHidden = false
+
             photoSelected = true
         }
         

@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import QuickLook
 
 private let reuseIdentifier = "networkJustCell"
 private let headerIdentifier = "ProfileHeader"
@@ -17,9 +16,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     
     
     // MARK - Properties
-    
-    
-    
+
     var currentUser: User {
         didSet {
             collectionView.reloadData()
@@ -331,12 +328,6 @@ extension CurrentUserController: ProfileHeaderDelegate {
     }
     
     func handleBackTapped(_ header: ProfileHeader) {
-//        let transition:CATransition = CATransition()
-//        transition.duration = 0.5
-//        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-//        transition.type = CATransitionType.push
-//        transition.subtype = .fromRight
-//        self.navigationController?.view.layer.add(transition, forKey: kCATransition)
         self.navigationController?.popViewController(animated: true)
     }
     

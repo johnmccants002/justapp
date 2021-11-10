@@ -18,6 +18,7 @@ class Just {
     var justID: String
     var profileImageUrl: URL?
     var respects: Int = 0
+    var justImageUrl: URL?
     
     init(justID: String, dictionary: [String: Any]) {
         self.justID = justID
@@ -34,6 +35,11 @@ class Just {
         
         if let timestamp = dictionary["timestamp"] as? Double {
             self.timestamp = Date(timeIntervalSince1970: timestamp)
+        }
+        
+        if let justImageUrl = dictionary["justImageUrl"] as? String {
+            guard let imageUrl = URL(string: justImageUrl) else { return }
+            self.justImageUrl = imageUrl
         }
         
     }
