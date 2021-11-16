@@ -14,6 +14,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
     
+    @IBOutlet weak var addPhotoImageView: UIImageView!
     @IBOutlet weak var addPhotoButton: UIButton!
     @IBOutlet weak var navigation: UINavigationItem!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
@@ -29,7 +30,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     var postButtonKeyboard: UIBarButtonItem {
         let nextButton = UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(self.postButtonPressed(_:)))
         nextButton.width = self.view.viewWidth
-        nextButton.tintColor = UIColor.blue
+        nextButton.tintColor = UIColor.black
         return nextButton
     }
     var keyboardToolBar: UIToolbar {
@@ -45,11 +46,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     var xButton : UIButton = {
         let button = UIButton()
-        button.setTitle("X", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = .white
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.black.cgColor
+        button.setImage(UIImage(named: "xButton1"), for: .normal)
         button.setDimensions(width: 15, height: 15)
         button.titleLabel?.textAlignment = .center
         button.addTarget(self, action: #selector(xButtonTapped), for: .touchUpInside)
@@ -98,12 +95,16 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         xButton.anchor(top: self.addPhotoButton.topAnchor, right: addPhotoButton.rightAnchor, paddingTop: -4)
         xButton.isHidden = true
         self.imagePicker.allowsEditing = true
+        
+        self.addPhotoImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(addPhotoButtonTapped(_:)))
+        self.addPhotoImageView.addGestureRecognizer(tap)
       
     }
     
     func networkButtonSetUp() {
         selectButton.layer.cornerRadius = 5
-        selectButton.layer.borderColor = UIColor.blue.cgColor
+        selectButton.layer.borderColor = UIColor.black.cgColor
         selectButton.layer.borderWidth = 1
         selectButton.layer.backgroundColor = UIColor.white.cgColor
         let width = selectButton.widthAnchor.constraint(equalToConstant: 130)
@@ -133,7 +134,6 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
             self.widthConstraint = widthPlus
             
         }
-        
         if let networks = networks {
             alert.addAction(action2)
         }
@@ -147,26 +147,87 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         let _ : Timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.myPerformCode), userInfo: nil, repeats: false)
     }
     
+    func openCamera()
+    {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.camera) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerController.SourceType.camera
+            imagePicker.allowsEditing = false
+            self.present(imagePicker, animated: true, completion: nil)
+        }
+        else
+        {
+            let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func openGallery()
+    {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.photoLibrary){
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.allowsEditing = true
+            imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+            self.present(imagePicker, animated: true, completion: nil)
+        }
+        else
+        {
+            let alert  = UIAlertController(title: "Warning", message: "You don't have permission to access gallery.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    // MARK: - Firebase Functions
+    
     func fetchCurrentUserNetworkUsers() {
         guard let currentUser = currentUser else { return }
         NetworkService.shared.fetchCurrentUserNetworkUsers { userIds in
             self.yourNetworkUserIds = userIds
-            print("These are the userIds \(userIds)")
         }
     }
     
+    func uncheckNetworks() {
+       if friendsNetwork == true {
+            if let networks = networks, let yourNetworkUserIds = yourNetworkUserIds {
+                NetworkService.shared.uncheckNetworks(networks: networks, yourNetworkUserIds: yourNetworkUserIds)
+            }
+       }
+        
+    }
+    
     // MARK: - Selectors
+    
+    @IBAction func addPhotoButtonTapped(_ sender: UIButton) {
+        let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
+              alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+                  self.openCamera()
+              }))
 
-    @objc func postButtonPressed(_: UIButton) {
-        self.loadingIndicator.isHidden = false
-        self.loadingIndicator.startAnimating()
-        sendInfoToDB()
+              alert.addAction(UIAlertAction(title: "Photos", style: .default, handler: { _ in
+                  self.openGallery()
+              }))
+
+              alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+
+              self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func selectButtonTapped(_ sender: UIButton) {
         presentAlertSelection()
     }
     
+    @objc func postButtonPressed(_: UIButton) {
+        if self.justTextView.hasText {
+            self.loadingIndicator.isHidden = false
+            self.loadingIndicator.startAnimating()
+            sendInfoToDB()
+        } 
+      
+    }
     
     @objc func myPerformCode() {
         guard let justText = justTextView.text else { return }
@@ -191,26 +252,10 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-    func uncheckNetworks() {
-       if friendsNetwork == true {
-            if let networks = networks, let yourNetworkUserIds = yourNetworkUserIds {
-                NetworkService.shared.uncheckNetworks(networks: networks, yourNetworkUserIds: yourNetworkUserIds)
-            }
-        
-       }
-        
-    }
-    @IBAction func addPhotoButtonTapped(_ sender: UIButton) {
-        self.present(imagePicker, animated: true, completion: nil)
-    }
-    
     @objc func xButtonTapped() {
         self.addPhotoButton.setImage(nil, for: .normal)
         self.xButton.isHidden = true
-    }
-    
-    func fetchYourNetworkUserIds() {
-        
+        self.addPhotoImageView.isHidden = false
     }
 
 }
@@ -221,8 +266,10 @@ extension NewJustViewController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         self.keyboardToolBar.isHidden = true
+        self.postButtonKeyboard.isEnabled = false
         if textView.text.count > 1 {
                 self.keyboardToolBar.isHidden = false
+            self.postButtonKeyboard.isEnabled = true
             print("textview greater than 1")
             }
         
@@ -239,7 +286,7 @@ extension NewJustViewController: UITextViewDelegate {
     }
         
     func textViewDidBeginEditing(_ textView: UITextView) {
-        self.justTextView.text = ""
+        
     }
     
 }
@@ -254,6 +301,7 @@ extension NewJustViewController: UIImagePickerControllerDelegate {
             justImage = pickedImage
             self.addPhotoButton.imageView?.contentMode = .scaleAspectFit
             xButton.isHidden = false
+            addPhotoImageView.isHidden = true
 
             photoSelected = true
         }

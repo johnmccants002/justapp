@@ -121,7 +121,9 @@ struct NetworkService {
             
         }
         myGroup.notify(queue: .main) {
-            let allNetworks = uncheckedNetworks + checkedNetworks
+            let sortedUnchecked = uncheckedNetworks.sorted(by: { $0.user.firstName < $1.user.firstName})
+            let sortedChecked = checkedNetworks.sorted(by: {$0.user.firstName < $1.user.firstName})
+            let allNetworks = sortedUnchecked + sortedChecked
             completion(allNetworks)
         }
  
@@ -188,5 +190,47 @@ struct NetworkService {
             }
         }
     }
+    
+    func removeUserFromNetwork(currentUser: User, userToRemove: User, networkId: String, completion: @escaping() -> Void) {
+        
+        // Remove Justs containing userToRemove.uid from currentUser's network in Firestore
+        let query : Query = FIRESTORE_DB_REF.collection("networks").document(networkId).collection("justs").whereField("uid", isEqualTo: userToRemove.uid)
+        
+        query.getDocuments { snapshot, err in
+            if let error = err {
+                print(error.localizedDescription)
+            } else {
+                for document in snapshot!.documents {
+                    FIRESTORE_DB_REF.collection("networks").document("networkId").collection("justs").document(document.documentID).delete()
+                }
+            }
+        }
+        
+        // Removing userToRemove.uid from currentUsers network
+        REF_NETWORK_USERS.child(networkId).child(userToRemove.uid).removeValue()
+        
+        REF_CURRENT_USER_NETWORKS.child(currentUser.uid).child(userToRemove.uid).removeValue()
+    }
+    
+    func fetchUsersInNetwork(networkId: String, currentUser: User, completion:@escaping([User]) -> Void) {
+        var users : [User] = []
+        let myGroup = DispatchGroup()
+        REF_NETWORK_USERS.child(networkId).observeSingleEvent(of: .value) { snapshot in
+            print("This is the snapshot: \(snapshot.value)")
+            guard let dict = snapshot.value as? [String: Any] else { return }
+            
+            for (key, value) in dict {
+                myGroup.enter()
+                UserService.shared.fetchUser(uid: key) { user in
+                    users.append(user)
+                    myGroup.leave()
+                }
+            }
+            myGroup.notify(queue: .main) {
+                print("These are the users networks we got \(users)")
+            completion(users)
+        }
+        }
 
+}
 }

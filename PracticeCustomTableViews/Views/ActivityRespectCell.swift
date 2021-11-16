@@ -9,9 +9,11 @@ import UIKit
 
 class ActivityRespectCell: UICollectionViewCell {
 
+    @IBOutlet weak var timestampLabel: UILabel!
     var respectNotification: RespectNotification? {
         didSet {
             fetchUser()
+            setupTimeStamp()
         }
     }
     var user: User? {
@@ -20,6 +22,8 @@ class ActivityRespectCell: UICollectionViewCell {
             setupImageView()
         }
     }
+    
+    var lineView = UIView()
     @IBOutlet weak var containerView: UIView!
     
     @IBOutlet weak var imageView: UIImageView!
@@ -37,6 +41,8 @@ class ActivityRespectCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.25)
+        
     }
     
     func setupImageView() {
@@ -50,6 +56,28 @@ class ActivityRespectCell: UICollectionViewCell {
         imageView.layer.borderColor = UIColor.white.cgColor
         imageView.layer.borderWidth = 4
         imageView.isUserInteractionEnabled = true
+        
+        
+    }
+    
+    func setupTimeStamp() {
+        guard let notification = respectNotification else { return }
+        
+        let timestamp: String = {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day, .weekOfMonth]
+            formatter.maximumUnitCount = 1
+            
+            
+            let now = Date()
+            if formatter.string(from: notification.timestamp, to: now) == "0d" {
+                return "Today"
+            }
+            return formatter.string(from: notification.timestamp, to: now) ?? "2m"
+        }()
+        
+        self.timestampLabel.text = timestamp
+       
     }
     
     @objc func imageTapped() {
@@ -62,7 +90,8 @@ class ActivityRespectCell: UICollectionViewCell {
         guard let respectNotification = respectNotification else { return }
         captionLabel.text = "\(respectNotification.firstName) respected your just"
         guard let user = user else { return }
-        guard let url = user.profileImageUrl else {return
+        guard let url = user.profileImageUrl else { imageView.image = UIImage(named: "blank")
+            return
         }
         imageView.sd_setImage(with: url, completed: nil)
     }
@@ -79,4 +108,6 @@ class ActivityRespectCell: UICollectionViewCell {
 protocol ActivityRespectCellDelegate: AnyObject {
     func cellImageTapped(cell: ActivityRespectCell)
 }
+
+
 

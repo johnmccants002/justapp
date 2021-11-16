@@ -17,6 +17,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         didSet {
             collectionView.isUserInteractionEnabled = true
             collectionView.reloadData()
+            fetchAllNetworkJusts()
         }
     }
     let justNibName = "NetworkJustCell"
@@ -29,12 +30,28 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         }
     }
     
+    var allNetworkJusts = [Just]() {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
+     
+    var lastJustIds: [String]? {
+        didSet {
+            guard let lastJustIds = lastJustIds else { return }
+            fetchOtherJusts(lastJustIds: lastJustIds)
+        }
+    }
+    
+    var user: User
+    
     // MARK: - Initializer
     
-    init(currentUser: User, titleText: String, networkId: String) {
+    init(currentUser: User, titleText: String, networkId: String, user: User) {
         self.currentUser = currentUser
         self.titleText = titleText
         self.networkId = networkId
+        self.user = user
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
         
     }
@@ -51,6 +68,8 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         updateViews()
         addObservers()
         setupRefreshControl()
+        setupRightBarButtonItem()
+        setupCurrentUserArray()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -69,7 +88,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     // MARK: - Helper Functions
     
     func updateViews() {
-        print("update views being called")
         let nib = UINib(nibName: justNibName, bundle: nil)
         collectionView.register(nib, forCellWithReuseIdentifier: "networkJustCell")
         collectionView.backgroundColor = .white
@@ -79,12 +97,33 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
    
     }
     
+    func setupRightBarButtonItem() {
+        if titleText == "My Network" {
+    
+        let button : UIButton = {
+            let button = UIButton(type: .infoLight, primaryAction: nil)
+            button.addTarget(self, action: #selector(rightBarButtonTapped), for: .touchUpInside)
+            
+            return button
+        }()
+        let barButton = UIBarButtonItem(customView: button)
+        self.navigationItem.setRightBarButton(barButton, animated: true)
+        
+        }
+    }
+    
     func longPressAlert(currentUser: Bool, cell: NetworkJustCell) -> UIAlertController {
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         if currentUser == true {
             let alert = UIAlertController(title: "Delete", message: "You sure you want to delete this just?", preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Delete", style: .default) { action in
                 self.removeCell(cell: cell)
+                guard let currentUserArray = self.currentUserArray, let just = cell.just else { return }
+                var networkIds = currentUserArray.map { $0.networkId }
+                JustService.shared.deleteJust(networkIDs: networkIds, justID: just.justID, uid: self.currentUser.uid, currentUserNetworkID: self.currentUser.networkId) {
+                    self.collectionView.reloadData()
+                }
+                
             }
             alert.addAction(deleteAction)
             alert.addAction(cancelAction)
@@ -100,10 +139,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     
     func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadNetworkJusts), name: NSNotification.Name.init("reloadNetworkJusts"), object: nil)
-    }
-    
-    @objc func reloadNetworkJusts() {
-        fetchLastJusts()
     }
     
     func setupRefreshControl() {
@@ -131,6 +166,19 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             self.lastJusts = justs
             self.checkIfUserRespectedJusts(justs: self.lastJusts)
             self.collectionView.refreshControl?.endRefreshing()
+            
+            var lastJustIds : [String] = []
+            for just in justs {
+                lastJustIds.append(just.justID)
+            }
+            self.lastJustIds = lastJustIds
+           
+        }
+    }
+    
+    func fetchOtherJusts(lastJustIds: [String]) {
+        JustService.shared.testGrabAllJusts(lastJustIds: lastJustIds, networkId: networkId) { justs in
+            self.lastJusts.append(contentsOf: justs)
         }
     }
     
@@ -153,10 +201,35 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         }
     }
     
+    func fetchAllNetworkJusts() {
+        
+    }
+    
+    // MARK: - Selectors
+    
     @objc func removeCell(cell: NetworkJustCell) {
         let i = cell.tag
         lastJusts.remove(at: i)
         collectionView.reloadData()
+    }
+    
+    @objc func reloadNetworkJusts() {
+        fetchLastJusts()
+    }
+    
+    @objc func rightBarButtonTapped() {
+        print("right bar button tapped")
+        guard let currentUserArray = currentUserArray else { return }
+        if self.currentUser == user {
+            let controller = NetworkDetailsController(currentUser: currentUser, user: currentUser, currentUserArray: currentUserArray)
+            controller.networkUsers = currentUserArray
+            
+            self.navigationController?.pushViewController(controller, animated: true)
+        } else {
+            let controller = NetworkDetailsController(currentUser: currentUser, user: user, currentUserArray: currentUserArray)
+            controller.fetchNetworkUsers()
+            self.navigationController?.pushViewController(controller, animated: true)
+        }
     }
     
 
@@ -170,12 +243,8 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
             cell.fetchToken()
-        
-//        if lastJusts[indexPath.row].uid == currentUser.uid {
-//            cell.setupRespectCountButton()
-//        }
-        
-        
+            cell.tag = indexPath.row
+ 
         return cell
     }
     
@@ -260,7 +329,6 @@ extension NetworkJustsController: NetworkJustCellDelegate {
 
         JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
         }
-        
     }
     
     

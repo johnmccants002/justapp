@@ -37,7 +37,15 @@ class RespectedByCell: UICollectionViewCell {
         } else {
             self.profileImageView.image = UIImage(named: "blank")
         }
+        self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.25)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(imageViewTapped))
+        profileImageView.addGestureRecognizer(tap)
+        profileImageView.isUserInteractionEnabled = true
         
+    }
+    
+    @objc func imageViewTapped() {
+        delegate?.usernameButtonTapped(cell: self)
     }
 
 }

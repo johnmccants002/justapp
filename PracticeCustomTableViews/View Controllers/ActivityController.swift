@@ -11,18 +11,29 @@ import UIKit
 class ActivityController: UICollectionViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
+    
     let currentUser : User
     var invites : [User]? {
         didSet {
+            if ((invites?.isEmpty) != nil) {
+                removeLoadingView()
+//                displayEmptyView()
+            }
+            removeLoadingView()
             collectionView.reloadData()
         }
     }
     let inviteNib : String = "InviteCell"
     var loadingIndicator = UIActivityIndicatorView()
     var refreshControl = UIRefreshControl()
+    var emptyInvitesView: InvitesEmptyView?
+    var loadingView: LoadingView?
+    
+    // MARK: - Lifecycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        displayLoadingView()
         let nib = UINib(nibName: self.inviteNib, bundle: nil)
         
         collectionView.register(nib, forCellWithReuseIdentifier: "inviteCell")
@@ -43,6 +54,8 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Helper Functions
+    
     func setupLoadingIndicator() {
         loadingIndicator.hidesWhenStopped = true
         loadingIndicator.isHidden = true
@@ -53,13 +66,9 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         
     }
     
-    func setupRefreshControl() {
-        self.refreshControl.addTarget(self, action: #selector(reloadInvites), for: .valueChanged)
-        self.collectionView.refreshControl = self.refreshControl
-    }
-    
-    @objc func reloadInvites() {
-        fetchInvites()
+    func setupLeftBarItem() {
+        let backButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissController))
+        self.navigationItem.leftBarButtonItem = backButton
     }
     
     func updateViews() {
@@ -72,19 +81,47 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         
     }
     
-    func setupLeftBarItem() {
-        let backButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissController))
-        self.navigationItem.leftBarButtonItem = backButton
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadInvites), for: .valueChanged)
+        self.collectionView.refreshControl = self.refreshControl
     }
+    
+    func displayEmptyView() {
+            let emptyView = InvitesEmptyView(frame: CGRect(x: self.view.bounds.minX, y: self.view.bounds.minY, width: self.view.bounds.width, height: self.view.bounds.height))
+            self.view.addSubview(emptyView)
+        
+    }
+    
+    func displayLoadingView() {
+        let loadView = LoadingView(frame: CGRect(x: self.view.bounds.minX, y: self.view.bounds.minY, width: self.view.bounds.width, height: self.view.bounds.height))
+        self.loadingView = loadView
+        self.view.addSubview(loadView)
+    }
+    
+    func removeLoadingView() {
+        guard let loadingView = self.loadingView else { return }
+        loadingView.removeFromSuperview()
+    }
+    
+    // MARK: - Firebase Functions
     
     func fetchInvites() {
         NetworkService.shared.fetchInvites(uid: currentUser.uid) { users in
             if users.isEmpty {
                 self.collectionView.refreshControl?.endRefreshing()
+                self.displayEmptyView()
+                self.removeLoadingView()
             }
+            self.removeLoadingView()
             self.invites = users
             self.collectionView.refreshControl?.endRefreshing()
         }
+    }
+    
+    // MARK: - Selectors
+    
+    @objc func reloadInvites() {
+        fetchInvites()
     }
     
     @objc func dismissController() {
@@ -99,8 +136,6 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
 
 // MARK: - UICollectionViewDataSource
 
-
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         print("dequeueing cell")
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "inviteCell", for: indexPath) as! InviteCell
@@ -109,8 +144,7 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         cell.delegate = self
         cell.acceptButton.tag = indexPath.row
         cell.denyButton.tag = indexPath.row
-//        cell.acceptButton.addTarget(self, action: #selector(removeCell(sender:)), for: .touchUpInside)
-//        cell.denyButton.addTarget(self, action: #selector(removeCell(sender:)), for: .touchUpInside)
+
       return cell
     }
     
@@ -118,6 +152,8 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         return invites?.count ?? 0
     }
 }
+
+// MARK: - UICollecitonViewDelegateFlowLayout
 
 extension ActivityController: UICollectionViewDelegateFlowLayout {
     
@@ -141,6 +177,8 @@ extension ActivityController: UICollectionViewDelegateFlowLayout {
             return 0
         }
 }
+
+// MARK: - InviteCellDelegate
 
 extension ActivityController: InviteCellDelegate {
     func acceptButtonTapped(cell: InviteCell) {

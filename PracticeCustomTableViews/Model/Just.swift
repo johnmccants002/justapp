@@ -45,3 +45,9 @@ class Just {
     }
     
 }
+
+extension Just: Equatable {
+    static func == (lhs: Just, rhs: Just) -> Bool {
+        return lhs.justID == rhs.justID
+    }
+}

@@ -11,9 +11,14 @@ import UIKit
 
 class SharedNetworksController: UICollectionViewController, UINavigationControllerDelegate {
     
+    // MARK: - Properties
+    
     var currentUser: User
     var users: [User]
     let sharedNetworkNibName = "SharedNetworkCell"
+    
+    
+    // MARK: - Lifecycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,18 +32,22 @@ class SharedNetworksController: UICollectionViewController, UINavigationControll
         self.navigationController?.navigationBar.barStyle = .default
     }
     
+    // MARK: - Helper Functions
+    
     func configure() {
         let nib = UINib(nibName: sharedNetworkNibName, bundle: nil)
         collectionView.register(nib, forCellWithReuseIdentifier: "sharedNetworkCell")
         collectionView.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         navigationController?.delegate = self
        
         
         
     }
+    
+    // MARK: - Initializer
     
     required init?(coder: NSCoder) {
         
@@ -52,6 +61,7 @@ class SharedNetworksController: UICollectionViewController, UINavigationControll
 }
   
     
+    // MARK: - UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "sharedNetworkCell", for: indexPath) as! SharedNetworkCell
@@ -70,11 +80,15 @@ class SharedNetworksController: UICollectionViewController, UINavigationControll
         
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
+
 extension SharedNetworksController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 80)
+        return CGSize(width: view.frame.width, height: 60)
     }
 }
+
+// MARK: - SharedNetworkCellDelegate
 
 extension SharedNetworksController: SharedNetworkCellDelegate {
     
@@ -92,6 +106,4 @@ extension SharedNetworksController: SharedNetworkCellDelegate {
         }
        
     }
-    
-    
 }

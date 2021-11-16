@@ -25,6 +25,7 @@ class SharedNetworkCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         updateViews()
+        self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.25)
     }
     
     func updateViews() {

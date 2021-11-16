@@ -8,13 +8,6 @@
 import Foundation
 import UIKit
 
-public enum SimpleAnimationEdge {
-  case none
-  case top
-  case bottom
-  case left
-  case right
-}
 
 class UserJustsController: UICollectionViewController, UINavigationControllerDelegate {
     
@@ -97,6 +90,11 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
             let alert = UIAlertController(title: "Delete", message: "You sure you want to delete this just?", preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Delete", style: .default) { action in
                 self.removeCell(cell: cell)
+                guard let currentUserArray = self.currentUserArray, let just = cell.just else { return }
+                let networkIds = currentUserArray.map { $0.networkId }
+                JustService.shared.deleteJust(networkIDs: networkIds, justID: just.justID, uid: self.currentUser.uid, currentUserNetworkID: self.currentUser.networkId) {
+                    self.collectionView.reloadData()
+                }
             }
             alert.addAction(deleteAction)
             alert.addAction(cancelAction)

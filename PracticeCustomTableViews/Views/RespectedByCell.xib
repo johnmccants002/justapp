@@ -21,14 +21,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="264" height="72"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PyL-n3-QAC">
-                                <rect key="frame" x="8" y="14.5" width="43" height="43"/>
+                                <rect key="frame" x="8" y="16" width="40" height="40"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="43" id="1ys-kU-MxH"/>
-                                    <constraint firstAttribute="height" constant="43" id="6or-2N-uhb"/>
+                                    <constraint firstAttribute="width" constant="40" id="1ys-kU-MxH"/>
+                                    <constraint firstAttribute="height" constant="40" id="6or-2N-uhb"/>
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TUL-Qj-pH6">
-                                <rect key="frame" x="59" y="21" width="197" height="30"/>
+                                <rect key="frame" x="56" y="21" width="200" height="30"/>
                                 <connections>
                                     <action selector="userButtonTapped:" destination="gTV-IL-0wX" eventType="touchUpInside" id="kv8-bL-QlS"/>
                                 </connections>

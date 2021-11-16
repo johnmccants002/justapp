@@ -9,7 +9,6 @@ import UIKit
 
 
 class NetworkViewController: UIViewController {
-
     
     // MARK: - Properties
     

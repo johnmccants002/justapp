@@ -65,6 +65,8 @@ struct JustService {
                 guard let justImageUrl = url?.absoluteString else { return }
                 guard let uid = Auth.auth().currentUser?.uid else { return }
                 let values = ["justImageUrl": justImageUrl]
+                let ref = REF_USER_JUSTS.child(justID)
+                ref.updateChildValues(values)
                 
                 REF_NETWORK_JUSTS.document(user.networkId).collection("justs").document(justID).updateData(values)
                 REF_NETWORK_JUSTS.document(user.networkId).collection("last-justs").document(uid).updateData(values)
@@ -116,17 +118,72 @@ struct JustService {
         }
     }
     
-    func deleteJust(networkIDs: [String], justID: String, uid: String) {
+    func deleteJust(networkIDs: [String], justID: String, uid: String, currentUserNetworkID: String, completion: @escaping()-> (Void)) {
+       
+        print("these are the networkIDs : \(networkIDs)")
+        let firstGroup = DispatchGroup()
+        let secondGroup = DispatchGroup()
+        firstGroup.enter()
+        DispatchQueue.main.async {
         for networkID in networkIDs {
-            REF_NETWORK_JUSTS.document(networkID).collection("justs").document(justID).delete { error in
-                if let error = error {
-                    print("DEBUG Error Deleting: \(error)")
+            print("1")
+            REF_NETWORK_JUSTS.document(networkID).collection("justs").document(justID).getDocument { snapshot, err in
+                guard let snapshot = snapshot else { return }
+                if snapshot.exists {
+                    REF_NETWORK_JUSTS.document(networkID).collection("justs").document(justID).delete { error in
+                        if let error = error {
+                            print("DEBUG Error Deleting: \(error)")
+                        }
+                    }
                 }
                 
-                REF_USER_JUSTS.child(uid).child(justID).removeValue()
+            
+            }
+            REF_NETWORK_JUSTS.document(networkID).collection("last-justs").document(justID).delete { error in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+           
             }
         }
+        firstGroup.leave()
     }
+            
+            
+        REF_NETWORK_JUSTS.document(currentUserNetworkID).collection("justs").document(justID).delete()
+        REF_NETWORK_JUSTS.document(currentUserNetworkID).collection("last-justs").document(justID).delete()
+        REF_USER_JUSTS.child(justID).removeValue()
+        
+        REF_JUST_RESPECTS.child(justID).removeValue()
+      
+
+        REF_USER_RESPECTS.child(uid).observeSingleEvent(of: .value) { snapshot in
+            
+            guard let dict = snapshot.value as? [String: [String: Any]] else { return }
+            
+            for (key, value) in dict {
+                secondGroup.enter()
+                for (key2, value2) in value {
+                    print("2")
+                    if let value2 = value2 as? String {
+                        if key2 == "justID" && value2 == justID {
+                            print("This is what should be deleted: \(key2), \(value2)")
+                            REF_USER_RESPECTS.child(uid).child(key).removeValue()
+                        }
+                    }
+                }
+               
+            }
+            secondGroup.leave()
+        }
+            
+        
+        secondGroup.notify(queue: .main) {
+            completion()
+        }
+      
+    }
+    
     
     func reportJust(justID: String, uid: String) {
         let values = [justID: uid]
@@ -222,14 +279,18 @@ struct JustService {
     
     func fetchRespectedBy(just: Just, completion: @escaping([User]) -> Void) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        print("This is the justID: \(just.justID)")
+        
+        
         var users: [User] = []
         let myGroup = DispatchGroup()
         REF_JUST_RESPECTS.child(just.justID).observeSingleEvent(of: .value) { snapshot in
             if snapshot.exists() == false {
                 completion([])
             }
+            print("this is the snapshot: \(snapshot.value)")
             guard let dict = snapshot.value as? [String: Any] else { return }
-            
+            print("passed respected by guard")
             for (key, value) in dict {
                 myGroup.enter()
                 UserService.shared.fetchUser(uid: key) { user in
@@ -240,8 +301,62 @@ struct JustService {
             myGroup.notify(queue: .main) {
                 print("These are the users networks we got \(users)")
             completion(users)
+        }
+       
+        }
+    
+    }
+    
+    func fetchSingleJust(justID: String, completion: @escaping(Just?) -> Void) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        REF_USER_JUSTS.child(justID).observeSingleEvent(of: .value) { snapshot in
+            guard let dict = snapshot.value as? [String: Any] else { return }
+            let just = Just(justID: justID, dictionary: dict)
+            completion(just)
+        }
+    }
+    
+    func fetchAllNetworkJusts(networkId: String, completion: @escaping([Just]) -> Void) {
+        var networkJusts: [Just] = []
+        var lastJustIds : [String] = ["", "", ""]
+        
+        REF_NETWORK_JUSTS.document(networkId).collection("justs").getDocuments { snapshot, error in
+            
+           
+            
+            guard let snapshot = snapshot else { return }
+           
+            for document in snapshot.documents {
+                let dict = document.data() as [String: Any]
+                let just = Just(justID: document.documentID, dictionary: dict)
+                networkJusts.append(just)
+                
             }
         }
+            let sortedJusts = networkJusts.sorted(by: {
+                $0.timestamp.compare($1.timestamp) == .orderedDescending
+            })
+            completion(sortedJusts)
+        
+    }
+    
+    func testGrabAllJusts(lastJustIds: [String], networkId: String, completion: @escaping([Just]) -> Void) {
+        print("These are the lastJustIds: \(lastJustIds)")
+        var allJusts: [Just] = []
+        REF_NETWORK_JUSTS.document(networkId).collection("justs").whereField("justID", notIn: lastJustIds).getDocuments { snapshot, error in
+            print("These are the snapshot documents: \(snapshot?.documents)")
+            guard let snapshot = snapshot else { return }
+            for document in snapshot.documents {
+                let dict = document.data() as [String: Any]
+                let just = Just(justID: document.documentID, dictionary: dict)
+                allJusts.append(just)
+            }
+            let sortedJusts = allJusts.sorted(by: {
+                $0.timestamp.compare($1.timestamp) == .orderedDescending
+            })
+            completion(sortedJusts)
+        }
+        
     }
 }
 

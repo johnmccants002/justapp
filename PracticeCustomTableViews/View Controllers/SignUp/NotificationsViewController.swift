@@ -25,6 +25,7 @@ class NotificationsViewController: UIViewController, UINavigationControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
+        self.navigationController?.isNavigationBarHidden = false
     }
     
     // MARK: - IBAction Functions
@@ -57,7 +58,10 @@ class NotificationsViewController: UIViewController, UINavigationControllerDeleg
     }
     
     func updateViews() {
-        
+        self.acceptButton.layer.borderWidth = 1
+        self.acceptButton.layer.borderColor = UIColor.black
+            .cgColor
+        self.acceptButton.setRoundedView()
     }
     
     func presentMain() {

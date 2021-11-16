@@ -18,7 +18,8 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     @IBOutlet weak var emailTextField: UITextField!
-   
+    @IBOutlet weak var signUpButton: UIButton!
+    
 
     // MARK: - Lifecycles
     
@@ -49,6 +50,10 @@ class LoginViewController: UIViewController {
         self.loadingIndicator.isHidden = true
         self.emailTextField.autocorrectionType = .no
         self.passwordTextField.autocorrectionType = .no
+        self.signUpButton.layer.borderWidth = 1
+        self.signUpButton.layer.borderColor = UIColor.black.cgColor
+        self.signUpButton.setRoundedView()
+        self.loginButton.setRoundedView()
     }
     
     func sendInfoToDB(email: String, password: String) {

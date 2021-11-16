@@ -33,6 +33,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
             print(Messaging.messaging().fcmToken)
         }
     }
+    var loadingView: LoadingView?
     @IBOutlet weak var respectLabel: UILabel!
     @IBOutlet weak var myImageView: UIImageView!
     @IBOutlet weak var myNetworkView: UIView!
@@ -49,6 +50,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         didSet {
             friendsTableView.reloadData()
             print("Networks set")
+            self.removeLoadingView()
+       
         }
     }
     
@@ -77,6 +80,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        addLoadingView()
         setupSearchController()
         setupInvitesLabel()
         setupRespectsLabel()
@@ -85,11 +89,15 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         getNotificationSettings()
         addObservers()
         setupRefreshControl()
+        setCurrentNetworkImage()
+        authenticateUserAndConfigureUI()
+        updateViews()
+
 //        logoutButtonTapped()
-        
-        
-        
+
+
     }
+    
     
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -100,17 +108,17 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         super.viewWillDisappear(animated)
         // needed to clear the text in the back navigation:
         self.navigationItem.title = " "
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("Main Just View Will Appear")
-        authenticateUserAndConfigureUI()
-        updateViews()
-        setCurrentNetworkImage()
-        self.navigationItem.title = "Just App"
+       
+        self.navigationItem.title = "Just"
         navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.barStyle = .default
+//        navigationController?.navigationBar.barTintColor = .white
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -176,31 +184,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     
     func fetchUserToken() {
         guard let currentUser = currentUser else { return }
-        
         UserService.shared.fetchUserToken(uid: currentUser.uid) { token in
             print(token)
         }
-    }
-    
-    func setRootController() {
-        self.window?.rootViewController = self
-        self.window?.makeKeyAndVisible()
-    }
-    
-    func setupInvitesLabel() {
-        self.invitesLabel.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleInvitesTapped))
-        self.invitesLabel.addGestureRecognizer(tap)
-        self.invitesLabel.font = UIFont.systemFont(ofSize: 14)
-        self.invitesLabel.text = "Invites"
-    }
-    
-    func setupRespectsLabel() {
-        self.respectLabel.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleRespectsTapped))
-        self.respectLabel.addGestureRecognizer(tap)
-        self.respectLabel.font = UIFont.systemFont(ofSize: 14)
-        self.respectLabel.text = "Respects"
     }
     
     func checkedUncheckedActivity() {
@@ -226,6 +212,35 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         }
     }
     
+    func logoutButtonTapped() {
+        AuthService.shared.logoutUser()
+            self.presentLogin()
+    }
+    
+    // MARK: Helper Functions
+    
+    func setRootController() {
+        self.window?.rootViewController = self
+        self.window?.makeKeyAndVisible()
+    }
+    
+    func setupInvitesLabel() {
+        self.invitesLabel.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleInvitesTapped))
+        self.invitesLabel.addGestureRecognizer(tap)
+        self.invitesLabel.font = UIFont.init(name: "HelveticaNeue", size: 14)
+        self.invitesLabel.text = "Invites"
+    }
+    
+    func setupRespectsLabel() {
+        self.respectLabel.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleRespectsTapped))
+        self.respectLabel.addGestureRecognizer(tap)
+        self.respectLabel.font = UIFont.init(name: "HelveticaNeue", size: 14)
+        self.respectLabel.text = "Respects"
+    }
+    
+    
     func getNotificationSettings() {
       UNUserNotificationCenter.current().getNotificationSettings { settings in
         print("Notification settings: \(settings)")
@@ -239,13 +254,6 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     func registerForPushNotifications() {
         guard let pushManager = pushManager else { return }
         pushManager.registerForPushNotifications()
-    }
-    
- 
-    
-    func logoutButtonTapped() {
-        AuthService.shared.logoutUser()
-            self.presentLogin()
     }
     
     func presentLogin() {
@@ -265,80 +273,56 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         
     }
     
-    @objc func reloadNetworks() {
-        self.fetchUserNetworks()
-        
-    }
-    
     func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(refetchUser), name: NSNotification.Name.init(rawValue: "refetchUser"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleAppDidBecomeActiveNotification(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
-    @objc func handleAppDidBecomeActiveNotification(_ notification: NSNotification) {
-        fetchUser()
-    }
-    
-    @objc func refetchUser() {
-        fetchUser()
-    }
-    
-    
-    
-    
-
-    // MARK: - Selectors
-        
-    @objc func handleInvitesTapped() {
-        guard let user = self.currentUser else { return }
-        UserService.shared.checkUncheckInvites(string: "check", uid: user.uid)
+    func updateViews() {
         self.invitesLabel.text = "Invites"
-        self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
-        let controller = ActivityController(currentUser: user)
-        let nav = UINavigationController(rootViewController: controller)
-        nav.modalPresentationStyle = .fullScreen
-        self.present(nav, animated: true) {
+        self.friendsTableView.delegate = self
+        self.friendsTableView.dataSource = self
+        self.myNetworkView.layer.backgroundColor = UIColor.white.cgColor
+        myImageView.setRounded()
+        self.myNetworkView.layer.borderWidth = 1
+        self.myNetworkView.layer.borderColor = UIColor.black.cgColor
+        self.myNetworkView.setRoundedView()
+        self.myNetworkView.layer.shadowOpacity = 0.5
+        self.friendsTableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        self.delegate = self
+        self.delegate2 = self
+    }
+    
+    func setUpViewGestureRecognizer() {
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector (self.myNetworkTapped))
+        self.myNetworkView.addGestureRecognizer(tapRecognizer)
+        self.detail = "My Network"
+        self.myNetworkView.sendSubviewToBack(invitesLabel)
+        self.myNetworkView.sendSubviewToBack(respectLabel)
+    }
+    
+    func addLoadingView() {
+        let loadView = LoadingView(frame: CGRect(x: self.view.bounds.minX, y: self.view.bounds.minY, width: self.view.bounds.width, height: self.view.viewHeight + 100))
+      
+        self.loadingView = loadView
+        if let loadingView = self.loadingView {
+            self.navigationController?.view.addSubview(loadingView)
         }
-    }
+        }
     
-    @objc func handleRespectsTapped() {
-        guard let user = self.currentUser else { return }
-        UserService.shared.checkUncheckRespects(string: "check", uid: user.uid)
-        self.respectLabel.text = "Respects"
-        self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
-        let controller = ActivityRespectController(currentUser: user)
-        let nav = UINavigationController(rootViewController: controller)
-        nav.modalPresentationStyle = .fullScreen
-        self.present(nav, animated: true)
-    }
-    
-    @objc func myNetworkTapped() {
-        guard let currentUser = currentUser else { return }
-        let controller = NetworkJustsController(currentUser: currentUser, titleText: "My Network", networkId: currentUser.networkId)
-        controller.networkId = currentUser.networkId
-        self.navigationController?.pushViewController(controller, animated: true)
-    }
-    
-    @IBAction func profileButtonTapped(_ sender: UIBarButtonItem) {
-        print("profile button tapped")
-
-        guard let currentUser = currentUser else { return }
-        let controller = CurrentUserController(currentUser: currentUser, isUser: false)
-        controller.currentUser = currentUser
+    func removeLoadingView() {
+        if let loadingView = self.loadingView {
+            loadingView.removeFromSuperview()
+        }
         
-        let transition:CATransition = CATransition()
-        transition.duration = 0.5
-        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        transition.type = .push
-        transition.subtype = .fromLeft
-        self.navigationController?.view.layer.add(transition, forKey: kCATransition)
-
-        self.navigationController?.pushViewController(controller, animated: true)
     }
     
-
     
+    func authenticateUserAndConfigureUI() {
+            setUpViewGestureRecognizer()
+            setupTapCellGesture()
+    }
     
     func setupSearchController() {
         
@@ -369,42 +353,78 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         definesPresentationContext = true
     
     }
-
     
-    // MARK: - Helper Functions
+    func usernameDoesNotExist(username: String, controller: UITableViewController) -> UIAlertController {
+        let alert = UIAlertController(title: "Username not found", message: "\(username) does not exist.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok", style: .default) { action in
+            controller.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(action)
+        
+        return alert
+    }
     
-    func updateViews() {
+    // MARK: Selectors
+    
+    @objc func reloadNetworks() {
+        self.fetchUserNetworks()
+        
+    }
+    
+    @objc func handleAppDidBecomeActiveNotification(_ notification: NSNotification) {
+        fetchUser()
+    }
+    
+    @objc func refetchUser() {
+        fetchUser()
+    }
+        
+    @objc func handleInvitesTapped() {
+        guard let user = self.currentUser else { return }
+        UserService.shared.checkUncheckInvites(string: "check", uid: user.uid)
         self.invitesLabel.text = "Invites"
-        self.friendsTableView.delegate = self
-        self.friendsTableView.dataSource = self
-        self.myNetworkView.layer.backgroundColor = UIColor.systemGray5.cgColor
-        myImageView.setRounded()
-        self.myNetworkView.layer.borderWidth = 1
-        self.myNetworkView.layer.borderColor = UIColor.lightGray.cgColor
-        self.myNetworkView.setRoundedView()
-        self.myNetworkView.layer.shadowOpacity = 0.5
-        self.friendsTableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        self.delegate = self
-        self.delegate2 = self
+        self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+        let controller = ActivityController(currentUser: user)
+        let nav = UINavigationController(rootViewController: controller)
+        nav.modalPresentationStyle = .fullScreen
+        self.present(nav, animated: true) {
+        }
     }
     
-    func setUpViewGestureRecognizer() {
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector (self.myNetworkTapped))
-        self.myNetworkView.addGestureRecognizer(tapRecognizer)
-        self.detail = "My Network"
-        self.myNetworkView.sendSubviewToBack(invitesLabel)
-        self.myNetworkView.sendSubviewToBack(respectLabel)
+    @objc func handleRespectsTapped() {
+        guard let user = self.currentUser else { return }
+        UserService.shared.checkUncheckRespects(string: "check", uid: user.uid)
+        self.respectLabel.text = "Respects"
+        self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+        let controller = ActivityRespectController(currentUser: user)
+        let nav = UINavigationController(rootViewController: controller)
+        nav.modalPresentationStyle = .fullScreen
+        self.present(nav, animated: true)
     }
     
-    
-    func authenticateUserAndConfigureUI() {
-            setUpViewGestureRecognizer()
-            setupTapCellGesture()
+    @objc func myNetworkTapped() {
+        guard let currentUser = currentUser else { return }
+        let controller = NetworkJustsController(currentUser: currentUser, titleText: "My Network", networkId: currentUser.networkId, user: currentUser)
+        controller.networkId = currentUser.networkId
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
+    @IBAction func profileButtonTapped(_ sender: UIBarButtonItem) {
+        print("profile button tapped")
 
+        guard let currentUser = currentUser else { return }
+        let controller = CurrentUserController(currentUser: currentUser, isUser: false)
+        controller.currentUser = currentUser
+        
+        let transition:CATransition = CATransition()
+        transition.duration = 0.5
+        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        transition.type = .push
+        transition.subtype = .fromLeft
+        self.navigationController?.view.layer.add(transition, forKey: kCATransition)
 
-    
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
 
     // MARK: - Navigation
 
@@ -422,16 +442,6 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
             destinationVC.networkIds = setupNetworkIds(networkUsers: networkUsers)
         }
     }
-
-func usernameDoesNotExist(username: String, controller: UITableViewController) -> UIAlertController {
-    let alert = UIAlertController(title: "Username not found", message: "\(username) does not exist.", preferredStyle: .alert)
-    let action = UIAlertAction(title: "Ok", style: .default) { action in
-        controller.dismiss(animated: true, completion: nil)
-    }
-    alert.addAction(action)
-    
-    return alert
-}
 
 func setupNetworkIds(networkUsers: [User]) -> [String]? {
     var networkIds: [String] = []
@@ -529,7 +539,7 @@ extension MainJustViewController: NetworkTableViewCellDelegate {
         guard let user = cell.user else { return }
         guard let currentUser = currentUser else { return }
         let titleText = "\(user.firstName) \(user.lastName)'s Network"
-        let controller = NetworkJustsController(currentUser: currentUser, titleText: titleText, networkId: user.networkId)
+        let controller = NetworkJustsController(currentUser: currentUser, titleText: titleText, networkId: user.networkId, user: user)
         cell.network?.checked = 0
         navigationController?.pushViewController(controller, animated: true)
         

@@ -23,6 +23,7 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
     let respectNibName = "ActivityRespectCell"
     var respectCount : String?
     var refreshControl = UIRefreshControl()
+    var currentUserArray: [User]?
     
     
     // MARK: - Initializer
@@ -47,11 +48,11 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         fetchTotalRespect()
         setupRightBarItem()
         setupRefreshControl()
+        setupCurrentUserArray()
+        
     }
     
-   
-    
-    // MARK: Helper Functions
+    // MARK: - Helper Functions
     
     func updateViews() {
         let nib = UINib(nibName: respectNibName, bundle: nil)
@@ -70,12 +71,23 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         self.navigationItem.rightBarButtonItem = rightButton
     }
     
+    func setupRefreshControl() {
+        self.refreshControl.addTarget(self, action: #selector(reloadRespects), for: .valueChanged)
+        self.collectionView.refreshControl = refreshControl
+    }
+    
+    // MARK: - Firebase Functions
+    
     func fetchRespect() {
         UserService.shared.fetchUserRespect(uid: currentUser.uid) { respectNotifications in
             if respectNotifications.isEmpty {
                 self.collectionView.refreshControl?.endRefreshing()
             }
-            self.respectNotifications = respectNotifications
+            let respectArray = respectNotifications.sorted(by: {
+                $0.timestamp.compare($1.timestamp) == .orderedDescending
+            })
+            self.respectNotifications = respectArray
+            
             self.collectionView.refreshControl?.endRefreshing()
             print("These are the respectNotfications: \(respectNotifications)")
         }
@@ -90,16 +102,22 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         }
     }
     
+    func setupCurrentUserArray() {
+        var currentUserArray : [User] = []
+        if let currentUserNetworks = currentUser.networks {
+            for network in currentUserNetworks {
+                currentUserArray.append(network.user)
+            }
+            self.currentUserArray = currentUserArray
+            
+        }
+    }
+    
     func fetchTotalRespect() {
         UserService.shared.fetchTotalRespect(uid: currentUser.uid) { countString in
             self.navigationItem.rightBarButtonItem?.title = countString
             self.respectCount = countString
         }
-    }
-     
-    func setupRefreshControl() {
-        self.refreshControl.addTarget(self, action: #selector(reloadRespects), for: .valueChanged)
-        self.collectionView.refreshControl = refreshControl
     }
     
     // MARK: - Selectors
@@ -137,17 +155,27 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         guard let respectNotifications = respectNotifications else { return 0 }
        return respectNotifications.count
     }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        if let respectNotifications = respectNotifications {
+            let notification = respectNotifications[indexPath.row]
+            let controller = ViewJustController(justID: notification.justID, user: notification.user, currentUser: currentUser)
+            navigationController?.pushViewController(controller, animated: true)
+        }
+    }
 }
 
 // MARK: ActivityRespectCellDelegate
 
 extension ActivityRespectController: ActivityRespectCellDelegate {
     func cellImageTapped(cell: ActivityRespectCell) {
-        print("cell image tapped")
         guard let user = cell.user else { return }
-        let fullName = "\(user.firstName) \(user.lastName)"
         let profileController = CurrentUserController(currentUser: currentUser, isUser: true)
-        profileController.user = user
+        profileController.fetchUser(uid: user.uid)
+        if let currentUserArray = self.currentUserArray {
+            profileController.currentUserArray = currentUserArray
+        }
         self.navigationController?.pushViewController(profileController, animated: true)
 
     }
@@ -158,6 +186,6 @@ extension ActivityRespectController: ActivityRespectCellDelegate {
 
 extension ActivityRespectController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.view.frame.width, height: 81)
+        return CGSize(width: self.view.frame.width, height: 60)
     }
 }

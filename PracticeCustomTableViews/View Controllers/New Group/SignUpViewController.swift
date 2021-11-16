@@ -54,6 +54,7 @@ class SignUpViewController: UIViewController {
         self.label.textColor = .white
         self.signUpTextField.textColor = .white
         self.navigationController?.isNavigationBarHidden = true
+        
     }
     
     func setupKeyboard() {
@@ -249,6 +250,7 @@ class SignUpViewController: UIViewController {
             guard let user = user, let password = passwordString else { return }
             destination.user = user
             destination.password = password
+            destination.navigationController?.navigationBar.isHidden = false
             print("Going to Notification Controller")
         }
     }

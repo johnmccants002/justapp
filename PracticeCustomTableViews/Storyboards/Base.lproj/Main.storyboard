@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Just App-->
+        <!--Just-->
         <scene sceneID="Hb9-OQ-HLw">
             <objects>
                 <viewController storyboardIdentifier="MainJustViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2fu-gm-Zwq" customClass="MainJustViewController" customModule="PracticeCustomTableViews" customModuleProvider="target" sceneMemberID="viewController">
@@ -75,45 +75,45 @@
                                 <rect key="frame" x="20" y="98" width="374" height="124"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="55 New Respect!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh3-mE-DvA">
-                                        <rect key="frame" x="0.0" y="83" width="170" height="21"/>
+                                        <rect key="frame" x="0.0" y="88" width="170" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="170" id="58g-Z2-6qo"/>
                                             <constraint firstAttribute="height" constant="21" id="QRU-P8-7fl"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="15"/>
-                                        <color key="textColor" systemColor="systemIndigoColor"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10 New Requests!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2R3-3m-3Js">
-                                        <rect key="frame" x="204" y="83" width="170" height="21"/>
+                                        <rect key="frame" x="204" y="88" width="170" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="21" id="45W-D5-4Pp"/>
                                             <constraint firstAttribute="width" constant="170" id="jRf-iO-rm0"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="15"/>
-                                        <color key="textColor" systemColor="systemIndigoColor"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="john" translatesAutoresizingMaskIntoConstraints="NO" id="b42-23-TCs">
-                                        <rect key="frame" x="171" y="8" width="32" height="32"/>
+                                        <rect key="frame" x="169.5" y="10" width="35" height="35"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="32" id="GqG-KG-WXN"/>
-                                            <constraint firstAttribute="width" constant="32" id="u8m-Vw-GJa"/>
+                                            <constraint firstAttribute="height" constant="35" id="GqG-KG-WXN"/>
+                                            <constraint firstAttribute="width" constant="35" id="u8m-Vw-GJa"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Network" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fuc-fH-MGA">
-                                        <rect key="frame" x="0.0" y="42" width="374" height="41"/>
+                                        <rect key="frame" x="0.0" y="47" width="374" height="41"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="41" id="nXw-hE-ht2"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="17"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemGray6Color"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="b42-23-TCs" firstAttribute="top" secondItem="PMO-1t-R4K" secondAttribute="top" constant="8" id="Dfg-V3-fWf"/>
+                                    <constraint firstItem="b42-23-TCs" firstAttribute="top" secondItem="PMO-1t-R4K" secondAttribute="top" constant="10" id="Dfg-V3-fWf"/>
                                     <constraint firstItem="Yh3-mE-DvA" firstAttribute="top" secondItem="fuc-fH-MGA" secondAttribute="bottom" id="ODV-Px-8zP"/>
                                     <constraint firstItem="fuc-fH-MGA" firstAttribute="top" secondItem="b42-23-TCs" secondAttribute="bottom" constant="2" id="aWd-2b-wEg"/>
                                     <constraint firstAttribute="trailing" secondItem="fuc-fH-MGA" secondAttribute="trailing" id="bVJ-ns-R4Q"/>
@@ -138,7 +138,7 @@
                             <constraint firstItem="PMO-1t-R4K" firstAttribute="top" secondItem="4vb-jV-nOm" secondAttribute="top" constant="10" id="skC-NO-VlH"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Just App" id="peH-pt-sfA">
+                    <navigationItem key="navigationItem" title="Just" id="peH-pt-sfA">
                         <barButtonItem key="leftBarButtonItem" image="person.crop.circle" catalog="system" id="vGv-qM-BVP">
                             <connections>
                                 <action selector="profileButtonTapped:" destination="2fu-gm-Zwq" id="jsi-Hc-zUU"/>
@@ -358,6 +358,14 @@
                                     <action selector="addPhotoButtonTapped:" destination="ieZ-qY-N3C" eventType="touchUpInside" id="AUo-AT-LaV"/>
                                 </connections>
                             </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="photo" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="5wY-20-xME">
+                                <rect key="frame" x="337" y="357.5" width="35" height="32.5"/>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="35" id="Anh-vW-9SV"/>
+                                    <constraint firstAttribute="height" constant="35" id="Twk-sk-2Ky"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="KmE-Zh-MRB"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -369,9 +377,11 @@
                             <constraint firstItem="HMp-vH-VhO" firstAttribute="leading" secondItem="KmE-Zh-MRB" secondAttribute="leading" constant="20" id="ZNT-K1-mTu"/>
                             <constraint firstItem="OfA-48-mIE" firstAttribute="top" secondItem="HMp-vH-VhO" secondAttribute="bottom" constant="8" symbolic="YES" id="cg0-Wj-Uoy"/>
                             <constraint firstItem="kLr-q1-xXm" firstAttribute="top" secondItem="OfA-48-mIE" secondAttribute="bottom" constant="74" id="dhu-dx-HyY"/>
+                            <constraint firstItem="KmE-Zh-MRB" firstAttribute="trailing" secondItem="5wY-20-xME" secondAttribute="trailing" constant="42" id="pjh-gj-7CJ"/>
                             <constraint firstItem="OfA-48-mIE" firstAttribute="leading" secondItem="KmE-Zh-MRB" secondAttribute="leading" constant="20" id="s3V-pD-6xC"/>
                             <constraint firstItem="tCR-gO-Ml6" firstAttribute="centerX" secondItem="MbU-UM-kGg" secondAttribute="centerX" id="tS7-6O-BYe"/>
                             <constraint firstItem="HMp-vH-VhO" firstAttribute="top" secondItem="KmE-Zh-MRB" secondAttribute="top" constant="102" id="unA-P2-7lH"/>
+                            <constraint firstItem="kLr-q1-xXm" firstAttribute="top" secondItem="5wY-20-xME" secondAttribute="bottom" constant="-22.5" id="yG9-OS-eRy"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="p8q-nW-56S">
@@ -388,6 +398,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="addPhotoButton" destination="kLr-q1-xXm" id="Obj-F1-HDr"/>
+                        <outlet property="addPhotoImageView" destination="5wY-20-xME" id="M8s-Nd-yWx"/>
                         <outlet property="justTextView" destination="OfA-48-mIE" id="q2d-OU-wDu"/>
                         <outlet property="loadingIndicator" destination="tCR-gO-Ml6" id="nfc-n2-EHw"/>
                         <outlet property="navigation" destination="p8q-nW-56S" id="wf1-gP-JOT"/>
@@ -645,6 +656,7 @@
         <image name="justRectangle" width="355" height="80"/>
         <image name="person.2" catalog="system" width="128" height="81"/>
         <image name="person.crop.circle" catalog="system" width="128" height="121"/>
+        <image name="photo" catalog="system" width="128" height="93"/>
         <image name="profileDefault" width="225" height="225"/>
         <image name="respecttapped" width="99" height="33"/>
         <systemColor name="labelColor">
@@ -653,11 +665,11 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemGray6Color">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemIndigoColor">
-            <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

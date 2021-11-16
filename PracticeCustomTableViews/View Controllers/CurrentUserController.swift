@@ -13,8 +13,6 @@ private let headerIdentifier = "ProfileHeader"
 
 class CurrentUserController: UICollectionViewController, UINavigationControllerDelegate {
 
-    
-    
     // MARK - Properties
 
     var currentUser: User {
@@ -30,6 +28,8 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
             collectionView.reloadData()
         }
     }
+        
+    
     let justNibName = "NetworkJustCell"
 
     
@@ -53,27 +53,9 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     var isUser: Bool
     
     private let cache = NSCache<NSNumber, Just>()
+     
+    
     private let utilityQueue = DispatchQueue.global(qos: .utility)
-    
-    var instagramButton : UIButton = {
-        var button = UIButton()
-        button.backgroundColor = .brown
-        button.setTitle("Instagram", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.addTarget(self, action: #selector(instagramButtonTapped), for: .touchUpInside)
-//        button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
-        return button
-    }()
-    
-    var twitterButton: UIButton = {
-        var button = UIButton()
-        button.backgroundColor = .twitterBlue
-        button.setTitle("Twitter", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.addTarget(self, action: #selector(twitterButtonTapped), for: .touchUpInside)
-        
-        return button
-    }()
     
     // MARK - Initializer
     
@@ -91,7 +73,6 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        updateViews()
         fetchUserJusts()
         addObservers()
         setupCurrentUserArray()
@@ -123,35 +104,69 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     // MARK: - Firebase Functions
     
     func fetchUserJusts() {
-        if isUser == true {
-            guard let user = user else { return }
-            JustService.shared.fetchUserJusts(networkId: user.networkId, userUid: user.uid) { justs in
-                self.justs = justs
-                self.checkIfUserRespectedJusts(justs: self.justs)
-                self.justs.reverse()
-            }
-        } else if isUser == false {
+            if isUser == false {
             JustService.shared.fetchUserJusts(networkId: currentUser.networkId, userUid: currentUser.uid) { justs in
                 self.justs = justs
-                self.checkIfUserRespectedJusts(justs: self.justs)
                 self.justs.reverse()
+                self.fetchJustRespects(justs: justs) {
+                    self.collectionView.reloadData()
+                }
+//                self.checkIfUserRespectedJusts(justs: justs) {
+//                    self.collectionView.reloadData()
+//                }
+                
         }
         }
     }
     
-    func checkIfUserRespectedJusts(justs: [Just]) {
+    func checkIfUserRespectedJusts(justs: [Just], completion:@escaping() -> (Void)) {
         for (index, just) in justs.enumerated() {
             JustService.shared.checkIfUserRespected(just: just) {
                 didRespect in
                 guard didRespect == true else { return }
-                self.justs[index].didRespect = true
+                let itemNumber = NSNumber(value: index)
+                if let cachedObject = self.cache.object(forKey: itemNumber) {
+                    self.cache.object(forKey: itemNumber)?.didRespect = true
+                } else {
+                    
+                    self.justs[index].didRespect = true
+                }
             }
+        }
+    }
+    
+    func fetchJustRespects(justs: [Just], completion: @escaping() -> (Void)) {
+        if isUser == false {
+            for just in self.justs {
+                JustService.shared.fetchJustRespects(just: just) { respectCount in
+                    if let respectCount = respectCount {
+                        just.respects = Int(respectCount)
+                    }
+                }
+            }
+            
         }
     }
     
     func fetchUser(uid: String) {
         UserService.shared.fetchUser(uid: uid) { user in
             self.user = user
+        }
+    }
+    
+    func fetchSharedNetworks() {
+        guard let currentUserArray = self.currentUserArray else { return }
+        if isUser == true {
+            if let user = user {
+                UserService.shared.fetchSharedNetworks(currentUserArray: currentUserArray, user: user) { users in
+                    if users.count >= 1 {
+                    self.sharedArray = users
+                    }
+                    for user in users {
+                        print("Current user and user are in \(user.username) network")
+                    }
+                }
+            }
         }
     }
     
@@ -173,71 +188,10 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         }
     }
     
-    func fetchSharedNetworks() {
-        guard let currentUserArray = self.currentUserArray else { return }
-        if isUser == true {
-            if let user = user {
-                UserService.shared.fetchSharedNetworks(currentUserArray: currentUserArray, user: user) { users in
-                    if users.count >= 1 {
-                    self.sharedArray = users
-                    }
-                    for user in users {
-                        print("Current user and user are in \(user.username) network")
-                    }
-                }
-            }
-        }
-    }
-    
-    func presentLogin() {
-        let storyboard = UIStoryboard(name: "SignUp", bundle: nil)
-        UserDefaults.standard.set(false, forKey: "isUserLoggedIn")
-        UserDefaults.standard.set("", forKey: "uid")
-        UserDefaults.standard.synchronize()
-        let loginVC = storyboard.instantiateViewController(identifier: "LoginViewController") as! LoginViewController
-        loginVC.modalPresentationStyle = .fullScreen
-        self.present(loginVC, animated: true) {
-        }
-        
-    }
-    
     func loadJust(completion: @escaping(Just?) -> ()) {
         
     }
-    
-    func setupSocialButtons() {
-        if isUser == false {
-            guard let user = user else { return }
-            collectionView.isHidden = true
-            
-            if user.instagramUsername != "" && user.twitterUsername != "" {
-                setupSocialButtons()
-            } else if user.instagramUsername != "" && user.twitterUsername == "" {
-                setupInstagramButton()
-            } else if user.instagramUsername == "" && user.twitterUsername != "" {
-                setupTwitterButton()
-            }
-        }
-   
-    }
-    
-    func setupBothSocialButtons() {
-        view.addSubview(instagramButton)
-        instagramButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
-        view.addSubview(twitterButton)
-        twitterButton.anchor(top: instagramButton.bottomAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 10, paddingLeft: 20, paddingRight: 20)
-    }
-    
-    func setupInstagramButton() {
-        view.addSubview(instagramButton)
-        instagramButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
-        
-    }
-    
-    func setupTwitterButton() {
-        view.addSubview(twitterButton)
-        twitterButton.anchor(top: collectionView.topAnchor, left: collectionView.leftAnchor, right: collectionView.rightAnchor, paddingTop: 15, paddingLeft: 20, paddingRight: 20)
-    }
+
     
     func addObservers() {
             NotificationCenter.default.addObserver(self, selector: #selector(refetchCurrentUser), name: NSNotification.Name.init("refetchCurrentUser"), object: nil)
@@ -245,16 +199,11 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     }
     
     @objc func refetchCurrentUser() {
-        print("refetchCurrentUser called")
             UserService.shared.fetchUser(uid: self.currentUser.uid) { user in
                 self.currentUser = user
-            
 
         }
     }
-    
-    
-    
     
     // MARK: UICollectionView Functions
 
@@ -291,7 +240,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         cell.tag = indexPath.row
         
         if justs[indexPath.row].uid == currentUser.uid {
-            cell.setupRespectButton()
+            cell.currentUser = self.currentUser
         }
         return cell
     }
@@ -299,8 +248,6 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return justs.count
     }
-    
-    
 }
 
 // MARK: - ProfileHeaderDelegate
@@ -317,14 +264,9 @@ extension CurrentUserController: ProfileHeaderDelegate {
         
     }
     
-
-    
     func handleSettingsTapped(_ header: ProfileHeader) {
         let controller = SettingsController(currentUser: currentUser)
         self.navigationController?.pushViewController(controller, animated: true)
-        //        let alert = self.setupSettings()
-//        self.present(alert, animated: true, completion: nil)
-        
     }
     
     func handleBackTapped(_ header: ProfileHeader) {
@@ -332,42 +274,19 @@ extension CurrentUserController: ProfileHeaderDelegate {
     }
     
     @objc func removeCell(cell: NetworkJustCell) {
-        let i = cell.tag
-        justs.remove(at: i)
-        collectionView.reloadData()
-    }
-    
-    @objc func instagramButtonTapped() {
-        guard let user = user, let instagramUsername = user.instagramUsername else { return }
-        let appURL = URL(string: "instagram://user?username=\(instagramUsername)")!
-                let application = UIApplication.shared
-                
-                if application.canOpenURL(appURL)
-                {
-                    application.open(appURL)
-                }
-                else
-                {
-                    let webURL = URL(string: "https://instagram.com/\(instagramUsername)")!
-                    application.open(webURL)
-                }
         
-    }
-    
-    @objc func twitterButtonTapped() {
-        guard let user = user, let twitterUsername = user.twitterUsername else { return }
-        let appURL = URL(string: "twitter://user?screen_name=\(twitterUsername)")!
-                let application = UIApplication.shared
-                
-                if application.canOpenURL(appURL)
-                {
-                    application.open(appURL)
-                }
-                else
-                {
-                    let webURL = URL(string: "https://twitter.com/\(twitterUsername)")!
-                    application.open(webURL)
-                }
+        guard let just = cell.just, let currentUserArray = currentUserArray else { return }
+        var networkIds: [String] = []
+        for user in currentUserArray {
+            networkIds.append(user.networkId)
+        }
+        
+        
+        JustService.shared.deleteJust(networkIDs: networkIds, justID: just.justID, uid: currentUser.uid, currentUserNetworkID: currentUser.networkId) {
+            print("In delete just completion handler")
+            self.collectionView.reloadData()
+        }
+
     }
     
     // MARK: - Long Press Alert
@@ -378,6 +297,9 @@ extension CurrentUserController: ProfileHeaderDelegate {
             let alert = UIAlertController(title: "Delete", message: "You sure you want to delete this just?", preferredStyle: .alert)
             let deleteAction = UIAlertAction(title: "Delete", style: .default) { action in
                 self.removeCell(cell: cell)
+                self.justs.remove(at: cell.tag)
+                let itemNumber = NSNumber(value: cell.tag)
+                self.cache.removeObject(forKey: itemNumber)
             }
             alert.addAction(deleteAction)
             alert.addAction(cancelAction)
@@ -408,7 +330,6 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
             header.isUser = true
             header.delegate = self
             if let sharedArray = self.sharedArray {
-                print("we have a shared array")
                 header.sharedArray = sharedArray
             }
         } else if isUser == false {
@@ -423,18 +344,18 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if isUser == false {
-            return CGSize(width: view.frame.width, height: 420)
+            return CGSize(width: view.frame.width, height: 440)
         }
         
         if let user = user {
             if user.instagramUsername != "" {
-                return CGSize(width: view.frame.width, height: 420)
+                return CGSize(width: view.frame.width, height: 440)
             } else {
                 print("returned 300")
                 return CGSize(width: view.frame.width, height: 300)
             }
         }
-        return CGSize(width: view.frame.width, height: 420)
+        return CGSize(width: view.frame.width, height: 440)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -460,7 +381,7 @@ extension CurrentUserController: NetworkJustCellDelegate {
     
     func didLongPress(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
-        
+        print("This is the cell.tag: \(cell.tag)")
         if just.uid == self.currentUser.uid {
             let alert = self.longPressAlert(currentUser: true, cell: cell)
             self.present(alert, animated: true, completion: nil)

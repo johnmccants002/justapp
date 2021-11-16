@@ -20,6 +20,8 @@ class RespectedByViewController: UICollectionViewController, UINavigationControl
     var just: Just
     var currentUser: User
     let respectByNibName = "RespectedByCell"
+    
+    // MARK: Lifecycles
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,18 +36,22 @@ class RespectedByViewController: UICollectionViewController, UINavigationControl
         self.navigationController?.navigationBar.barStyle = .default
     }
     
+    // MARK: Helper Functions
+    
     func configure() {
         let nib = UINib(nibName: respectByNibName, bundle: nil)
         collectionView.register(nib, forCellWithReuseIdentifier: "respectedByCell")
         collectionView.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         navigationController?.delegate = self
        
         
         
     }
+    
+    // MARK: - Initializer
 
     init(just: Just, currentUser: User) {
     self.just = just
@@ -53,15 +59,18 @@ class RespectedByViewController: UICollectionViewController, UINavigationControl
     super.init(collectionViewLayout: UICollectionViewFlowLayout())
 }
     
-
-    
     required init?(coder: NSCoder) {
         
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Firebase Functions
+    
     func fetchUsers() {
         JustService.shared.fetchRespectedBy(just: just) { users in
+            let names = users.map { $0.firstName
+            }
+            print("These are the names of the users: \(names)")
             self.users = users
         }
     }
@@ -90,9 +99,11 @@ extension RespectedByViewController {
     
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
+
 extension RespectedByViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 80)
+        return CGSize(width: view.frame.width, height: 60)
     }
 }
 

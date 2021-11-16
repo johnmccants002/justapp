@@ -9,7 +9,8 @@ import UIKit
 
 
 class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
-    
+     
+    // MARK: - Properties
     @IBOutlet weak var timestampLabel: UILabel!
     @IBOutlet weak var respectCountButton: UIButton!
     @IBOutlet weak var view: UIView!
@@ -19,7 +20,6 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     var justImageView = UIImageView()
     var just: Just? {
         didSet {
-            print("Just did set called")
             configure()
             setupRespectButton()
             setupImageView()
@@ -27,20 +27,24 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             fetchToken()
             fetchUserImage()
             setupLabelTapJustImageView()
-            
         }
     }
+    var currentUser: User? {
+        didSet {
+            setupRespectCountButton()
+        }
+    }
+    
+    var nameButton = UIButton()
     var currentUserId: String?
-    
     var token : String?
-    
     @IBOutlet weak var respectLabel: UILabel!
-    
     var lineView = UIView()
-    
-  
     var delegate: NetworkJustCellDelegate?
 
+    
+    // MARK: - Lifecycles
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         setupShadows()
@@ -54,6 +58,12 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         justImageView.centerX(inView: self)
         justImageView.centerY(inView: self)
         justImageView.setDimensions(width: 20, height: 20)
+        self.nameButton.addTarget(self, action: #selector(imageTapped), for: .touchUpInside)
+        self.addSubview(nameButton)
+        self.bringSubviewToFront(nameButton)
+        self.nameButton.setDimensions(width: 100, height: self.imageView.viewHeight)
+        self.nameButton.anchor(top: justLabel.topAnchor, left: imageView.rightAnchor)
+       
     }
     
     override func prepareForReuse() {
@@ -62,32 +72,65 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         self.just = nil
     }
     
-    // MARK: - Selectors
-    
-    @IBAction func imageButtonTapped(_ sender: UIButton) {
-        delegate?.imageTapped(cell: self)
-    }
-    
-    // MARK: - Helper Functions
-    
-    func fetchToken() {
-        guard let just = just else { return }
-        UserService.shared.fetchUserToken(uid: just.uid) { token in
-            print("success fetching token: \(token)")
-            self.token = token
-        }
-    }
+    // MARK: - Firebase Functions
     
     func fetchUserImage() {
         guard let just = self.just else { return }
         UserService.shared.fetchProfileImage(uid: just.uid) { imageURL in
-            self.imageView.sd_setImage(with: imageURL) { image, error, cache, url in
-                if let error = error {
-                    self.imageView.image = UIImage(named: "blank")
-                }
+                if let imageURL = imageURL {
+                    self.imageView.sd_setImage(with: imageURL) { image, error, cache, url in
+                    }
+            } else {
+                self.imageView.image = UIImage(named: "blank")
             }
         }
     }
+    
+    func setupRespectCountButton() {
+        guard let just = just, let currentUserId = currentUserId else { return }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(respectCountTapped))
+        self.respectCountButton.addGestureRecognizer(tap)
+        self.respectCountButton.isUserInteractionEnabled = true
+        self.respectCountButton.setTitleColor(.black, for: .normal)
+        if just.uid == currentUserId {
+            print("Passed the two guards and if statement")
+            
+                let count = just.respects
+                switch count {
+                case 1:
+                    self.respectCountButton.setTitle("\(count) respect", for: .normal)
+                case _ where count >= 2:
+                    self.respectCountButton.setTitle("\(count) respects", for: .normal)
+                default:
+                    self.respectCountButton.isHidden = true
+                }
+            
+            
+//            JustService.shared.fetchJustRespects(just: just) { respectCount in
+//                if let respectCount = respectCount {
+//                    let count = Int(respectCount)
+//                    switch count {
+//                    case 1:
+//                        self.respectCountButton.setTitle("\(count) respect", for: .normal)
+//                    case _ where count >= 2:
+//                        self.respectCountButton.setTitle("\(count) respects", for: .normal)
+//                    default:
+//                        self.respectCountButton.isHidden = true
+//                    }
+//                }
+//            }
+
+        }
+    }
+    
+    func fetchToken() {
+        guard let just = just else { return }
+        UserService.shared.fetchUserToken(uid: just.uid) { token in
+            self.token = token
+        }
+    }
+    
+    // MARK: - Helper Functions
     
     func configure() {
         guard let just = just else { return }
@@ -100,6 +143,8 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             justImageView.sd_setImage(with: justImageUrl) { img, err, cache, url in
                 self.justImageView.setupImageViewer(options: [.theme(.dark)], from: nil)
             }
+        } else {
+            self.justImageView.image = UIImage(named: "blank")
         }
         
     }
@@ -131,31 +176,6 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         
     }
     
-    @objc func respectCountTapped() {
-        delegate?.respectCountTapped(cell: self)
-    }
-    
-    
-    @IBAction func respectButtonTapped(_ sender: UIButton) {
-        guard var just = just else { return }
-        if just.didRespect == false {
-            self.respectButton.imageView!.animationImages = animatedImages(for: "Fistbump")
-//            imageView.animationImages = animatedImages(for: "Fistbump")
-            self.respectButton.imageView!.animationDuration = 0.2
-            self.respectButton.imageView!.animationRepeatCount = 1
-            self.respectButton.imageView!.startAnimating()
-            self.respectButton.setImage(UIImage(named: "Fistbump4"), for: .normal)
-            self.respectLabel.textColor = .black
-            delegate?.respectTapped(cell: self)
-            self.just?.didRespect.toggle()
-        } else if just.didRespect == true {
-            self.respectButton.setImage(UIImage(named:"Fistbump1"), for: .normal)
-            self.respectLabel.textColor = .lightGray
-            delegate?.respectTapped(cell: self)
-            self.just?.didRespect.toggle()
-        }
-    }
-    
     func setupShadows() {
         layer.borderWidth = 0.0
         layer.shadowColor = UIColor.lightGray.cgColor
@@ -173,9 +193,20 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         
     }
     
-    @objc func labelTapped() {
-        print("Label Tapped")
-        self.respectButtonTapped(respectButton)
+    func setupNameButton() {
+        self.nameButton.addTarget(self, action: #selector(imageTapped), for: .touchUpInside)
+        self.nameButton.setDimensions(width: 30, height: self.imageView.viewHeight)
+       
+        self.bringSubviewToFront(nameButton)
+    }
+    
+    func setupLabelTapJustImageView() {
+        guard let just = just else { return }
+            let tapAction = UITapGestureRecognizer(target: self, action: #selector(self.tapLabel(gesture:)))
+            justLabel.isUserInteractionEnabled = true
+            self.contentView.isUserInteractionEnabled = true
+            
+            justLabel.addGestureRecognizer(tapAction)
     }
     
     func setupImageView() {
@@ -190,24 +221,13 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         imageView.layer.borderWidth = 4
     }
     
-    func setupLabelTapJustImageView() {
-        guard let just = just else { return }
-            let tapAction = UITapGestureRecognizer(target: self, action: #selector(self.tapLabel(gesture:)))
-            justLabel.isUserInteractionEnabled = true
-            self.contentView.isUserInteractionEnabled = true
-            
-            justLabel.addGestureRecognizer(tapAction)
-            
-        
-        
+    func setupLongPressGesture() {
+        let longPressGesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.didLongPress))
+        longPressGesture.minimumPressDuration = 1.0 // 1 second press
+        longPressGesture.delegate = self
+        addGestureRecognizer(longPressGesture)
     }
     
-
-    
-    @objc func imageTapped() {
-        delegate?.imageTapped(cell: self)
-        print("Image tapped")
-    }
     
     func animatedImages(for name: String) -> [UIImage] {
         var i = 1
@@ -220,44 +240,47 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         return images
     }
     
-    @objc func didLongPress(sender: UILongPressGestureRecognizer) {
-        print("Cell did Long Press")
-        if sender.state == UIGestureRecognizer.State.began {
-            delegate?.didLongPress(cell: self)
+    
+    // MARK: - Selectors
+    
+    @IBAction func imageButtonTapped(_ sender: UIButton) {
+        delegate?.imageTapped(cell: self)
+    }
+    
+    @IBAction func respectButtonTapped(_ sender: UIButton) {
+        guard var just = just else { return }
+        if just.didRespect == false {
+            self.respectButton.imageView!.animationImages = animatedImages(for: "Fistbump")
+            self.respectButton.imageView!.animationDuration = 0.2
+            self.respectButton.imageView!.animationRepeatCount = 1
+            self.respectButton.imageView!.startAnimating()
+            self.respectButton.setImage(UIImage(named: "Fistbump4"), for: .normal)
+            self.respectLabel.textColor = .black
+            delegate?.respectTapped(cell: self)
+            self.just?.didRespect.toggle()
+        } else if just.didRespect == true {
+            self.respectButton.setImage(UIImage(named:"Fistbump1"), for: .normal)
+            self.respectLabel.textColor = .lightGray
+            delegate?.respectTapped(cell: self)
+            self.just?.didRespect.toggle()
         }
     }
     
-    func setupLongPressGesture() {
-        let longPressGesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.didLongPress))
-        longPressGesture.minimumPressDuration = 1.0 // 1 second press
-        longPressGesture.delegate = self
-        addGestureRecognizer(longPressGesture)
+    @objc func respectCountTapped() {
+        delegate?.respectCountTapped(cell: self)
     }
     
-    
-    func setupRespectCountButton() {
-        guard let just = just, let currentUserId = currentUserId else { return }
-        let tap = UITapGestureRecognizer(target: self, action: #selector(respectCountTapped))
-        self.respectCountButton.addGestureRecognizer(tap)
-        self.respectCountButton.isUserInteractionEnabled = true
-        self.respectCountButton.setTitleColor(.black, for: .normal)
-        if just.uid == currentUserId {
-            print("Passed the two guards and if statement")
-            JustService.shared.fetchJustRespects(just: just) { respectCount in
-                if let respectCount = respectCount {
-                    let count = Int(respectCount)
-                    switch count {
-                    case 1:
-                        self.respectCountButton.setTitle("\(count) respect", for: .normal)
-                    case _ where count >= 2:
-                        self.respectCountButton.setTitle("\(count) respects", for: .normal)
-                    default:
-                        self.respectCountButton.isHidden = true
-                    }
-                    
-                }
-            }
+    @objc func labelTapped() {
+        self.respectButtonTapped(respectButton)
+    }
 
+    @objc func imageTapped() {
+        delegate?.imageTapped(cell: self)
+    }
+        
+    @objc func didLongPress(sender: UILongPressGestureRecognizer) {
+        if sender.state == UIGestureRecognizer.State.began {
+            delegate?.didLongPress(cell: self)
         }
     }
     
@@ -274,9 +297,9 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             }
 
 }
-    
-    
 }
+
+// MARK: - NetworkJustCellDelegate
 
 protocol NetworkJustCellDelegate {
     func imageTapped(cell: NetworkJustCell)

@@ -56,6 +56,7 @@ class InviteCell: UICollectionViewCell {
         } else {
             profileImageView.image = UIImage(named: "blank")
         }
+        self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.25)
         
     }
     
