@@ -20,6 +20,7 @@ class RespectedByCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        overrideUserInterfaceStyle = .light
     }
     
     @IBAction func userButtonTapped(_ sender: UIButton) {

@@ -12,6 +12,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
      
     // MARK: - Properties
     @IBOutlet weak var timestampLabel: UILabel!
+    @IBOutlet weak var moreJustsButton: UIButton!
     @IBOutlet weak var respectCountButton: UIButton!
     @IBOutlet weak var view: UIView!
     @IBOutlet weak var justLabel: UILabel!
@@ -48,6 +49,7 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         setupShadows()
+        overrideUserInterfaceStyle = .light
 
     }
     
@@ -137,7 +139,13 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
         let viewModel = JustViewModel(just: just)
         contentView.isUserInteractionEnabled = true
         justLabel.attributedText = viewModel.userInfoText
-        timestampLabel.text = viewModel.timestamp
+        
+        if let dateString = just.dateString {
+            timestampLabel.text = dateString
+        } else {
+            timestampLabel.text = viewModel.timestamp
+        }
+        
         
         if let justImageUrl = just.justImageUrl {
             justImageView.sd_setImage(with: justImageUrl) { img, err, cache, url in
@@ -243,6 +251,11 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     // MARK: - Selectors
     
+    @IBAction func moreJustsButtonTapped(_ sender: UIButton) {
+        delegate?.moreButtonTapped(cell: self)
+    }
+    
+    
     @IBAction func imageButtonTapped(_ sender: UIButton) {
         delegate?.imageTapped(cell: self)
     }
@@ -306,5 +319,6 @@ protocol NetworkJustCellDelegate {
     func respectTapped(cell: NetworkJustCell)
     func didLongPress(cell: NetworkJustCell)
     func respectCountTapped(cell: NetworkJustCell)
+    func moreButtonTapped(cell: NetworkJustCell)
     
 }

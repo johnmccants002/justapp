@@ -35,7 +35,7 @@ class ResultTableViewCell: UITableViewCell {
     var currentUser: User? 
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+        overrideUserInterfaceStyle = .light
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

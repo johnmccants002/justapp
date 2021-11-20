@@ -26,7 +26,7 @@ class InviteCell: UICollectionViewCell {
     var token: String?
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+        overrideUserInterfaceStyle = .light
         
     }
     @IBAction func acceptButtonTapped(_ sender: UIButton) {

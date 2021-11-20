@@ -1,16 +1,16 @@
 //
-//  NetworkDetailsHeader.swift
+//  JustsHeader.swift
 //  PracticeCustomTableViews
 //
-//  Created by John McCants on 11/15/21.
+//  Created by John McCants on 11/19/21.
 //
 
-import Foundation
 import UIKit
+import Foundation
 
-class NetworkDetailsHeader: UICollectionReusableView {
-    
-    var count: Int? {
+class JustsHeader: UICollectionReusableView {
+      
+    var date: String? {
         didSet {
             configure()
         }
@@ -18,7 +18,7 @@ class NetworkDetailsHeader: UICollectionReusableView {
     
     private var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .lightText
+        view.backgroundColor = .none
         
         return view
     }()
@@ -26,19 +26,13 @@ class NetworkDetailsHeader: UICollectionReusableView {
     private var label: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.textAlignment = .left
+        label.textAlignment = .center
         return label
     }()
     
     func configure() {
-        guard let count = count else { return }
-        if count == 1 {
-            self.label.text = "No one in your network"
-        } else if count > 1 {
-            self.label.text = "\(count) people in your network"
-        } else {
-            self.label.isHidden = true
-        }
+        guard let date = date else { return }
+        self.label.text = date
         
     }
     
@@ -57,12 +51,11 @@ class NetworkDetailsHeader: UICollectionReusableView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        label.font = UIFont(name: "HelveticaNeue-Medium", size: 12)
-        self.backgroundColor = .systemGray5
+        label.font = UIFont(name: "HelveticaNeue-Bold", size: 14)
+        self.backgroundColor = .clear
         self.addSubview(label)
         label.centerY(inView: self)
-        label.anchor(left: self.leftAnchor, paddingLeft: 20)
+        label.anchor(left: self.leftAnchor, right: self.rightAnchor, paddingLeft: 20, paddingRight: 20)
         overrideUserInterfaceStyle = .light
     }
-    
 }

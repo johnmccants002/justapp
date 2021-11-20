@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		31307A6126D046E4005DA1FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31307A6026D046E4005DA1FC /* Constants.swift */; };
 		31307A6326D046EB005DA1FC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31307A6226D046EB005DA1FC /* Extensions.swift */; };
+		313F666727486966002865F8 /* JustsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F666627486966002865F8 /* JustsHeader.swift */; };
 		313F7365270D29FC007E6BC8 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */; };
 		313F7367270E6218007E6BC8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 313F7366270E6218007E6BC8 /* GoogleService-Info.plist */; };
 		313F7369270E6EF8007E6BC8 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */; };
@@ -72,6 +73,7 @@
 /* Begin PBXFileReference section */
 		31307A6026D046E4005DA1FC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = PracticeCustomTableViews/Utilities/Constants.swift; sourceTree = SOURCE_ROOT; };
 		31307A6226D046EB005DA1FC /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = PracticeCustomTableViews/Utilities/Extensions.swift; sourceTree = SOURCE_ROOT; };
+		313F666627486966002865F8 /* JustsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustsHeader.swift; sourceTree = "<group>"; };
 		313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
 		313F7366270E6218007E6BC8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		313F7368270E6EF8007E6BC8 /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 			isa = PBXGroup;
 			children = (
 				316A98D72742B340006CAA3A /* LoadingView.swift */,
+				313F666627486966002865F8 /* JustsHeader.swift */,
 				316A98D92742C275006CAA3A /* InvitesEmptyView.swift */,
 				31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */,
 				316A98DB2742D86D006CAA3A /* NetworkDetailsHeader.swift */,
@@ -478,6 +481,7 @@
 				31CC0D5026CE410300E5F560 /* ActivityController.swift in Sources */,
 				31D296222653EB4200965DD7 /* LoginViewController.swift in Sources */,
 				31D9D1CB26D4D8A600954C1D /* CurrentUserController.swift in Sources */,
+				313F666727486966002865F8 /* JustsHeader.swift in Sources */,
 				316A98D5273EBEC3006CAA3A /* NetworkUserCell.swift in Sources */,
 				316CE2F2264BB2AC0015C145 /* User.swift in Sources */,
 				31D296202653EAE700965DD7 /* NotificationsViewController.swift in Sources */,
@@ -650,7 +654,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.72;
+				MARKETING_VERSION = 1.6.77;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -672,7 +676,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.72;
+				MARKETING_VERSION = 1.6.77;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

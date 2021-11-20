@@ -45,7 +45,7 @@ class ResultsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        overrideUserInterfaceStyle = .light
         let nib = UINib(nibName: ResultsTableViewController.nibName, bundle: nil)
         
         tableView.register(nib, forCellReuseIdentifier: "cellID")

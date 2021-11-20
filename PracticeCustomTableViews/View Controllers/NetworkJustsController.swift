@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+private let headerIdentifier = "JustsHeader"
+
 class NetworkJustsController: UICollectionViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
@@ -16,7 +18,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     var lastJusts = [Just]() {
         didSet {
             collectionView.isUserInteractionEnabled = true
-            collectionView.reloadData()
             fetchAllNetworkJusts()
         }
     }
@@ -30,16 +31,18 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         }
     }
     
-    var allNetworkJusts = [Just]() {
-        didSet {
-            collectionView.reloadData()
-        }
-    }
+    var allNetworkJusts = [Just]()
      
     var lastJustIds: [String]? {
         didSet {
             guard let lastJustIds = lastJustIds else { return }
             fetchOtherJusts(lastJustIds: lastJustIds)
+        }
+    }
+    
+    var allJusts : [[Just]]? {
+        didSet {
+            collectionView.reloadData()
         }
     }
     
@@ -70,6 +73,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         setupRefreshControl()
         setupRightBarButtonItem()
         setupCurrentUserArray()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -93,7 +97,10 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         collectionView.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: -5, left: 0, bottom: 0, right: 0)
+        
+        collectionView.register(JustsHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerIdentifier)
    
     }
     
@@ -161,25 +168,44 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     // MARK: - Firebase Functions
     
     func fetchLastJusts() {
+        
         JustService.shared.fetchLastJusts(networkID: networkId) { justs in
-            print(justs)
-            self.lastJusts = justs
-            self.checkIfUserRespectedJusts(justs: self.lastJusts)
-            self.collectionView.refreshControl?.endRefreshing()
             
             var lastJustIds : [String] = []
-            for just in justs {
+            for var just in justs {
                 lastJustIds.append(just.justID)
             }
             self.lastJustIds = lastJustIds
+            self.lastJusts = justs
+            
+            if self.lastJusts.isEmpty == false {
+                self.checkIfUserRespectedJusts(justs: self.lastJusts)
+            }
+      
            
         }
     }
     
     func fetchOtherJusts(lastJustIds: [String]) {
+        if lastJustIds.isEmpty == false {
         JustService.shared.testGrabAllJusts(lastJustIds: lastJustIds, networkId: networkId) { justs in
-            self.lastJusts.append(contentsOf: justs)
+            self.collectionView.refreshControl?.endRefreshing()
+            var sortedJusts = justs.sorted(by: {
+                $0.dateString!.compare($1.dateString!) == .orderedDescending
+            })
+            
+            var objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
+
+            objectGroups.insert(self.lastJusts, at: 0)
+            self.allJusts = objectGroups
         }
+        }
+    }
+    
+    func sortJusts() {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.calendar]
+        
     }
     
     func checkIfUserRespectedJusts(justs: [Just]) {
@@ -204,7 +230,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     func fetchAllNetworkJusts() {
         
     }
-    
     // MARK: - Selectors
     
     @objc func removeCell(cell: NetworkJustCell) {
@@ -239,24 +264,34 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "networkJustCell", for: indexPath) as! NetworkJustCell
-            cell.just = lastJusts[indexPath.row]
+        if let allJusts = allJusts {
+            cell.just = allJusts[indexPath.section][indexPath.row]
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
             cell.fetchToken()
-            cell.tag = indexPath.row
+            cell.timestampLabel.isHidden = true
+        }
+         
  
         return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return lastJusts.count
+        guard let allJusts = allJusts else { return 0 }
+        return allJusts[section].count
         
     }
     
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        guard let allJusts = allJusts else { return 0 }
+        return allJusts.count
+    }
+    
+    
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        let just = lastJusts[indexPath.row]
-        
+        guard let allJusts = allJusts else { return }
+        let just = allJusts[indexPath.section][indexPath.row]
+
         let titleText = "\(just.firstName) \(just.lastName)"
         let userUid = just.uid
         let controller = UserJustsController(currentUser: currentUser, userUid: userUid, titleText: titleText, networkId: networkId)
@@ -267,19 +302,49 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         navigationController?.pushViewController(controller, animated: true)
     }
     
-}
-
-extension NetworkJustsController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let just = lastJusts[indexPath.row]
-        let viewModel = JustViewModel(just: just)
-        let height = viewModel.size(forWidth: view.frame.width).height
-        return CGSize(width: view.frame.width - 20, height: height + 80)
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! JustsHeader
+        
+        guard let allJusts = allJusts else { return sectionHeader }
+        
+        sectionHeader.date = allJusts[indexPath.section].first?.dateString!
+            
+        return sectionHeader
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: self.view.bounds.width, height: 50)
     }
     
 }
 
+extension NetworkJustsController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let allJusts = allJusts else { return CGSize() }
+        let just = allJusts[indexPath.section][indexPath.row]
+        let viewModel = JustViewModel(just: just)
+        let height = viewModel.size(forWidth: view.frame.width).height
+        return CGSize(width: view.frame.width - 20, height: height + 100)
+    }
+    
+
+    
+}
+
 extension NetworkJustsController: NetworkJustCellDelegate {
+    func moreButtonTapped(cell: NetworkJustCell) {
+        guard let just = cell.just  else { return }
+        let titleText = "\(just.firstName) \(just.lastName)"
+        let userUid = just.uid
+        let controller = UserJustsController(currentUser: currentUser, userUid: userUid, titleText: titleText, networkId: networkId)
+        controller.lastJust = just
+        if let currentUserArray = self.currentUserArray {
+        controller.currentUserArray = currentUserArray
+        }
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
     func respectCountTapped(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         let controller = RespectedByViewController(just: just, currentUser: currentUser)
@@ -326,7 +391,7 @@ extension NetworkJustsController: NetworkJustCellDelegate {
             guard let token = cell.token else { return }
             PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body, id: self.currentUser.uid)
         }
-
+        
         JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
         }
     }

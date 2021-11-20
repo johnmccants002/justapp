@@ -68,6 +68,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         updateViews()
         self.imagePicker.delegate = self
         fetchCurrentUserNetworkUsers()
+        overrideUserInterfaceStyle = .light
        
     }
     
@@ -191,11 +192,10 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     }
     
     func uncheckNetworks() {
-       if friendsNetwork == true {
             if let networks = networks, let yourNetworkUserIds = yourNetworkUserIds {
                 NetworkService.shared.uncheckNetworks(networks: networks, yourNetworkUserIds: yourNetworkUserIds)
             }
-       }
+       
         
     }
     

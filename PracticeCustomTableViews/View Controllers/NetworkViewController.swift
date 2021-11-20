@@ -23,6 +23,7 @@ class NetworkViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
+        overrideUserInterfaceStyle = .light
     }
     
     // MARK: - Lifecycles

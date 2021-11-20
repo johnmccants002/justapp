@@ -37,6 +37,7 @@ class ActivityRespectCell: UICollectionViewCell {
                                                            action: #selector(imageTapped))
                    containerView.isUserInteractionEnabled = true
                    imageView.addGestureRecognizer(tapGesture)
+        overrideUserInterfaceStyle = .light
     }
     
     override func layoutSubviews() {

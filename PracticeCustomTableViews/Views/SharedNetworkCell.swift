@@ -19,6 +19,7 @@ class SharedNetworkCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        overrideUserInterfaceStyle = .light
         
     }
     

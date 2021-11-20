@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="KUI-9w-is1">
-                                <rect key="frame" x="20" y="240" width="374" height="622"/>
+                                <rect key="frame" x="20" y="256" width="374" height="606"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="friends" rowHeight="64" id="ZSf-SK-0qK" customClass="NetworksTableViewCell" customModule="PracticeCustomTableViews" customModuleProvider="target">
@@ -72,22 +72,22 @@
                                 </prototypes>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PMO-1t-R4K">
-                                <rect key="frame" x="20" y="98" width="374" height="124"/>
+                                <rect key="frame" x="20" y="98" width="374" height="140"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="55 New Respect!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh3-mE-DvA">
-                                        <rect key="frame" x="0.0" y="88" width="170" height="21"/>
+                                        <rect key="frame" x="0.0" y="88" width="170" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="170" id="58g-Z2-6qo"/>
-                                            <constraint firstAttribute="height" constant="21" id="QRU-P8-7fl"/>
+                                            <constraint firstAttribute="height" constant="40" id="QRU-P8-7fl"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="15"/>
                                         <color key="textColor" systemColor="systemBlueColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10 New Requests!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2R3-3m-3Js">
-                                        <rect key="frame" x="204" y="88" width="170" height="21"/>
+                                        <rect key="frame" x="204" y="88" width="170" height="40"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="21" id="45W-D5-4Pp"/>
+                                            <constraint firstAttribute="height" constant="40" id="45W-D5-4Pp"/>
                                             <constraint firstAttribute="width" constant="170" id="jRf-iO-rm0"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="15"/>
@@ -117,7 +117,7 @@
                                     <constraint firstItem="Yh3-mE-DvA" firstAttribute="top" secondItem="fuc-fH-MGA" secondAttribute="bottom" id="ODV-Px-8zP"/>
                                     <constraint firstItem="fuc-fH-MGA" firstAttribute="top" secondItem="b42-23-TCs" secondAttribute="bottom" constant="2" id="aWd-2b-wEg"/>
                                     <constraint firstAttribute="trailing" secondItem="fuc-fH-MGA" secondAttribute="trailing" id="bVJ-ns-R4Q"/>
-                                    <constraint firstAttribute="height" constant="124" id="cKl-5a-Kdv"/>
+                                    <constraint firstAttribute="height" constant="140" id="cKl-5a-Kdv"/>
                                     <constraint firstItem="fuc-fH-MGA" firstAttribute="leading" secondItem="PMO-1t-R4K" secondAttribute="leading" id="fk2-Gr-o1C"/>
                                     <constraint firstItem="b42-23-TCs" firstAttribute="centerX" secondItem="PMO-1t-R4K" secondAttribute="centerX" id="gJe-Pz-Dd6"/>
                                     <constraint firstItem="Yh3-mE-DvA" firstAttribute="leading" secondItem="PMO-1t-R4K" secondAttribute="leading" id="hmK-C9-Fur"/>

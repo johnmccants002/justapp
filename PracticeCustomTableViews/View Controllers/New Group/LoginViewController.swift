@@ -27,6 +27,7 @@ class LoginViewController: UIViewController {
         super.viewDidLoad()
         updateViews()
         self.hideKeyboardWhenTappedAround()
+        overrideUserInterfaceStyle = .light
         // Do any additional setup after loading the view.
     }
     

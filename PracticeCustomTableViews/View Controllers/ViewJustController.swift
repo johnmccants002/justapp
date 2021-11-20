@@ -26,6 +26,7 @@ class ViewJustController: UICollectionViewController, UINavigationControllerDele
         super.viewDidLoad()
         updateViews()
         fetchJust()
+        overrideUserInterfaceStyle = .light
     }
     
     // MARK: - Initializer
@@ -73,6 +74,7 @@ class ViewJustController: UICollectionViewController, UINavigationControllerDele
             cell.just = just
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
+            cell.moreJustsButton.isHidden = true
         
      
         cell.imageView.isUserInteractionEnabled = true
@@ -99,6 +101,10 @@ extension ViewJustController: UICollectionViewDelegateFlowLayout {
 // MARK: - NetworkJustCellDelegate
 
 extension ViewJustController: NetworkJustCellDelegate {
+    func moreButtonTapped(cell: NetworkJustCell) {
+        
+    }
+    
     func imageTapped(cell: NetworkJustCell) {
         
     }

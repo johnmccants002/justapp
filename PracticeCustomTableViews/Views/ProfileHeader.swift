@@ -156,6 +156,7 @@ class ProfileHeader: UICollectionReusableView {
     // MARK: - Helper Functions
     
     func configure() {
+        
         guard let user = user else {
             return }
         fullnameLabel.text = "\(user.firstName) \(user.lastName)"
@@ -388,7 +389,8 @@ class ProfileHeader: UICollectionReusableView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+        self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.75)
+        biotTextView.dataDetectorTypes = .link
         instagramButton.setRoundedView()
         twitterButton.setRoundedView()
         self.isUserInteractionEnabled = true

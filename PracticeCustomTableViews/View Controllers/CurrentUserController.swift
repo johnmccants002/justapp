@@ -52,7 +52,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     }
     var isUser: Bool
     
-    private let cache = NSCache<NSNumber, Just>()
+    private let cache = NSCache<NSNumber, JustObject>()
      
     
     private let utilityQueue = DispatchQueue.global(qos: .utility)
@@ -76,7 +76,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         fetchUserJusts()
         addObservers()
         setupCurrentUserArray()
-        
+        overrideUserInterfaceStyle = .light
         print("Is User is == to \(isUser)")
     }
     
@@ -126,7 +126,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
                 guard didRespect == true else { return }
                 let itemNumber = NSNumber(value: index)
                 if let cachedObject = self.cache.object(forKey: itemNumber) {
-                    self.cache.object(forKey: itemNumber)?.didRespect = true
+//                    self.cache.object(forKey: itemNumber)?.didRespect = true
                 } else {
                     
                     self.justs[index].didRespect = true
@@ -140,7 +140,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
             for just in self.justs {
                 JustService.shared.fetchJustRespects(just: just) { respectCount in
                     if let respectCount = respectCount {
-                        just.respects = Int(respectCount)
+//                        just.respects = Int(respectCount)
                     }
                 }
             }
@@ -219,7 +219,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         collectionView.backgroundColor = .white
         collectionView.register(ProfileHeader.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerIdentifier)
- 
+        
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -228,14 +228,15 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         let itemNumber = NSNumber(value: indexPath.row)
         cell.currentUserId = currentUser.uid
         cell.delegate = self
+        cell.moreJustsButton.isHidden = true
         
         if let cachedJust = self.cache.object(forKey: itemNumber) {
-            cell.just = cachedJust
+//            cell.just = cachedJust
             print("we have cachedJust")
         } else {
             print("we do not have cachedJust")
             cell.just = justs[indexPath.row]
-            self.cache.setObject(justs[indexPath.row], forKey: itemNumber)
+//            self.cache.setObject(justs[indexPath.row], forKey: itemNumber)
         }
         cell.tag = indexPath.row
         
@@ -324,6 +325,7 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! ProfileHeader
+        
         if isUser == true {
             print("isUser == true")
             header.user = self.user
@@ -364,13 +366,17 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 20.0, left: 1.0, bottom: 1.0, right: 1.0)
+        return UIEdgeInsets(top: 15.0, left: 1.0, bottom: 1.0, right: 1.0)
     }
 }
 
 // MARK: NetworkJustCellDelegate
 
 extension CurrentUserController: NetworkJustCellDelegate {
+    func moreButtonTapped(cell: NetworkJustCell) {
+        
+    }
+    
     func respectCountTapped(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         let controller = RespectedByViewController(just: just, currentUser: currentUser)

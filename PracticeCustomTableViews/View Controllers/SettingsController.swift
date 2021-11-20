@@ -131,6 +131,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         setupUserInfo()
         loadingIndicator.hidesWhenStopped = true
         self.hideKeyboardWhenTappedAround()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillLayoutSubviews() {

@@ -44,6 +44,7 @@ class NetworkDetailsController: UICollectionViewController, UINavigationControll
         super.viewDidLoad()
         registerCell()
         configureCollectionView()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillLayoutSubviews() {

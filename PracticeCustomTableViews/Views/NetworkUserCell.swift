@@ -21,6 +21,7 @@ class NetworkUserCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        overrideUserInterfaceStyle = .light
     }
     
     override func layoutSubviews() {

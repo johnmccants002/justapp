@@ -25,6 +25,7 @@ class NotificationsViewController: UIViewController, UINavigationControllerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         updateViews()
+        overrideUserInterfaceStyle = .light
         self.navigationController?.isNavigationBarHidden = false
     }
     

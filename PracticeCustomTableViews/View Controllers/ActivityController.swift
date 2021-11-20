@@ -40,6 +40,7 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         setupRefreshControl()
         updateViews()
         setupLoadingIndicator()
+        overrideUserInterfaceStyle = .light
         
     }
     

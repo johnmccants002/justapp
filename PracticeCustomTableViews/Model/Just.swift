@@ -7,8 +7,13 @@
 
 import Foundation
 
-
-class Just {
+class JustObject {
+    var just : Just
+    init(just: Just) {
+        self.just = just
+    }
+}
+struct Just {
     var justText: String
     var uid: String
     var timestamp: Date!
@@ -19,6 +24,7 @@ class Just {
     var profileImageUrl: URL?
     var respects: Int = 0
     var justImageUrl: URL?
+    var dateString: String?
     
     init(justID: String, dictionary: [String: Any]) {
         self.justID = justID
@@ -35,6 +41,22 @@ class Just {
         
         if let timestamp = dictionary["timestamp"] as? Double {
             self.timestamp = Date(timeIntervalSince1970: timestamp)
+            let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MM/dd/yy"
+            let date = Date()
+            let yesterday = date.dayBefore
+            let todaysDateString = dateFormatter.string(from: date)
+            let yesterdayDateString = dateFormatter.string(from: yesterday)
+            let justDateString = dateFormatter.string(from: self.timestamp)
+            if todaysDateString == justDateString {
+                self.dateString = "Today"
+            } else if yesterdayDateString == justDateString {
+                self.dateString = "Yesterday"
+            } else {
+                self.dateString = dateFormatter.string(from: self.timestamp)
+            }
+           
+       
         }
         
         if let justImageUrl = dictionary["justImageUrl"] as? String {
@@ -50,4 +72,8 @@ extension Just: Equatable {
     static func == (lhs: Just, rhs: Just) -> Bool {
         return lhs.justID == rhs.justID
     }
+}
+
+extension Just: Hashable {
+    
 }

@@ -92,6 +92,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         setCurrentNetworkImage()
         authenticateUserAndConfigureUI()
         updateViews()
+        overrideUserInterfaceStyle = .light
 
 //        logoutButtonTapped()
 
@@ -194,9 +195,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         UserService.shared.fetchCheckedRespect(uid: uid) { respectString in
             self.respectLabel.text = respectString
             if respectString == "New Respects!" {
-                self.respectLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 14)
+                self.respectLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
             } else {
-                self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+                self.respectLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
             }
             
         }
@@ -204,9 +205,9 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         UserService.shared.fetchCheckedInvites(uid: uid) { invitesString in
             self.invitesLabel.text = invitesString
             if invitesString == "New Invites!" {
-                self.invitesLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 14)
+                self.invitesLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
             } else {
-                self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+                self.invitesLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
             }
             
         }
@@ -228,7 +229,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         self.invitesLabel.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleInvitesTapped))
         self.invitesLabel.addGestureRecognizer(tap)
-        self.invitesLabel.font = UIFont.init(name: "HelveticaNeue", size: 14)
+        self.invitesLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 16)
         self.invitesLabel.text = "Invites"
     }
     
@@ -236,7 +237,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         self.respectLabel.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleRespectsTapped))
         self.respectLabel.addGestureRecognizer(tap)
-        self.respectLabel.font = UIFont.init(name: "HelveticaNeue", size: 14)
+        self.respectLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
         self.respectLabel.text = "Respects"
     }
     
@@ -383,7 +384,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         guard let user = self.currentUser else { return }
         UserService.shared.checkUncheckInvites(string: "check", uid: user.uid)
         self.invitesLabel.text = "Invites"
-        self.invitesLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+        self.invitesLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
         let controller = ActivityController(currentUser: user)
         let nav = UINavigationController(rootViewController: controller)
         nav.modalPresentationStyle = .fullScreen
@@ -395,7 +396,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         guard let user = self.currentUser else { return }
         UserService.shared.checkUncheckRespects(string: "check", uid: user.uid)
         self.respectLabel.text = "Respects"
-        self.respectLabel.font = UIFont(name: "HelveticaNeue", size: 14)
+        self.respectLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
         let controller = ActivityRespectController(currentUser: user)
         let nav = UINavigationController(rootViewController: controller)
         nav.modalPresentationStyle = .fullScreen

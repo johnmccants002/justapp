@@ -228,14 +228,17 @@ struct JustService {
     func fetchLastJusts(networkID: String, completion: @escaping([Just]) -> Void) {
         var lastJusts : [Just] = []
         REF_NETWORK_JUSTS.document(networkID).collection("last-justs").getDocuments { snapshot, error in
-          
+            let firstString = "just "
             guard let snapshot = snapshot else { return }
             if snapshot.isEmpty {
                 completion([])
             }
             for document in snapshot.documents {
                 let dict = document.data() as [String: AnyObject]
-                let just = Just(justID: dict["justID"] as! String, dictionary: dict)
+                var just = Just(justID: dict["justID"] as! String, dictionary: dict)
+                just.dateString = "Justs"
+                let secondString = just.justText
+                just.justText = firstString + secondString
                 lastJusts.append(just)
             }
             completion(lastJusts)

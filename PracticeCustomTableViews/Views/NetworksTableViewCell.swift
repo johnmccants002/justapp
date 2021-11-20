@@ -24,6 +24,7 @@ class NetworksTableViewCell: UITableViewCell {
     var delegate : NetworkTableViewCellDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
+        overrideUserInterfaceStyle = .light
         
     }
     

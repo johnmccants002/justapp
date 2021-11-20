@@ -19,6 +19,7 @@ class JustTableViewCell: UITableViewCell {
     var delegate: PracticeTableViewCellDelegate?
     override func awakeFromNib() {
         super.awakeFromNib()
+        overrideUserInterfaceStyle = .light
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

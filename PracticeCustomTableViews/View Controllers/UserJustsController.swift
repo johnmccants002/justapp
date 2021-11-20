@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-
+private let headerIdentifier = "JustsHeader"
 class UserJustsController: UICollectionViewController, UINavigationControllerDelegate {
     
     // Properties
@@ -18,6 +18,12 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         didSet {
             updateViews()
             userJusts.reverse()
+            collectionView.reloadData()
+        }
+    }
+    
+    var allJusts : [[Just]]? {
+        didSet {
             collectionView.reloadData()
         }
     }
@@ -53,6 +59,7 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         fetchUserJusts()
         collectionView.isUserInteractionEnabled = true
         setupRefreshControl()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -74,7 +81,9 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         let nib = UINib(nibName: justNibName, bundle: nil)
         collectionView.register(nib, forCellWithReuseIdentifier: "networkJustCell")
         collectionView.backgroundColor = .white
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: -5, left: 0, bottom: 0, right: 0)
+        
+        collectionView.register(JustsHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerIdentifier)
     }
     
     @objc func removeCell(cell: NetworkJustCell) {
@@ -130,7 +139,12 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
             }
         }
         myGroup.notify(queue: .main) {
-            self.collectionView.reloadData()
+            let sortedJusts = justs.sorted(by: {
+                $0.dateString!.compare($1.dateString!) == .orderedAscending
+            })
+            
+            let objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
+            self.allJusts = objectGroups
             self.collectionView.refreshControl?.endRefreshing()
         }
     }
@@ -152,22 +166,36 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "networkJustCell", for: indexPath) as! NetworkJustCell
-        cell.just = userJusts[indexPath.row]
-        cell.delegate = self
-        cell.imageView.isUserInteractionEnabled = true
-        cell.currentUserId = self.currentUser.uid
-        cell.fetchToken()
-        cell.tag = indexPath.row
         
-        if userJusts[indexPath.row].uid == currentUser.uid {
-            cell.setupRespectButton()
+        if let allJusts = allJusts {
+            cell.just = allJusts[indexPath.section][indexPath.row]
+            cell.delegate = self
+            cell.imageView.isUserInteractionEnabled = true
+            cell.currentUserId = self.currentUser.uid
+            cell.fetchToken()
+            cell.timestampLabel.isHidden = true
+            cell.moreJustsButton.isHidden = true
+            
+            if allJusts[indexPath.section][indexPath.row].uid == currentUser.uid {
+                cell.setupRespectButton()
+            }
         }
         
         return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return userJusts.count
+        if let allJusts = allJusts {
+            return allJusts[section].count
+        }
+        return 0
+    }
+    
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if let allJusts = allJusts {
+            return allJusts.count
+        }
+        return 0
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -178,27 +206,47 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         cell.imageView.addGestureRecognizer(tap)
     }
     
-    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        if (indexPath.row == userJusts.count - 1) {
-            loadMoreJusts()
-        }
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let sectionHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! JustsHeader
+        
+        guard let allJusts = allJusts else { return sectionHeader }
+        
+        sectionHeader.date = allJusts[indexPath.section].first?.dateString!
+            
+        return sectionHeader
+        
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: self.view.bounds.width, height: 50)
+    }
+    
+//    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        if (indexPath.row == userJusts.count - 1) {
+//            loadMoreJusts()
+//        }
+//    }
 }
 
 // MARK: UICollectionViewDelegateFlowLayout
 
 extension UserJustsController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let just = userJusts[indexPath.row]
+        guard let allJusts = allJusts else { return CGSize()}
+        let just = allJusts[indexPath.section][indexPath.row]
         let viewModel = JustViewModel(just: just)
         let height = viewModel.size(forWidth: view.frame.width).height
-        return CGSize(width: view.frame.width - 20, height: height + 80)
+        return CGSize(width: view.frame.width - 20, height: height + 100)
     }
 }
 
 // MARK: NetworkJustCellDelegate
 
 extension UserJustsController: NetworkJustCellDelegate {
+    func moreButtonTapped(cell: NetworkJustCell) {
+        
+    }
+    
     func respectCountTapped(cell: NetworkJustCell) {
         guard let just = cell.just else { return }
         let controller = RespectedByViewController(just: just, currentUser: currentUser)

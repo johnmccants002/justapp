@@ -49,6 +49,7 @@ class ActivityRespectController: UICollectionViewController, UINavigationControl
         setupRightBarItem()
         setupRefreshControl()
         setupCurrentUserArray()
+        overrideUserInterfaceStyle = .light
         
     }
     

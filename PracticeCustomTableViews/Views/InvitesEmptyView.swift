@@ -25,6 +25,7 @@ class InvitesEmptyView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        overrideUserInterfaceStyle = .light
         self.backgroundColor = UIColor.white
         self.addSubview(imageView)
         imageView.setDimensions(width: 200, height: 300)

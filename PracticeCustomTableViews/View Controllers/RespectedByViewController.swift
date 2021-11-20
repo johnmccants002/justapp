@@ -27,6 +27,7 @@ class RespectedByViewController: UICollectionViewController, UINavigationControl
         super.viewDidLoad()
         configure()
         fetchUsers()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillAppear(_ animated: Bool) {

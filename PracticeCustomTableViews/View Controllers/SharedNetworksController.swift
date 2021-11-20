@@ -23,6 +23,7 @@ class SharedNetworksController: UICollectionViewController, UINavigationControll
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
+        overrideUserInterfaceStyle = .light
     }
     
     override func viewWillAppear(_ animated: Bool) {
