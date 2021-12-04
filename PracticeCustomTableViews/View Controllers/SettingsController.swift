@@ -8,12 +8,18 @@
 import Foundation
 import UIKit
 
+enum ImageSelect {
+    case profileImage
+    case fireImage
+}
+
 class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
     
     var currentUser: User
     var originalImage: UIImage?
+    var newFireImage: UIImage?
     var newImage: UIImage? {
         didSet {
             saveButton.isEnabled = true
@@ -22,6 +28,18 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     var loadingIndicator = UIActivityIndicatorView()
     
     private let profileImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFit
+        iv.clipsToBounds = true
+        iv.backgroundColor = .lightGray
+        iv.layer.borderColor = UIColor.white.cgColor
+        iv.layer.borderWidth = 4
+        iv.isUserInteractionEnabled = true
+        return iv
+
+    }()
+    
+    private let fireImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
@@ -93,7 +111,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     
     private let addPhotoButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Change Photo", for: .normal)
+        button.setTitle("Change Profile Photo", for: .normal)
         button.addTarget(self, action: #selector(profileImageViewTapped), for: .touchUpInside)
         button.setTitleColor(UIColor.systemBlue, for: .normal)
         
@@ -109,6 +127,18 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         return label
         
     }()
+    
+    private let addFirePhotoButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Change Fire Photo", for: .normal)
+        button.addTarget(self, action: #selector(fireImageViewTapped), for: .touchUpInside)
+        button.setTitleColor(UIColor.systemBlue, for: .normal)
+        
+        return button
+        
+    }()
+    
+    var isProfile: Bool = false
     
     // MARK: - Initializer
     
@@ -164,6 +194,13 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             self.profileImageView.image = UIImage(named: "blank")
         }
         
+        if let fireUrl = currentUser.fireImageUrl {
+            self.fireImageView.sd_setImage(with: fireUrl, completed: nil)
+        } else {
+            self.fireImageView.image = UIImage(named: "blank")
+        }
+        
+        
         self.aboutTextView.text = currentUser.aboutText
     }
     
@@ -171,19 +208,33 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         
         // Profile Image View
         view.addSubview(profileImageView)
-        profileImageView.anchor(top: self.view.safeAreaLayoutGuide.topAnchor, paddingTop: 20)
+        profileImageView.anchor(top: self.view.safeAreaLayoutGuide.topAnchor, left: self.view.safeAreaLayoutGuide.leftAnchor, paddingTop: 20, paddingLeft: 30)
         profileImageView.setDimensions(width: 100, height: 100)
         profileImageView.layer.cornerRadius = 100 / 2
-        profileImageView.centerX(inView: self.view)
+//        profileImageView.centerX(inView: self.view)
         profileImageView.clipsToBounds = true
         profileImageView.image = UIImage(named: "test")
+        
+        view.addSubview(fireImageView)
+        fireImageView.anchor(top: profileImageView.topAnchor, right: self.view.safeAreaLayoutGuide.rightAnchor, paddingRight: 30)
+        fireImageView.setDimensions(width: 100, height: 100)
+        fireImageView.layer.cornerRadius = 100 / 2
+        fireImageView.clipsToBounds = true
+        fireImageView.image = UIImage(named: "test")
+        
+        // AddPhotobutton
+        view.addSubview(addFirePhotoButton)
+        addFirePhotoButton.anchor(top: fireImageView.bottomAnchor, paddingTop: 10, width: 120, height: 20)
+        addFirePhotoButton.centerX(inView: fireImageView)
+        addFirePhotoButton.titleLabel?.textAlignment = .center
+        addFirePhotoButton.titleLabel?.font = UIFont(name: "HelveticaNeue", size: 14)
         
         
         // AddPhotobutton
         view.addSubview(addPhotoButton)
-        addPhotoButton.anchor(top: profileImageView.bottomAnchor, paddingTop: 10, width: 120, height: 20)
+        addPhotoButton.anchor(top: profileImageView.bottomAnchor, paddingTop: 10, width: 140, height: 20)
+        addPhotoButton.centerX(inView: profileImageView)
         addPhotoButton.titleLabel?.textAlignment = .center
-        addPhotoButton.centerX(inView: self.view)
         addPhotoButton.titleLabel?.font = UIFont(name: "HelveticaNeue", size: 14)
         
         // About Label
@@ -317,6 +368,14 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             }
         }
         
+        if let fireImage = newFireImage {
+            AuthService.shared.updateFireImage(image: fireImage) { err, ref in
+                if err == nil {
+                    print("Success Saving Fire Image")
+                }
+            }
+        }
+        
         if let aboutText = self.aboutTextView.text, !aboutText.isEmpty, aboutTextView.textColor != UIColor.lightGray {
             AuthService.shared.updateAboutText(aboutText: aboutText) { err, ref in
                 if err == nil {
@@ -357,9 +416,29 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     }
     
     @objc func profileImageViewTapped() {
+        isProfile = true
         let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
               alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
                   self.openCamera()
+              }))
+
+              alert.addAction(UIAlertAction(title: "Photos", style: .default, handler: { _ in
+                  self.openGallery()
+              }))
+
+              alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+
+              self.present(alert, animated: true, completion: nil)
+//        self.present(imagePicker, animated: true, completion: nil)
+        
+    }
+    
+    @objc func fireImageViewTapped() {
+        isProfile = false
+        let alert = UIAlertController(title: "Choose Image", message: nil, preferredStyle: .actionSheet)
+              alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
+                  self.openCamera()
+                
               }))
 
               alert.addAction(UIAlertAction(title: "Photos", style: .default, handler: { _ in
@@ -386,8 +465,14 @@ extension SettingsController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            self.profileImageView.image = pickedImage
-            self.newImage = pickedImage
+            if isProfile == true {
+                self.profileImageView.image = pickedImage
+                self.newImage = pickedImage
+            } else if isProfile == false {
+                self.fireImageView.image = pickedImage
+                self.newFireImage = pickedImage
+                
+            }
          
         }
         picker.dismiss(animated: true) {

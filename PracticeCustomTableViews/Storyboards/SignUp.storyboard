@@ -84,7 +84,6 @@
                                 </state>
                                 <connections>
                                     <action selector="signUpButtonTapped:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="Yge-yJ-LG4"/>
-                                    <segue destination="8PV-SV-Khv" kind="presentation" modalPresentationStyle="fullScreen" id="zTZ-bB-uSv"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New to the app?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pww-9X-S9V">

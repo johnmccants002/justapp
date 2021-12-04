@@ -215,7 +215,7 @@ struct NetworkService {
     func fetchUsersInNetwork(networkId: String, currentUser: User, completion:@escaping([User]) -> Void) {
         var users : [User] = []
         let myGroup = DispatchGroup()
-        REF_NETWORK_USERS.child(networkId).observeSingleEvent(of: .value) { snapshot in
+        REF_NETWORK_USERS.child(currentUser.networkId).observeSingleEvent(of: .value) { snapshot in
             print("This is the snapshot: \(snapshot.value)")
             guard let dict = snapshot.value as? [String: Any] else { return }
             
@@ -233,4 +233,11 @@ struct NetworkService {
         }
 
 }
+    
+    func leaveNetwork(currentUserUid: String, userUid: String, networkId: String, completion:@escaping() -> (Void)) {
+        REF_CURRENT_USER_NETWORKS.child(currentUserUid).child(userUid).removeValue()
+        REF_NETWORK_USERS.child(networkId).child(currentUserUid).removeValue()
+        completion()
+        
+    }
 }

@@ -144,6 +144,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
             self.networkUsers = users
             print("These are your networks \(users)")
             NetworkService.shared.checkedUncheckedNetworks(users: users, currentUser: currentUser) { networks in
+                
                 self.networks = networks
                 self.currentUser?.networks = networks
                 self.friendsTableView.refreshControl?.endRefreshing()
@@ -435,7 +436,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         guard let currentUser = self.currentUser else { return }
         let destinationVC = segue.destination as! NewJustViewController
             destinationVC.currentUser = currentUser
-            
+            destinationVC.fetchTodayCount(networkId: currentUser.networkId, uid: currentUser.uid)
             if let networks = networks {
                 destinationVC.networks = networks
             }

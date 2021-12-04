@@ -28,8 +28,6 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
             collectionView.reloadData()
         }
     }
-        
-    
     let justNibName = "NetworkJustCell"
 
     
@@ -51,8 +49,14 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         }
     }
     var isUser: Bool
+    var userJustsArray : [UserJustsObject]? {
+        didSet {
+            print("userJustsArray didSet")
+            self.collectionView.reloadData()
+        }
+    }
     
-    private let cache = NSCache<NSNumber, JustObject>()
+    private let cache = NSCache<NSNumber, UserJustsObject>()
      
     
     private let utilityQueue = DispatchQueue.global(qos: .utility)
@@ -108,15 +112,19 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
             JustService.shared.fetchUserJusts(networkId: currentUser.networkId, userUid: currentUser.uid) { justs in
                 self.justs = justs
                 self.justs.reverse()
-                self.fetchJustRespects(justs: justs) {
+                self.fetchJustRespects(justs: self.justs) {
                     self.collectionView.reloadData()
                 }
-//                self.checkIfUserRespectedJusts(justs: justs) {
-//                    self.collectionView.reloadData()
-//                }
-                
+            }
         }
+    }
+    
+    func setUserJustsArray(justs: [Just]) {
+        var justObjects: [UserJustsObject] = []
+        for just in justs {
+            justObjects.append(UserJustsObject(just: just))
         }
+        self.userJustsArray = justObjects
     }
     
     func checkIfUserRespectedJusts(justs: [Just], completion:@escaping() -> (Void)) {
@@ -126,7 +134,7 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
                 guard didRespect == true else { return }
                 let itemNumber = NSNumber(value: index)
                 if let cachedObject = self.cache.object(forKey: itemNumber) {
-//                    self.cache.object(forKey: itemNumber)?.didRespect = true
+                    cachedObject.just.didRespect = true
                 } else {
                     
                     self.justs[index].didRespect = true
@@ -136,13 +144,22 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
     }
     
     func fetchJustRespects(justs: [Just], completion: @escaping() -> (Void)) {
+        print("fetchJustRespects Called")
         if isUser == false {
-            for just in self.justs {
+            print("in fetch just respects")
+            let myGroup = DispatchGroup()
+            for var (index, just) in self.justs.enumerated() {
+                myGroup.enter()
                 JustService.shared.fetchJustRespects(just: just) { respectCount in
                     if let respectCount = respectCount {
-//                        just.respects = Int(respectCount)
+                        self.justs[index].respects = Int(respectCount)
                     }
+                    myGroup.leave()
                 }
+            }
+            myGroup.notify(queue: .main) {
+                self.collectionView.reloadData()
+                self.setUserJustsArray(justs: self.justs)
             }
             
         }
@@ -230,14 +247,20 @@ class CurrentUserController: UICollectionViewController, UINavigationControllerD
         cell.delegate = self
         cell.moreJustsButton.isHidden = true
         
+        
         if let cachedJust = self.cache.object(forKey: itemNumber) {
-//            cell.just = cachedJust
+            cell.just = cachedJust.just
             print("we have cachedJust")
+            print("This is the number of respects: \(cachedJust.just.respects)")
         } else {
             print("we do not have cachedJust")
             cell.just = justs[indexPath.row]
-//            self.cache.setObject(justs[indexPath.row], forKey: itemNumber)
+            cell.setupRespectCountButton()
+            guard let userJustsArray = userJustsArray else {  return cell }
+            self.cache.setObject(userJustsArray[indexPath.row], forKey: itemNumber)
+            print("we did set the cache object")
         }
+        
         cell.tag = indexPath.row
         
         if justs[indexPath.row].uid == currentUser.uid {

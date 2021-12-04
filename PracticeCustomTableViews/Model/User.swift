@@ -16,6 +16,7 @@ struct User {
     var firstName: String
     var lastName: String
     var profileImageUrl: URL?
+    var fireImageUrl: URL?
     var networkId: String
     var userNetworks: [String] = []
     var lastJustMyNetwork: String?
@@ -26,6 +27,7 @@ struct User {
     var twitterUsername: String?
     var instagramUsername: String?
     var networks: [Network]?
+    var todayJustCount: Int = 0
     
     init(uid: String, dictionary: [String: Any]) {
         self.uid = uid
@@ -44,6 +46,11 @@ struct User {
         if let profileImageUrl = dictionary["profileImageUrl"] as? String {
             guard let url = URL(string: profileImageUrl) else { return }
             self.profileImageUrl = url
+        }
+        
+        if let fireImageUrl = dictionary["fireImageUrl"] as? String {
+            guard let url = URL(string: fireImageUrl) else { return }
+            self.fireImageUrl = url
         }
         
     }

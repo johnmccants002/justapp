@@ -11,7 +11,6 @@ import UIKit
 class NetworkViewController: UIViewController {
     
     // MARK: - Properties
-    
     var networkId: String?
     @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
@@ -104,6 +103,7 @@ extension NetworkViewController: NetworkCellDelegate {
         self.loadingIndicator.isHidden = false
         self.loadingIndicator.startAnimating()
         self.delayedReloadData()
+        
     }
   
 }

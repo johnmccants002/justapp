@@ -18,7 +18,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     var lastJusts = [Just]() {
         didSet {
             collectionView.isUserInteractionEnabled = true
-            fetchAllNetworkJusts()
         }
     }
     let justNibName = "NetworkJustCell"
@@ -30,24 +29,29 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             collectionView.reloadData()
         }
     }
-    
-    var allNetworkJusts = [Just]()
      
-    var lastJustIds: [String]? {
+    var lastJustIds: [String]? 
+    
+    var allJusts : [[Just]]?
+    
+    var fireUsers: [String: Int]? {
         didSet {
-            guard let lastJustIds = lastJustIds else { return }
-            fetchOtherJusts(lastJustIds: lastJustIds)
+            self.collectionView.reloadData()
         }
     }
     
-    var allJusts : [[Just]]? {
+    var todayArray: [String] = [] {
         didSet {
-            collectionView.reloadData()
+            print("This is the todayArray \(todayArray)")
+            self.fetchSetFireUsers(todayArray: todayArray)
         }
     }
+    
+    
     
     var user: User
     
+    private var cache = NSCache<NSString, UserJustsObject>()
     // MARK: - Initializer
     
     init(currentUser: User, titleText: String, networkId: String, user: User) {
@@ -56,7 +60,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         self.networkId = networkId
         self.user = user
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
-        
     }
     
     required init?(coder: NSCoder) {
@@ -80,6 +83,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         super.viewWillDisappear(animated)
         // needed to clear the text in the back navigation:
         self.navigationItem.title = ""
+        self.cache.removeAllObjects()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -87,6 +91,11 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         self.navigationItem.title = titleText
         self.navigationController?.navigationBar.isHidden = false
         self.navigationController?.navigationBar.barStyle = .default
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.cache.removeAllObjects()
     }
     
     // MARK: - Helper Functions
@@ -106,7 +115,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     
     func setupRightBarButtonItem() {
         if titleText == "My Network" {
-    
         let button : UIButton = {
             let button = UIButton(type: .infoLight, primaryAction: nil)
             button.addTarget(self, action: #selector(rightBarButtonTapped), for: .touchUpInside)
@@ -116,6 +124,18 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         let barButton = UIBarButtonItem(customView: button)
         self.navigationItem.setRightBarButton(barButton, animated: true)
         
+        } else {
+            let button : UIButton = {
+                let button = UIButton()
+                button.addTarget(self, action: #selector(networkBarButtonTapped), for: .touchUpInside)
+                button.setTitle("🚪", for: .normal)
+                button.titleLabel?.textAlignment = .center
+                
+                return button
+            }()
+            let barButton = UIBarButtonItem(customView: button)
+            self.navigationItem.setRightBarButton(barButton, animated: true)
+            
         }
     }
     
@@ -172,16 +192,21 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         JustService.shared.fetchLastJusts(networkID: networkId) { justs in
             
             var lastJustIds : [String] = []
+            var newJusts: [Just] = []
+            var dict : [String: Int] = [:]
             for var just in justs {
-                lastJustIds.append(just.justID)
+                if just.timestamp.timeIntervalSinceNow > -3600 {
+                    lastJustIds.append(just.justID)
+                    newJusts.append(just)
+                    print("We have just within last hour")
+                    self.todayArray.append(just.uid)
+                }
+                    
+                
             }
             self.lastJustIds = lastJustIds
-            self.lastJusts = justs
-            
-            if self.lastJusts.isEmpty == false {
-                self.checkIfUserRespectedJusts(justs: self.lastJusts)
-            }
-      
+            self.lastJusts = newJusts
+            self.fetchOtherJusts(lastJustIds: lastJustIds)
            
         }
     }
@@ -189,17 +214,52 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     func fetchOtherJusts(lastJustIds: [String]) {
         if lastJustIds.isEmpty == false {
         JustService.shared.testGrabAllJusts(lastJustIds: lastJustIds, networkId: networkId) { justs in
-            self.collectionView.refreshControl?.endRefreshing()
             var sortedJusts = justs.sorted(by: {
                 $0.dateString!.compare($1.dateString!) == .orderedDescending
             })
+            for just in sortedJusts {
+                if just.dateString == "Today" {
+                    self.todayArray.append(just.uid)
+                }
+            }
+            
             
             var objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
-
-            objectGroups.insert(self.lastJusts, at: 0)
-            self.allJusts = objectGroups
+            
+            if self.lastJusts.isEmpty == false {
+                objectGroups.insert(self.lastJusts, at: 0)
+                self.allJusts = objectGroups
+                self.checkIfUserRespectedJusts(justs: objectGroups)
+                self.fetchJustRespects(justs: objectGroups) {
+                }
+            } else {
+                self.allJusts = objectGroups
+                self.checkIfUserRespectedJusts(justs: objectGroups)
+                self.fetchJustRespects(justs: objectGroups) {
+                }
+            }
+           
         }
+        } else {
+            JustService.shared.grabAllJusts(networkId: networkId) { justs in
+                var sortedJusts = justs.sorted(by: {
+                    $0.dateString!.compare($1.dateString!) == .orderedDescending
+                })
+                for just in sortedJusts {
+                    if just.dateString == "Today" {
+                        self.todayArray.append(just.uid)
+                    }
+                }
+                
+                var objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
+                
+                self.allJusts = objectGroups
+                self.checkIfUserRespectedJusts(justs: objectGroups)
+                self.fetchJustRespects(justs: objectGroups) {
+                }
+            }
         }
+        
     }
     
     func sortJusts() {
@@ -208,26 +268,69 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         
     }
     
-    func checkIfUserRespectedJusts(justs: [Just]) {
+    func checkIfUserRespectedJusts(justs: [[Just]]) {
+        if let allJusts = self.allJusts {
         let myGroup = DispatchGroup()
-        for (index, just) in justs.enumerated() {
+            DispatchQueue.main.async {
+        for (index1, justArray) in justs.enumerated() {
             myGroup.enter()
+        for (index2, just) in justArray.enumerated() {
             JustService.shared.checkIfUserRespected(just: just) {
                 didRespect in
-                myGroup.leave()
                 guard didRespect == true else { return }
-                self.lastJusts[index].didRespect = true
-                self.collectionView.refreshControl?.endRefreshing()
+                self.allJusts?[index1][index2].didRespect = true
                 
+                if let cachedJust = self.cache.object(forKey: just.justID as NSString) {
+                    self.cache.object(forKey: just.justID as NSString)?.just.didRespect = true
+                }
+               
             }
-            
         }
-        myGroup.notify(queue: .main) {
+        }
+            myGroup.leave()
+        }
             self.collectionView.reloadData()
+        myGroup.notify(queue: .main) {
+            self.collectionView.refreshControl?.endRefreshing()
+            self.collectionView.reloadData()
+        }
         }
     }
     
-    func fetchAllNetworkJusts() {
+    
+    func fetchJustRespects(justs: [[Just]], completion: @escaping() -> (Void)) {
+        guard let allJusts = allJusts else { return }
+            print("in fetch just respects")
+        
+        for var (index, justArray) in allJusts.enumerated() {
+           
+                for var (index2, just) in justArray.enumerated() {
+//                if just.uid == currentUser.uid {
+                    JustService.shared.fetchJustRespects(just: just) { respectCount in
+                        if let respectCount = respectCount {
+                            self.allJusts?[index][index2].respects = Int(respectCount)
+
+                            if let cachedJust = self.cache.object(forKey: just.justID as NSString) {
+                                cachedJust.just.respects = Int(respectCount)
+                            }
+                        }
+                        
+                    }
+                   
+            }
+            
+        }
+            self.collectionView.reloadData()
+        
+    }
+    
+    func fetchSetFireUsers(todayArray: [String]) {
+        let mappedItems = todayArray.map { ($0, 1) }
+        let counts = Dictionary(mappedItems, uniquingKeysWith: +)
+        print("This is the counts: \(counts)")
+        self.fireUsers = counts
+        self.collectionView.reloadData()
+        
         
     }
     // MARK: - Selectors
@@ -243,17 +346,36 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     }
     
     @objc func rightBarButtonTapped() {
-        print("right bar button tapped")
         guard let currentUserArray = currentUserArray else { return }
         if self.currentUser == user {
             let controller = NetworkDetailsController(currentUser: currentUser, user: currentUser, currentUserArray: currentUserArray)
-            controller.networkUsers = currentUserArray
+            controller.fetchNetworkUsers()
             
             self.navigationController?.pushViewController(controller, animated: true)
         } else {
             let controller = NetworkDetailsController(currentUser: currentUser, user: user, currentUserArray: currentUserArray)
             controller.fetchNetworkUsers()
             self.navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
+    @objc func networkBarButtonTapped() {
+        let alert = UIAlertController(title: "Leave Network", message: "Do you want to leave \(user.firstName)'s network?", preferredStyle: .actionSheet)
+        let action = UIAlertAction(title: "Yes", style: .default) { action in
+            self.leaveNetworkTapped()
+        }
+        let cancelAction = UIAlertAction(title: "No", style: .cancel) { action in
+            
+        }
+        alert.addAction(action)
+        alert.addAction(cancelAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func leaveNetworkTapped() {
+        NetworkService.shared.leaveNetwork(currentUserUid: currentUser.uid, userUid: user.uid, networkId: networkId) {
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
+            self.navigationController?.popToRootViewController(animated: true)
         }
     }
     
@@ -264,12 +386,53 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "networkJustCell", for: indexPath) as! NetworkJustCell
-        if let allJusts = allJusts {
-            cell.just = allJusts[indexPath.section][indexPath.row]
+  
+        
+        if var allJusts = allJusts {
+            let idString = allJusts[indexPath.section][indexPath.row].justID as NSString
+            if let cachedJust = self.cache.object(forKey: idString), cachedJust.just.justID == allJusts[indexPath.section][indexPath.row].justID {
+                cell.section = indexPath.section
+                cell.row = indexPath.row
+                cell.timestampLabel.isHidden = true
+                if cachedJust.just.uid == currentUser.uid {
+                    cell.currentUser = currentUser
+                    cell.currentUserId = currentUser.uid
+                }
+                if let fireUsers = self.fireUsers {
+                    if fireUsers[cachedJust.just.uid] ?? 0 >= 3 {
+                        cachedJust.just.userOnFire = true
+                        print("this is fire users \(fireUsers)")
+                    } else {
+                        cell.fireLabel.isHidden = true
+                    }
+                }
+                cell.just = self.cache.object(forKey: idString as NSString)?.just
+                
+                
+                print("we have a cached just")
+            } else {
             cell.delegate = self
             cell.currentUserId = self.currentUser.uid
             cell.fetchToken()
             cell.timestampLabel.isHidden = true
+            cell.section = indexPath.section
+            cell.row = indexPath.row
+                if allJusts[indexPath.section][indexPath.row].uid == currentUser.uid {
+                    cell.currentUser = currentUser
+                    cell.currentUserId = currentUser.uid
+                }
+                if let fireUsers = self.fireUsers {
+                    if fireUsers[allJusts[indexPath.section][indexPath.row].uid] ?? 0 >= 3 {
+                        allJusts[indexPath.section][indexPath.row].userOnFire = true
+                    } else {
+                        cell.fireLabel.isHidden = true
+                    }
+                }
+            cell.just = allJusts[indexPath.section][indexPath.row]
+            self.cache.setObject(UserJustsObject(just: allJusts[indexPath.section][indexPath.row]), forKey: idString)
+            }
+
+
         }
          
  
@@ -338,6 +501,9 @@ extension NetworkJustsController: NetworkJustCellDelegate {
         let titleText = "\(just.firstName) \(just.lastName)"
         let userUid = just.uid
         let controller = UserJustsController(currentUser: currentUser, userUid: userUid, titleText: titleText, networkId: networkId)
+        if let userOnFire = cell.just?.userOnFire {
+            controller.userOnFire = userOnFire
+        }
         controller.lastJust = just
         if let currentUserArray = self.currentUserArray {
         controller.currentUserArray = currentUserArray
@@ -388,12 +554,28 @@ extension NetworkJustsController: NetworkJustCellDelegate {
         let body = "\(currentUser.firstName) \(currentUser.lastName) respected your just."
         guard var just = cell.just else { return }
         if just.didRespect == false {
+            print("If let false")
+            if let section = cell.section, let row = cell.row {
+                self.allJusts?[section][row].didRespect = true
+            }
+            if let cachedObject = self.cache.object(forKey: just.justID as NSString) {
+                cachedObject.just.didRespect = true
+            }
+        } else {
+            if let section = cell.section, let row = cell.row {
+                self.allJusts?[section][row].didRespect = false
+            }
+            if let cachedObject = self.cache.object(forKey: just.justID as NSString) {
+                cachedObject.just.didRespect = false
+            }
             guard let token = cell.token else { return }
             PushNotificationSender.shared.sendPushNotification(to: token, title: title, body: body, id: self.currentUser.uid)
         }
-        
         JustService.shared.respectJust(just: just, currentUser: currentUser) { error, ref in
+            self.collectionView.reloadData()
         }
+        
+        
     }
     
     

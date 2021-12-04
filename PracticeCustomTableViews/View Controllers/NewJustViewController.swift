@@ -21,11 +21,12 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet var selectButton : UIButton!
     @IBOutlet weak var countLabel: UILabel!
     var networkIds: [String]?
-    var currentUser: User?
+    var currentUser: User? 
     var networks: [Network]?
     var yourNetworkUserIds: [String]?
     var justImage: UIImage?
     var imagePicker = UIImagePickerController()
+    var currentUserTodayCount: Int?
     
     var postButtonKeyboard: UIBarButtonItem {
         let nextButton = UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(self.postButtonPressed(_:)))
@@ -56,8 +57,15 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     @IBOutlet weak var justTextView: UITextView!
     var widthConstraint : NSLayoutConstraint?
     let justMaxLength = 150
+    
     var photoSelected = false
     var friendsNetwork = false
+    var currentUserNetworkUsers : [User]?
+    var tokenArray : [String] = [] {
+        didSet {
+            print("This is the token array \(tokenArray)")
+        }
+    }
     
     
     // MARK: Lifecycles
@@ -86,7 +94,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.justTextView.autocapitalizationType = .none
         self.justTextView.isScrollEnabled = false
         self.justTextView.inputAccessoryView = keyboardToolBar
-        self.justTextView.autocorrectionType = .no
+        self.justTextView.autocorrectionType = .yes
         self.keyboardToolBar.isHidden = true
         
         self.view.addSubview(xButton)
@@ -188,6 +196,9 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         guard let currentUser = currentUser else { return }
         NetworkService.shared.fetchCurrentUserNetworkUsers { userIds in
             self.yourNetworkUserIds = userIds
+            if let userIds = userIds {
+                self.fetchUserTokens(uids: userIds)
+            }
         }
     }
     
@@ -195,7 +206,28 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
             if let networks = networks, let yourNetworkUserIds = yourNetworkUserIds {
                 NetworkService.shared.uncheckNetworks(networks: networks, yourNetworkUserIds: yourNetworkUserIds)
             }
+        
+
        
+        
+    }
+    
+    func fetchTodayCount(networkId: String, uid: String) {
+            print("in fetch today count")
+            JustService.shared.fetchTodaysJustsCount(networkId: networkId, uid: uid) { count in
+                print("This is the count \(count)")
+                self.currentUserTodayCount = count
+            }
+        
+     
+    }
+    
+    func fetchUserTokens(uids: [String]) {
+        for uid in uids {
+            UserService.shared.fetchUserToken(uid: uid) { token in
+                self.tokenArray.append(token)
+            }
+        }
         
     }
     
@@ -238,13 +270,32 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
                 self.uncheckNetworks()
+                if let currentUser = self.currentUser {
+                if let todayCount = self.currentUserTodayCount {
+                    if todayCount + 1 == 3 {
+                        for token in self.tokenArray {
+                                PushNotificationSender.shared.sendPushNotification(to: token, title: "🔥 Fire Alert 🔥", body: "\(currentUser.firstName) \(currentUser.lastName) is on fire!", id: currentUser.uid)
+                            }
+                    }
+                }
+                }
                 self.navigationController?.popViewController(animated: true)
                 self.loadingIndicator.stopAnimating()
+                
             }
         } else {
             JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, networks: nil, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
+                }
+                if let currentUser = self.currentUser {
+                if let todayCount = self.currentUserTodayCount {
+                    if todayCount + 1 == 3 {
+                        for token in self.tokenArray {
+                            PushNotificationSender.shared.sendPushNotification(to: token, title: "🔥 Fire Alert 🔥", body: "\(currentUser.firstName) \(currentUser.lastName) is on fire!", id: currentUser.uid)
+                            }
+                    }
+                }
                 }
                 self.navigationController?.popViewController(animated: true)
                 self.loadingIndicator.stopAnimating()

@@ -36,6 +36,8 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
     let justNibName = "NetworkJustCell"
     let networkId: String
     var refreshControl = UIRefreshControl()
+    private let cache = NSCache<NSString, UserJustsObject>()
+    var userOnFire: Bool = false
     
     // MARK: - Initializer
     
@@ -66,6 +68,7 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
         super.viewWillDisappear(animated)
         // needed to clear the text in the back navigation:
         self.navigationItem.title = " "
+        self.cache.removeAllObjects()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -122,32 +125,84 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
     func fetchUserJusts() {
         JustService.shared.fetchUserJusts(networkId: networkId, userUid: userUid) { justs in
             self.userJusts = justs
-            self.checkIfUserRespectedJusts(justs: self.userJusts)
+            var sortedJusts = justs.sorted(by: {
+                $0.dateString!.compare($1.dateString!) == .orderedDescending
+            })
+            
+            var objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
+            
+            self.allJusts = objectGroups
+            if self.userUid != self.currentUser.uid {
+                self.checkIfUserRespectedJusts(justs: objectGroups)
+            } else {
+                self.fetchJustRespects(justs: objectGroups) {
+                }
+            }
         }
     }
     
-    func checkIfUserRespectedJusts(justs: [Just]) {
+//    func checkIfUserRespectedJusts(justs: [Just]) {
+//        let myGroup = DispatchGroup()
+//        for (index, just) in justs.enumerated() {
+//            myGroup.enter()
+//            JustService.shared.checkIfUserRespected(just: just) {
+//                didRespect in
+//                myGroup.leave()
+//                guard didRespect == true else { return }
+//                self.userJusts[index].didRespect = true
+//
+//            }
+//        }
+//        myGroup.notify(queue: .main) {
+//            let sortedJusts = justs.sorted(by: {
+//                $0.dateString!.compare($1.dateString!) == .orderedAscending
+//            })
+//
+//            let objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
+//            self.allJusts = objectGroups
+//            self.collectionView.refreshControl?.endRefreshing()
+//        }
+//    }
+    
+    func checkIfUserRespectedJusts(justs: [[Just]]) {
+        if let allJusts = self.allJusts {
         let myGroup = DispatchGroup()
-        for (index, just) in justs.enumerated() {
+        for (index1, justArray) in justs.enumerated() {
             myGroup.enter()
+        for (index2, just) in justArray.enumerated() {
             JustService.shared.checkIfUserRespected(just: just) {
                 didRespect in
-                myGroup.leave()
                 guard didRespect == true else { return }
-                self.userJusts[index].didRespect = true
-               
+                self.allJusts?[index1][index2].didRespect = true
+                self.collectionView.refreshControl?.endRefreshing()
             }
         }
+            myGroup.leave()
+        }
         myGroup.notify(queue: .main) {
-            let sortedJusts = justs.sorted(by: {
-                $0.dateString!.compare($1.dateString!) == .orderedAscending
-            })
-            
-            let objectGroups = Array(Dictionary(grouping:sortedJusts){$0.dateString}.values.sorted(by: { $0.first!.timestamp.compare($1.first!.timestamp) == .orderedDescending }))
-            self.allJusts = objectGroups
-            self.collectionView.refreshControl?.endRefreshing()
+            self.collectionView.reloadData()
+        }
         }
     }
+    
+    func fetchJustRespects(justs: [[Just]], completion: @escaping() -> (Void)) {
+        if userUid == currentUser.uid {
+        guard let allJusts = allJusts else { return }
+            print("in fetch just respects")
+            let myGroup = DispatchGroup()
+        for var (index, justArray) in allJusts.enumerated() {
+            for var (index2, just) in justArray.enumerated() {
+                    JustService.shared.fetchJustRespects(just: just) { respectCount in
+                        if let respectCount = respectCount {
+                            self.allJusts?[index][index2].respects = Int(respectCount)
+                        }
+                    }
+            }
+            
+        }
+        }
+    }
+    
     func loadMoreJusts() {
         
     }
@@ -167,7 +222,21 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "networkJustCell", for: indexPath) as! NetworkJustCell
         
-        if let allJusts = allJusts {
+        if var allJusts = allJusts {
+            let idString = allJusts[indexPath.section][indexPath.row].justID as NSString
+            if let cachedJust = self.cache.object(forKey: idString) {
+                print("We have a cached just")
+                cell.just = cachedJust.just
+                cell.delegate = self
+                cell.imageView.isUserInteractionEnabled = true
+                cell.currentUserId = self.currentUser.uid
+                cell.fetchToken()
+                cell.timestampLabel.isHidden = true
+                cell.moreJustsButton.isHidden = true
+                cell.currentUser = currentUser
+                
+            }
+            allJusts[indexPath.section][indexPath.row].userOnFire = userOnFire
             cell.just = allJusts[indexPath.section][indexPath.row]
             cell.delegate = self
             cell.imageView.isUserInteractionEnabled = true
@@ -175,10 +244,8 @@ class UserJustsController: UICollectionViewController, UINavigationControllerDel
             cell.fetchToken()
             cell.timestampLabel.isHidden = true
             cell.moreJustsButton.isHidden = true
-            
-            if allJusts[indexPath.section][indexPath.row].uid == currentUser.uid {
-                cell.setupRespectButton()
-            }
+            cell.currentUser = currentUser
+            self.cache.setObject(UserJustsObject(just: allJusts[indexPath.section][indexPath.row]), forKey: idString)
         }
         
         return cell
@@ -286,8 +353,6 @@ extension UserJustsController: NetworkJustCellDelegate {
     
     func respectTapped(cell: NetworkJustCell) {
         let title = "New Respect"
-        
-       
         let body = "\(currentUser.firstName) \(currentUser.lastName) respected your just."
         guard var just = cell.just else { return }
         if let lastJust = lastJust {

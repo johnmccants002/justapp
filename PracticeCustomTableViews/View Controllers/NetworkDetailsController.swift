@@ -45,6 +45,8 @@ class NetworkDetailsController: UICollectionViewController, UINavigationControll
         registerCell()
         configureCollectionView()
         overrideUserInterfaceStyle = .light
+        
+        print("This is the currentUser Network Id: \(currentUser.networkId)")
     }
     
     override func viewWillLayoutSubviews() {
@@ -114,7 +116,7 @@ class NetworkDetailsController: UICollectionViewController, UINavigationControll
     // MARK: - Firebase Functions
     
     func fetchNetworkUsers() {
-        NetworkService.shared.fetchUsersInNetwork(networkId: user.networkId, currentUser: currentUser) { users in
+        NetworkService.shared.fetchUsersInNetwork(networkId: currentUser.networkId, currentUser: currentUser) { users in
             self.networkUsers = users
         }
     }
@@ -154,7 +156,7 @@ extension NetworkDetailsController: UICollectionViewDelegateFlowLayout {
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! NetworkDetailsHeader
-        header.count = self.currentUserArray.count
+        header.count = self.networkUsers?.count
         return header
     }
     

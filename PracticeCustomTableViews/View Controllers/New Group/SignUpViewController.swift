@@ -24,6 +24,15 @@ class SignUpViewController: UIViewController {
     var passwordValid = false
     var emailValid = false
     var usernameValid : Bool?
+    
+    var xButton: UIButton = {
+        let xButton = UIButton()
+        xButton.setDimensions(width: 30, height: 30)
+        xButton.setImage(UIImage(named: "xButton1"), for: .normal)
+        xButton.addTarget(self, action: #selector(xButtonTapped), for: .touchUpInside)
+        
+        return xButton
+    }()
 
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var signUpTextField: UITextField!
@@ -55,6 +64,10 @@ class SignUpViewController: UIViewController {
         self.label.textColor = .white
         self.signUpTextField.textColor = .white
         self.navigationController?.isNavigationBarHidden = true
+        
+        // XButton Setup
+        self.view.addSubview(xButton)
+        xButton.anchor(top: self.view.safeAreaLayoutGuide.topAnchor, right: self.view.safeAreaLayoutGuide.rightAnchor, paddingTop: 30, paddingRight: 20)
         
     }
     
@@ -239,6 +252,10 @@ class SignUpViewController: UIViewController {
         default:
             break
         }
+    }
+    
+    @objc func xButtonTapped() {
+        self.dismiss(animated: true, completion: nil)
     }
     
 

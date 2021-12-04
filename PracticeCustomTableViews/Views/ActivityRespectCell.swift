@@ -44,6 +44,7 @@ class ActivityRespectCell: UICollectionViewCell {
         super.layoutSubviews()
         self.layer.addBorder(edge: .bottom, color: .systemGray4, thickness: 0.25)
         
+        
     }
     
     func setupImageView() {

@@ -42,6 +42,9 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func signUpButtonTapped(_ sender: UIButton) {
+        let controller = PhoneNumberVerificationController()
+        controller.modalPresentationStyle = .overFullScreen
+        self.present(controller, animated: true, completion: nil)
     }
     
     

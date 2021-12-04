@@ -361,5 +361,50 @@ struct JustService {
         }
         
     }
+    
+    func grabAllJusts(networkId: String, completion: @escaping([Just]) -> Void) {
+        var allJusts: [Just] = []
+        REF_NETWORK_JUSTS.document(networkId).collection("justs").getDocuments { snapshot, error in
+            guard let snapshot = snapshot else { return }
+            for document in snapshot.documents {
+                let dict = document.data() as [String: Any]
+                let just = Just(justID: document.documentID, dictionary: dict)
+                allJusts.append(just)
+            }
+            let sortedJusts = allJusts.sorted(by: {
+                $0.timestamp.compare($1.timestamp) == .orderedDescending
+            })
+            completion(sortedJusts)
+        }
+    }
+    
+    func fetchTodaysJustsCount(networkId: String, uid: String, completion: @escaping(Int) -> Void) {
+        var count = 0
+        let beginningToday = NSCalendar.current.startOfDay(for: Date()).timeIntervalSince1970
+        let double = Double(beginningToday)
+        
+       REF_NETWORK_JUSTS.document(networkId).collection("justs").whereField("uid", isEqualTo: uid).getDocuments(completion: { snapshot, error in
+        if error != nil {
+            completion(0)
+        }
+        if let snapshot = snapshot {
+            for document in snapshot.documents {
+                if let dict = document.data() as? [String: Any] {
+                    if dict["timestamp"] as! Double >= double {
+                      print("This dict passes the argument: \(dict)")
+                       count += 1
+                        if count >= 3 {
+                            completion(3)
+                        }
+                    }
+                }
+            }
+            completion(count)
+            
+        } else {
+            completion(count)
+        }
+        })
+    }
 }
 

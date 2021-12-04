@@ -102,6 +102,22 @@ struct UserService {
         
     }
     
+    func fetchFireImage(uid: String, completion: @escaping(URL?) -> Void) {
+        REF_USERS.child(uid).child("fireImageUrl").observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists() == false {
+                completion(nil)
+            }
+            let imageUrlString = snapshot.value as? String
+            guard let imageUrlString = imageUrlString else { return }
+            let imageURL = URL(string: imageUrlString)
+            
+            guard let imageURL = imageURL else {
+                return }
+            
+            completion(imageURL)
+        }
+    }
+    
     func checkUncheckInvites(string: String, uid: String) {
         if string == "check" {
             REF_CHECKED_INVITES.child(uid).setValue(true)

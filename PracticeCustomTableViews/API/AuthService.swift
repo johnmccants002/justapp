@@ -99,6 +99,27 @@ struct AuthService {
         REF_USERS.child(uid).updateChildValues(["instagram": username])
     }
     
+    func updateFireImage(image: UIImage, completion: @escaping(Error?, DatabaseReference) -> Void) {
+    guard let compressedImage = image.jpegData(compressionQuality: 0.3) else { return }
+    let filename = NSUUID().uuidString
+    let storageRef = STORAGE_PROFILE_IMAGES.child(filename)
+    
+    storageRef.putData(compressedImage, metadata: nil) { (meta, error) in
+        if let error = error {
+            print("DEBUG: Error putting image data to database \(error)")
+        }
+        storageRef.downloadURL { url, error in
+            guard let fireImageUrl = url?.absoluteString else { return }
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            let values = ["fireImageUrl": fireImageUrl]
+            
+            REF_USERS.child(uid).updateChildValues(values, withCompletionBlock: completion)
+            
+        }
+    }
+        
+    }
+    
     func checkIfUsernameExists(username: String, completion: @escaping(Int) -> Void) {
         REF_USERS.queryOrdered(byChild: "username").queryEqual(toValue: username).observeSingleEvent(of: .value) { snapshot in
             if snapshot.exists() {

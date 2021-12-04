@@ -8,6 +8,13 @@
 import Foundation
 
 class JustObject {
+    var justs : [[Just]]
+    init(justs: [[Just]]) {
+        self.justs = justs
+    }
+}
+
+class UserJustsObject {
     var just : Just
     init(just: Just) {
         self.just = just
@@ -25,6 +32,8 @@ struct Just {
     var respects: Int = 0
     var justImageUrl: URL?
     var dateString: String?
+    var token: String?
+    var userOnFire: Bool = false
     
     init(justID: String, dictionary: [String: Any]) {
         self.justID = justID
@@ -77,3 +86,5 @@ extension Just: Equatable {
 extension Just: Hashable {
     
 }
+
+

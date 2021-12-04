@@ -33,6 +33,9 @@
 		31B4A47926453BC7001E7DD6 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47826453BC7001E7DD6 /* Notifications.swift */; };
 		31B4A47B26455295001E7DD6 /* NetworkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47A26455295001E7DD6 /* NetworkViewController.swift */; };
 		31B4A47D26455310001E7DD6 /* RequestsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A47C26455310001E7DD6 /* RequestsTableViewCell.swift */; };
+		31C69CF52756F4D400DEA41E /* PhoneNumberVerificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CF42756F4D400DEA41E /* PhoneNumberVerificationController.swift */; };
+		31C69CF92758397300DEA41E /* PhoneVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CF82758397300DEA41E /* PhoneVerificationView.swift */; };
+		31C69CFB27583B7700DEA41E /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CFA27583B7700DEA41E /* AuthManager.swift */; };
 		31CC0D3126C5FB7A00E5F560 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3026C5FB7A00E5F560 /* Network.swift */; };
 		31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3226C6F54C00E5F560 /* Just.swift */; };
 		31CC0D5026CE410300E5F560 /* ActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D4F26CE410300E5F560 /* ActivityController.swift */; };
@@ -99,6 +102,9 @@
 		31B4A47826453BC7001E7DD6 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		31B4A47A26455295001E7DD6 /* NetworkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkViewController.swift; sourceTree = "<group>"; };
 		31B4A47C26455310001E7DD6 /* RequestsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsTableViewCell.swift; sourceTree = "<group>"; };
+		31C69CF42756F4D400DEA41E /* PhoneNumberVerificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberVerificationController.swift; sourceTree = "<group>"; };
+		31C69CF82758397300DEA41E /* PhoneVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationView.swift; sourceTree = "<group>"; };
+		31C69CFA27583B7700DEA41E /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		31CC0D3026C5FB7A00E5F560 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		31CC0D3226C6F54C00E5F560 /* Just.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Just.swift; sourceTree = "<group>"; };
 		31CC0D4F26CE410300E5F560 /* ActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityController.swift; sourceTree = "<group>"; };
@@ -201,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				31D2961F2653EAE700965DD7 /* NotificationsViewController.swift */,
+				31C69CF42756F4D400DEA41E /* PhoneNumberVerificationController.swift */,
 				31D296232653EB5300965DD7 /* SignUpViewController.swift */,
 				31D296212653EB4200965DD7 /* LoginViewController.swift */,
 			);
@@ -254,6 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				316A98D72742B340006CAA3A /* LoadingView.swift */,
+				31C69CF82758397300DEA41E /* PhoneVerificationView.swift */,
 				313F666627486966002865F8 /* JustsHeader.swift */,
 				316A98D92742C275006CAA3A /* InvitesEmptyView.swift */,
 				31D9D1CC26D4DAFF00954C1D /* ProfileHeader.swift */,
@@ -312,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				31DEDDE326C3146200749E41 /* AuthService.swift */,
+				31C69CFA27583B7700DEA41E /* AuthManager.swift */,
 				31DEDDE526C3147900749E41 /* UserService.swift */,
 				31DEDDE726C3148F00749E41 /* NetworkService.swift */,
 				31DEDDE926C3149D00749E41 /* JustService.swift */,
@@ -458,6 +467,7 @@
 				31B4A47926453BC7001E7DD6 /* Notifications.swift in Sources */,
 				31CC0D6326D0442000E5F560 /* ActivityRespectCell.swift in Sources */,
 				31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */,
+				31C69CFB27583B7700DEA41E /* AuthManager.swift in Sources */,
 				31DEDDE626C3147900749E41 /* UserService.swift in Sources */,
 				316A98DC2742D86D006CAA3A /* NetworkDetailsHeader.swift in Sources */,
 				31D29614264E8E1000965DD7 /* NewJustViewController.swift in Sources */,
@@ -465,6 +475,7 @@
 				316A98C827396694006CAA3A /* SharedNetworksController.swift in Sources */,
 				31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */,
 				31B4A47B26455295001E7DD6 /* NetworkViewController.swift in Sources */,
+				31C69CF92758397300DEA41E /* PhoneVerificationView.swift in Sources */,
 				31307A6126D046E4005DA1FC /* Constants.swift in Sources */,
 				31D9D1D026D5002D00954C1D /* JustViewModel.swift in Sources */,
 				31DEDDE826C3148F00749E41 /* NetworkService.swift in Sources */,
@@ -499,6 +510,7 @@
 				31D296262653FCF300965DD7 /* NetworksTableViewCell.swift in Sources */,
 				31D29610264E82D800965DD7 /* RespectedByViewController.swift in Sources */,
 				316A98DA2742C275006CAA3A /* InvitesEmptyView.swift in Sources */,
+				31C69CF52756F4D400DEA41E /* PhoneNumberVerificationController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,7 +666,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.77;
+				MARKETING_VERSION = 1.6.81;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -676,7 +688,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.77;
+				MARKETING_VERSION = 1.6.81;
 				PRODUCT_BUNDLE_IDENTIFIER = com.john.JustAppBeta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
