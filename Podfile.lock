@@ -508,6 +508,7 @@ PODS:
   - SDWebImage (5.12.0):
     - SDWebImage/Core (= 5.12.0)
   - SDWebImage/Core (5.12.0)
+  - SwiftLinkPreview (3.4.0)
 
 DEPENDENCIES:
   - Firebase/Auth
@@ -518,6 +519,7 @@ DEPENDENCIES:
   - Firebase/Storage
   - ImageViewer.swift (~> 3.0)
   - SDWebImage
+  - SwiftLinkPreview (~> 3.4.0)
 
 SPEC REPOS:
   trunk:
@@ -544,6 +546,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - SDWebImage
+    - SwiftLinkPreview
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -569,7 +572,8 @@ SPEC CHECKSUMS:
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   SDWebImage: 4ea20cca2986adc5aacde07aa686742fd4c67a37
+  SwiftLinkPreview: c1bc5b2cb3cd42f2865137c1a61f5d788dcf5c9c
 
-PODFILE CHECKSUM: 02c506ca0fb4b22c5aec4afae835cd7bda0903ad
+PODFILE CHECKSUM: f0468eb26cb98ce802323f44dd3c771eefea32de
 
 COCOAPODS: 1.11.2
