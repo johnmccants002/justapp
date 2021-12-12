@@ -101,6 +101,10 @@ extension ViewJustController: UICollectionViewDelegateFlowLayout {
 // MARK: - NetworkJustCellDelegate
 
 extension ViewJustController: NetworkJustCellDelegate {
+    func detailsTapped(cell: NetworkJustCell) {
+
+    }
+    
     func moreButtonTapped(cell: NetworkJustCell) {
         
     }

@@ -310,6 +310,15 @@ extension UserJustsController: UICollectionViewDelegateFlowLayout {
 // MARK: NetworkJustCellDelegate
 
 extension UserJustsController: NetworkJustCellDelegate {
+    func detailsTapped(cell: NetworkJustCell) {
+        guard let just = cell.just else { return }
+        if let details = just.details, !details.isEmpty {
+            let controller = JustDetailsController()
+            controller.just = just
+            self.navigationController?.present(controller, animated: true, completion: nil)
+        }
+    }
+    
     func moreButtonTapped(cell: NetworkJustCell) {
         
     }

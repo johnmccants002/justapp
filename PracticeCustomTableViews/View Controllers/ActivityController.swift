@@ -17,7 +17,6 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         didSet {
             if ((invites?.isEmpty) != nil) {
                 removeLoadingView()
-//                displayEmptyView()
             }
             removeLoadingView()
             collectionView.reloadData()
@@ -35,7 +34,6 @@ class ActivityController: UICollectionViewController, UINavigationControllerDele
         super.viewDidLoad()
         displayLoadingView()
         let nib = UINib(nibName: self.inviteNib, bundle: nil)
-        
         collectionView.register(nib, forCellWithReuseIdentifier: "inviteCell")
         setupRefreshControl()
         updateViews()

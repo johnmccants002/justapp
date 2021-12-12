@@ -32,7 +32,11 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
      
     var lastJustIds: [String]? 
     
-    var allJusts : [[Just]]?
+    var allJusts : [[Just]]? {
+        didSet {
+            self.collectionView.reloadData()
+        }
+    }
     
     var fireUsers: [String: Int]? {
         didSet {
@@ -46,6 +50,11 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             self.fetchSetFireUsers(todayArray: todayArray)
         }
     }
+    
+    var networkSegementedControl : UISegmentedControl = {
+        let segment = UISegmentedControl()
+        return segment
+    }()
     
     
     
@@ -76,6 +85,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         setupRefreshControl()
         setupRightBarButtonItem()
         setupCurrentUserArray()
+//        setupSegmentedControl()
         overrideUserInterfaceStyle = .light
     }
     
@@ -84,6 +94,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         // needed to clear the text in the back navigation:
         self.navigationItem.title = ""
         self.cache.removeAllObjects()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -114,6 +125,15 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
     }
     
     func setupRightBarButtonItem() {
+        let announcementButton: UIButton = {
+            let button = UIButton()
+            button.setBackgroundImage(UIImage(systemName: "bell"), for: .normal)
+            button.addTarget(self, action: #selector(announcementBarButtonTapped), for: .touchUpInside)
+            button.tintColor = .systemBlue
+            
+            return button
+        }()
+        let barButton2 = UIBarButtonItem(customView: announcementButton)
         if titleText == "My Network" {
         let button : UIButton = {
             let button = UIButton(type: .infoLight, primaryAction: nil)
@@ -122,7 +142,8 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             return button
         }()
         let barButton = UIBarButtonItem(customView: button)
-        self.navigationItem.setRightBarButton(barButton, animated: true)
+        let buttons = [barButton, barButton2]
+            self.navigationItem.setRightBarButtonItems(buttons, animated: true)
         
         } else {
             let button : UIButton = {
@@ -134,9 +155,33 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
                 return button
             }()
             let barButton = UIBarButtonItem(customView: button)
-            self.navigationItem.setRightBarButton(barButton, animated: true)
+            let buttons = [barButton, barButton2]
+            self.navigationItem.setRightBarButtonItems(buttons, animated: true)
+            
             
         }
+    }
+    
+    func setupSegmentedControl() {
+        
+        let titles = ["\(user.firstName)", "\(user.firstName)'s Network"]
+        let networkSegmentedControl = UISegmentedControl(items: titles)
+        networkSegmentedControl.tintColor = UIColor.white
+        networkSegmentedControl.backgroundColor = UIColor.lightGray
+        networkSegmentedControl.selectedSegmentTintColor = .white
+        
+       
+        for index in 0...titles.count-1 {
+            networkSegmentedControl.setWidth(100, forSegmentAt: index)
+        }
+        networkSegmentedControl.sizeToFit()
+        networkSegmentedControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
+        networkSegmentedControl.sendActions(for: .valueChanged)
+        networkSegmentedControl.selectedSegmentIndex = 0
+        navigationItem.titleView = networkSegmentedControl
+        
+        networkSegmentedControl.setTitleTextAttributes([.font : UIFont(name: "HelveticaNeue-Medium", size: 10) ?? .systemFont(ofSize: 10)], for: .normal)
+ 
     }
     
     func longPressAlert(currentUser: Bool, cell: NetworkJustCell) -> UIAlertController {
@@ -194,7 +239,7 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
             var lastJustIds : [String] = []
             var newJusts: [Just] = []
             var dict : [String: Int] = [:]
-            for var just in justs {
+            for just in justs {
                 if just.timestamp.timeIntervalSinceNow > -3600 {
                     lastJustIds.append(just.justID)
                     newJusts.append(just)
@@ -289,7 +334,6 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         }
             myGroup.leave()
         }
-            self.collectionView.reloadData()
         myGroup.notify(queue: .main) {
             self.collectionView.refreshControl?.endRefreshing()
             self.collectionView.reloadData()
@@ -372,12 +416,28 @@ class NetworkJustsController: UICollectionViewController, UINavigationController
         self.present(alert, animated: true, completion: nil)
     }
     
+    @objc func announcementBarButtonTapped() {
+        let controller = AnnouncementController()
+        controller.user = user
+        controller.currentUser = currentUser
+        if let currentUserArray = currentUserArray {
+            controller.currentUserArray = currentUserArray
+        }
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
     func leaveNetworkTapped() {
         NetworkService.shared.leaveNetwork(currentUserUid: currentUser.uid, userUid: user.uid, networkId: networkId) {
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refetchUser"), object: nil)
             self.navigationController?.popToRootViewController(animated: true)
         }
     }
+    
+    
+    @objc func segmentChanged() {
+        
+    }
+
     
 
     
@@ -496,6 +556,15 @@ extension NetworkJustsController: UICollectionViewDelegateFlowLayout {
 }
 
 extension NetworkJustsController: NetworkJustCellDelegate {
+    func detailsTapped(cell: NetworkJustCell) {
+        guard let just = cell.just else { return }
+        if let details = just.details, !details.isEmpty {
+            let controller = JustDetailsController()
+            controller.just = just
+            self.navigationController?.present(controller, animated: true, completion: nil)
+        }
+    }
+    
     func moreButtonTapped(cell: NetworkJustCell) {
         guard let just = cell.just  else { return }
         let titleText = "\(just.firstName) \(just.lastName)"
@@ -509,6 +578,7 @@ extension NetworkJustsController: NetworkJustCellDelegate {
         controller.currentUserArray = currentUserArray
         }
         navigationController?.pushViewController(controller, animated: true)
+        
     }
     
     func respectCountTapped(cell: NetworkJustCell) {

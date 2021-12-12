@@ -34,6 +34,7 @@ struct Just {
     var dateString: String?
     var token: String?
     var userOnFire: Bool = false
+    var details: String?
     
     init(justID: String, dictionary: [String: Any]) {
         self.justID = justID
@@ -42,6 +43,10 @@ struct Just {
         self.firstName = dictionary["firstName"] as? String ?? ""
         self.lastName = dictionary["lastName"] as? String ?? ""
         self.respects = dictionary["respects"] as? Int ?? 0
+        
+        if let details = dictionary["justDetails"] as? String {
+            self.details = details
+        }
         
         if let profileImageUrl = dictionary["profileImageUrl"] as? String {
             guard let url = URL(string: profileImageUrl) else { return }

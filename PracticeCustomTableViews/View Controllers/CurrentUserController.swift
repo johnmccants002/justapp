@@ -396,6 +396,9 @@ extension CurrentUserController: UICollectionViewDelegateFlowLayout {
 // MARK: NetworkJustCellDelegate
 
 extension CurrentUserController: NetworkJustCellDelegate {
+    func detailsTapped(cell: NetworkJustCell) {
+    }
+    
     func moreButtonTapped(cell: NetworkJustCell) {
         
     }

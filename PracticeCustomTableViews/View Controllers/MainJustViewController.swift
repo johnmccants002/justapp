@@ -41,11 +41,10 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     private var searchController: UISearchController!
     private var resultsTableController: ResultsTableViewController!
     @IBOutlet weak var invitesLabel: UILabel!
+    
+    @IBOutlet weak var membersLabel: UILabel!
+    @IBOutlet weak var justsLabel: UILabel!
     var networkUsers: [User]?
-
-   
-    
-    
     var networks: [Network]? {
         didSet {
             friendsTableView.reloadData()
@@ -54,6 +53,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
        
         }
     }
+    
+    var currentUserArray: [User]?
     
     private var restoredState = SearchControllerRestorableState()
     var currentUser : User? {
@@ -84,6 +85,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         setupSearchController()
         setupInvitesLabel()
         setupRespectsLabel()
+        setupMembersLabel()
+        setupJustsLabel()
         setUpViewGestureRecognizer()
         fetchUser()
         getNotificationSettings()
@@ -147,6 +150,7 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
                 
                 self.networks = networks
                 self.currentUser?.networks = networks
+                self.setupCurrentUserArray()
                 self.friendsTableView.refreshControl?.endRefreshing()
                 print("These are the networks we got \(networks)")
             }
@@ -171,6 +175,21 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         }
         
     }
+    
+    func setupCurrentUserArray() {
+        var currentUserArray : [User] = []
+        guard let currentUser = currentUser else {
+            return
+        }
+        if let currentUserNetworks = currentUser.networks {
+            for network in currentUserNetworks {
+                currentUserArray.append(network.user)
+            }
+            self.currentUserArray = currentUserArray
+            
+        }
+    }
+
     
     func setCurrentNetworkImage() {
         guard let currentUser = currentUser else { return }
@@ -242,6 +261,18 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         self.respectLabel.text = "Respects"
     }
     
+    func setupMembersLabel() {
+        self.membersLabel.isUserInteractionEnabled = true
+        self.membersLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
+        self.membersLabel.text = "Members"
+    }
+    
+    func setupJustsLabel() {
+        self.justsLabel.isUserInteractionEnabled = true
+        self.justsLabel.font = UIFont(name: "HelveticaNeue-Medium", size: 16)
+        self.justsLabel.text = "Justs"
+    }
+    
     
     func getNotificationSettings() {
       UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -283,6 +314,8 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     
     func updateViews() {
         self.invitesLabel.text = "Invites"
+        self.membersLabel.text = "Members"
+        self.justsLabel.text = "Justs"
         self.friendsTableView.delegate = self
         self.friendsTableView.dataSource = self
         self.myNetworkView.layer.backgroundColor = UIColor.white.cgColor
@@ -298,10 +331,15 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
     
     func setUpViewGestureRecognizer() {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector (self.myNetworkTapped))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleMembersTapped))
         self.myNetworkView.addGestureRecognizer(tapRecognizer)
+        self.justsLabel.addGestureRecognizer(tapRecognizer)
+        self.membersLabel.addGestureRecognizer(tap)
         self.detail = "My Network"
         self.myNetworkView.sendSubviewToBack(invitesLabel)
         self.myNetworkView.sendSubviewToBack(respectLabel)
+        self.myNetworkView.sendSubviewToBack(justsLabel)
+        self.myNetworkView.sendSubviewToBack(membersLabel)
     }
     
     func addLoadingView() {
@@ -408,6 +446,17 @@ class MainJustViewController: UIViewController, UINavigationControllerDelegate, 
         guard let currentUser = currentUser else { return }
         let controller = NetworkJustsController(currentUser: currentUser, titleText: "My Network", networkId: currentUser.networkId, user: currentUser)
         controller.networkId = currentUser.networkId
+        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    @objc func handleMembersTapped() {
+        guard let user = self.currentUser else { return }
+        guard let currentUserArray = currentUserArray else {
+            return
+        }
+
+        let controller = NetworkDetailsController(currentUser: user, user: user, currentUserArray: currentUserArray)
+        controller.fetchNetworkUsers()
         self.navigationController?.pushViewController(controller, animated: true)
     }
     

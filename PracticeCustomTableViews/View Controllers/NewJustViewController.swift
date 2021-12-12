@@ -14,12 +14,15 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     // MARK: - Properties
     
+    @IBOutlet weak var justTitleLabel: UILabel!
+    
     @IBOutlet weak var addPhotoImageView: UIImageView!
     @IBOutlet weak var addPhotoButton: UIButton!
     @IBOutlet weak var navigation: UINavigationItem!
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     @IBOutlet var selectButton : UIButton!
     @IBOutlet weak var countLabel: UILabel!
+    var details: String?
     var networkIds: [String]?
     var currentUser: User? 
     var networks: [Network]?
@@ -54,6 +57,32 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         return button
     }()
     
+    var detailTextView: UITextView = {
+        let tv = UITextView()
+        tv.tintColor = .black
+        tv.autocapitalizationType = .none
+        tv.isScrollEnabled = false
+        tv.autocorrectionType = .yes
+        return tv
+    }()
+    
+    var detailsLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "HelveticaNeue", size: 14)
+        label.text = "Details"
+        label.textAlignment = .center
+        return label
+    }()
+    
+    var detailsButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Add Details", for: .normal)
+        button.titleLabel?.font = UIFont(name: "HelveticaNeue", size: 10) ?? .systemFont(ofSize: 10)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(detailsButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     @IBOutlet weak var justTextView: UITextView!
     var widthConstraint : NSLayoutConstraint?
     let justMaxLength = 150
@@ -67,12 +96,24 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
+    var backButton: UIButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+//        button.setTitle( "Back", for: .normal)
+//        button.setTitleColor(.black, for: .normal)
+//        button.titleLabel?.font = UIFont(name: "HelveticaNeue", size: 10)
+        button.setBackgroundImage(UIImage(systemName: "arrow.backward"), for: .normal)
+        button.tintColor = .black
+        return button
+    }()
+    
     
     // MARK: Lifecycles
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.justTextView.delegate = self
+        self.detailTextView.delegate = self
         updateViews()
         self.imagePicker.delegate = self
         fetchCurrentUserNetworkUsers()
@@ -82,12 +123,12 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.justTextView.becomeFirstResponder()
     }
     
     // MARK: Helper Functions
     
     func updateViews() {
+        self.justTextView.becomeFirstResponder()
         self.loadingIndicator.isHidden = true
         networkButtonSetUp()
         self.justTextView.tintColor = .black
@@ -96,7 +137,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.justTextView.inputAccessoryView = keyboardToolBar
         self.justTextView.autocorrectionType = .yes
         self.keyboardToolBar.isHidden = true
-        
+        self.detailTextView.inputAccessoryView = keyboardToolBar
         self.view.addSubview(xButton)
         xButton.setRoundedView()
         addPhotoButton.setRoundedView()
@@ -105,9 +146,34 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         xButton.isHidden = true
         self.imagePicker.allowsEditing = true
         
+        
+        self.addPhotoButton.isHidden = true
+        self.addPhotoImageView.isHidden = true
+        
         self.addPhotoImageView.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(addPhotoButtonTapped(_:)))
         self.addPhotoImageView.addGestureRecognizer(tap)
+        
+        // Set up Details View
+        self.detailTextView.isHidden = true
+        self.view.addSubview(detailTextView)
+        detailTextView.anchor(top: self.justTextView.topAnchor, left: self.justTextView.leftAnchor, bottom: self.justTextView.bottomAnchor, right: self.justTextView.rightAnchor)
+        detailTextView.backgroundColor = .white
+        detailTextView.tintColor = .black
+        self.detailTextView.delegate = self
+        
+        // Details Button
+        self.view.addSubview(detailsButton)
+        self.detailsButton.anchor(top: self.addPhotoButton.topAnchor, left: self.addPhotoButton.leftAnchor, bottom: self.addPhotoButton.bottomAnchor, right: self.addPhotoButton.rightAnchor)
+        
+        
+        //Back Button
+        backButton.isHidden = true
+        self.view.addSubview(backButton)
+        self.backButton.anchor(top: addPhotoButton.topAnchor, left: self.view.leftAnchor, paddingLeft: 20, width: 25, height: 25)
+        
+        
+        
       
     }
     
@@ -265,7 +331,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         guard let justText = justTextView.text else { return }
         guard let user = self.currentUser else { return }
         if let networks = networks {
-            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, networks: networks, friendsNetworks: friendsNetwork) { error in
+            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, justDetails: self.detailTextView.text, networks: networks, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
@@ -284,7 +350,7 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
                 
             }
         } else {
-            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, networks: nil, friendsNetworks: friendsNetwork) { error in
+            JustService.shared.uploadJust(user: user, justText: justText, justImage: justImage, justDetails: self.detailTextView.text, networks: nil, friendsNetworks: friendsNetwork) { error in
                 if let error = error {
                     print("DEBUG: Error uploading Just: \(error.localizedDescription)")
                 }
@@ -308,6 +374,34 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
         self.xButton.isHidden = true
         self.addPhotoImageView.isHidden = false
     }
+    
+    @objc func backButtonTapped() {
+        self.detailTextView.isHidden = true
+        self.justTextView.isHidden = false
+        self.justTextView.slideIn()
+        self.backButton.isHidden = true
+        self.justTitleLabel.text = "You just"
+        self.addPhotoButton.isHidden = true
+        self.addPhotoImageView.isHidden = true
+        self.detailsButton.isHidden = false
+        self.detailTextView.resignFirstResponder()
+        self.justTextView.becomeFirstResponder()
+        
+        
+    }
+    
+    @objc func detailsButtonTapped() {
+        self.justTitleLabel.text = "Details"
+        self.detailTextView.isHidden = false
+        self.detailsButton.isHidden = true
+        self.backButton.isHidden = false
+        self.addPhotoButton.isHidden = false
+        self.addPhotoImageView.isHidden = false
+        self.justTextView.resignFirstResponder()
+        self.justTextView.isHidden = true
+        self.detailTextView.becomeFirstResponder()
+        
+    }
 
 }
 
@@ -316,13 +410,29 @@ class NewJustViewController: UIViewController, UINavigationControllerDelegate {
 extension NewJustViewController: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
-        self.keyboardToolBar.isHidden = true
-        self.postButtonKeyboard.isEnabled = false
-        if textView.text.count > 1 {
-                self.keyboardToolBar.isHidden = false
-            self.postButtonKeyboard.isEnabled = true
-            print("textview greater than 1")
-            }
+        switch textView {
+        case justTextView:
+            print("just text view")
+            self.keyboardToolBar.isHidden = true
+            self.postButtonKeyboard.isEnabled = false
+            if textView.text.count > 1 {
+                    self.keyboardToolBar.isHidden = false
+                self.postButtonKeyboard.isEnabled = true
+                print("textview greater than 1")
+                }
+        case detailTextView:
+            print("detail text view")
+            self.keyboardToolBar.isHidden = true
+            self.postButtonKeyboard.isEnabled = false
+            if textView.text.count > 1 {
+                    self.keyboardToolBar.isHidden = false
+                self.postButtonKeyboard.isEnabled = true
+                print("textview greater than 1")
+                }
+            
+        default: break
+            
+        }
         
     }
     
@@ -330,6 +440,8 @@ extension NewJustViewController: UITextViewDelegate {
         
         if textView == self.justTextView {
             return textView.text.count + (text.count - range.length) <= justMaxLength
+        } else if textView == self.detailTextView {
+            return textView.text.count + (text.count - range.length) <= 350
         }
         
         return false

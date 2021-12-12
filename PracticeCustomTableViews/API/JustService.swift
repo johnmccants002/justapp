@@ -13,14 +13,25 @@ typealias DatabaseCompletion = ((Error?, DatabaseReference) -> Void)
 struct JustService {
     static let shared = JustService()
     
-    func uploadJust(user: User, justText: String, justImage: UIImage?, networks: [Network]?, friendsNetworks: Bool, completion: @escaping(Error?) -> Void) {
+    func uploadJust(user: User, justText: String, justImage: UIImage?, justDetails: String?, networks: [Network]?, friendsNetworks: Bool, completion: @escaping(Error?) -> Void) {
+        if justText.isEmpty == true {
+           completion(nil)
+        }
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let ref = REF_USER_JUSTS.childByAutoId()
         guard let justID = ref.key else { return }
         
-        let values = ["uid": uid, "timestamp": Int(NSDate().timeIntervalSince1970), "justText": justText, "respects": 0, "firstName": user.firstName, "lastName": user.lastName, "justID": justID, "profileImageUrl": user.profileImageUrl?.absoluteString ?? "blank"] as [String: Any]
+        let values : [String: Any]?
+        if let justDetails = justDetails, justDetails.isEmpty == false {
+            let justValues = ["uid": uid, "timestamp": Int(NSDate().timeIntervalSince1970), "justText": justText, "respects": 0, "firstName": user.firstName, "lastName": user.lastName, "justID": justID, "justDetails": justDetails, "profileImageUrl": user.profileImageUrl?.absoluteString ?? "blank"] as [String: Any]
+            values = justValues
+        } else {
+            let justValues = ["uid": uid, "timestamp": Int(NSDate().timeIntervalSince1970), "justText": justText, "respects": 0, "firstName": user.firstName, "lastName": user.lastName, "justID": justID, "profileImageUrl": user.profileImageUrl?.absoluteString ?? "blank"] as [String: Any]
+            values = justValues
+            
+        }
         
-        
+        if let values = values {
         ref.updateChildValues(values)
         print("this is the user network id : \(user.networkId)")
             REF_NETWORK_JUSTS.document(user.networkId).collection("justs").document(justID).setData(values)
@@ -46,9 +57,8 @@ struct JustService {
             } else {
                 completion(nil)
             }
-        
-        
-     
+    
+        }
 
     }
     

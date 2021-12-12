@@ -24,6 +24,7 @@
 		316A98DA2742C275006CAA3A /* InvitesEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316A98D92742C275006CAA3A /* InvitesEmptyView.swift */; };
 		316A98DC2742D86D006CAA3A /* NetworkDetailsHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316A98DB2742D86D006CAA3A /* NetworkDetailsHeader.swift */; };
 		316CE2F2264BB2AC0015C145 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CE2F1264BB2AC0015C145 /* User.swift */; };
+		31984A0427636F1A003C0104 /* AnnouncementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31984A0327636F1A003C0104 /* AnnouncementViewModel.swift */; };
 		31B4A44226425042001E7DD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A44126425042001E7DD6 /* AppDelegate.swift */; };
 		31B4A44426425042001E7DD6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4A44326425042001E7DD6 /* SceneDelegate.swift */; };
 		31B4A44926425042001E7DD6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31B4A44726425042001E7DD6 /* Main.storyboard */; };
@@ -36,6 +37,13 @@
 		31C69CF52756F4D400DEA41E /* PhoneNumberVerificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CF42756F4D400DEA41E /* PhoneNumberVerificationController.swift */; };
 		31C69CF92758397300DEA41E /* PhoneVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CF82758397300DEA41E /* PhoneVerificationView.swift */; };
 		31C69CFB27583B7700DEA41E /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C69CFA27583B7700DEA41E /* AuthManager.swift */; };
+		31CAC9F1275C3BBF0032C50E /* JustDetailsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CAC9F0275C3BBF0032C50E /* JustDetailsController.swift */; };
+		31CACA3D2761AD310032C50E /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CACA3C2761AD310032C50E /* Announcement.swift */; };
+		31CACA692763548D0032C50E /* AnnouncementsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CACA682763548D0032C50E /* AnnouncementsController.swift */; };
+		31CACA6C276355070032C50E /* AnnouncementCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CACA6A276355070032C50E /* AnnouncementCell.swift */; };
+		31CACA6D276355070032C50E /* AnnouncementCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31CACA6B276355070032C50E /* AnnouncementCell.xib */; };
+		31CACA6F27635F190032C50E /* NewAnnouncementController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CACA6E27635F190032C50E /* NewAnnouncementController.swift */; };
+		31CACA71276362220032C50E /* AnnouncementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CACA70276362220032C50E /* AnnouncementService.swift */; };
 		31CC0D3126C5FB7A00E5F560 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3026C5FB7A00E5F560 /* Network.swift */; };
 		31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D3226C6F54C00E5F560 /* Just.swift */; };
 		31CC0D5026CE410300E5F560 /* ActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CC0D4F26CE410300E5F560 /* ActivityController.swift */; };
@@ -91,6 +99,7 @@
 		316A98D92742C275006CAA3A /* InvitesEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitesEmptyView.swift; sourceTree = "<group>"; };
 		316A98DB2742D86D006CAA3A /* NetworkDetailsHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetailsHeader.swift; sourceTree = "<group>"; };
 		316CE2F1264BB2AC0015C145 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		31984A0327636F1A003C0104 /* AnnouncementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementViewModel.swift; sourceTree = "<group>"; };
 		31B4A43E26425042001E7DD6 /* PracticeCustomTableViews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PracticeCustomTableViews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B4A44126425042001E7DD6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		31B4A44326425042001E7DD6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -105,6 +114,13 @@
 		31C69CF42756F4D400DEA41E /* PhoneNumberVerificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberVerificationController.swift; sourceTree = "<group>"; };
 		31C69CF82758397300DEA41E /* PhoneVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationView.swift; sourceTree = "<group>"; };
 		31C69CFA27583B7700DEA41E /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		31CAC9F0275C3BBF0032C50E /* JustDetailsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JustDetailsController.swift; sourceTree = "<group>"; };
+		31CACA3C2761AD310032C50E /* Announcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
+		31CACA682763548D0032C50E /* AnnouncementsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementsController.swift; sourceTree = "<group>"; };
+		31CACA6A276355070032C50E /* AnnouncementCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementCell.swift; sourceTree = "<group>"; };
+		31CACA6B276355070032C50E /* AnnouncementCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnnouncementCell.xib; sourceTree = "<group>"; };
+		31CACA6E27635F190032C50E /* NewAnnouncementController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAnnouncementController.swift; sourceTree = "<group>"; };
+		31CACA70276362220032C50E /* AnnouncementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementService.swift; sourceTree = "<group>"; };
 		31CC0D3026C5FB7A00E5F560 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		31CC0D3226C6F54C00E5F560 /* Just.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Just.swift; sourceTree = "<group>"; };
 		31CC0D4F26CE410300E5F560 /* ActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityController.swift; sourceTree = "<group>"; };
@@ -228,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				316CE2F1264BB2AC0015C145 /* User.swift */,
+				31CACA3C2761AD310032C50E /* Announcement.swift */,
 				31CC0D3026C5FB7A00E5F560 /* Network.swift */,
 				31CC0D3226C6F54C00E5F560 /* Just.swift */,
 				31ED1E302700666100E41E76 /* RespectNotification.swift */,
@@ -240,6 +257,7 @@
 			children = (
 				31CC0D4226C88CBC00E5F560 /* SignUp */,
 				31D296192653BF9300965DD7 /* MainJustViewController.swift */,
+				31CAC9F0275C3BBF0032C50E /* JustDetailsController.swift */,
 				31D2961B2653C2DA00965DD7 /* ResultsTableViewController.swift */,
 				31D29613264E8E1000965DD7 /* NewJustViewController.swift */,
 				31D2960F264E82D800965DD7 /* RespectedByViewController.swift */,
@@ -249,10 +267,12 @@
 				31CE99DE271FAD1E00324501 /* SettingsController.swift */,
 				31D9D1CA26D4D8A600954C1D /* CurrentUserController.swift */,
 				31D9D17E26D0796D00954C1D /* NetworkJustsController.swift */,
+				31CACA6E27635F190032C50E /* NewAnnouncementController.swift */,
 				31D9D18426D1EF5300954C1D /* UserJustsController.swift */,
 				316A98C727396694006CAA3A /* SharedNetworksController.swift */,
 				316A98CF273BF3C0006CAA3A /* ViewJustController.swift */,
 				316A98D1273EBD82006CAA3A /* NetworkDetailsController.swift */,
+				31CACA682763548D0032C50E /* AnnouncementsController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -268,6 +288,8 @@
 				316A98DB2742D86D006CAA3A /* NetworkDetailsHeader.swift */,
 				31CE99DA271EC17000324501 /* RespectedByCell.swift */,
 				316A98C92739E90E006CAA3A /* SharedNetworkCell.swift */,
+				31CACA6A276355070032C50E /* AnnouncementCell.swift */,
+				31CACA6B276355070032C50E /* AnnouncementCell.xib */,
 				316A98CA2739E90E006CAA3A /* SharedNetworkCell.xib */,
 				31CE99DB271EC17000324501 /* RespectedByCell.xib */,
 				31D9D18026D07A9600954C1D /* NetworkJustCell.swift */,
@@ -312,6 +334,7 @@
 			isa = PBXGroup;
 			children = (
 				31D9D1CF26D5002D00954C1D /* JustViewModel.swift */,
+				31984A0327636F1A003C0104 /* AnnouncementViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -323,6 +346,7 @@
 				31C69CFA27583B7700DEA41E /* AuthManager.swift */,
 				31DEDDE526C3147900749E41 /* UserService.swift */,
 				31DEDDE726C3148F00749E41 /* NetworkService.swift */,
+				31CACA70276362220032C50E /* AnnouncementService.swift */,
 				31DEDDE926C3149D00749E41 /* JustService.swift */,
 				313F7364270D29FC007E6BC8 /* PushNotificationSender.swift */,
 			);
@@ -405,6 +429,7 @@
 				31D296182653B14400965DD7 /* SignUp.storyboard in Resources */,
 				31CC0D6426D0442000E5F560 /* ActivityRespectCell.xib in Resources */,
 				31D9D18326D07A9600954C1D /* NetworkJustCell.xib in Resources */,
+				31CACA6D276355070032C50E /* AnnouncementCell.xib in Resources */,
 				31D2961E2653C3BD00965DD7 /* TableCell.xib in Resources */,
 				31CC0D5A26CE4C4600E5F560 /* InviteCell.xib in Resources */,
 				31B4A44926425042001E7DD6 /* Main.storyboard in Resources */,
@@ -460,12 +485,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31CACA6C276355070032C50E /* AnnouncementCell.swift in Sources */,
 				31CC0D5926CE4C4600E5F560 /* InviteCell.swift in Sources */,
 				31ED1E312700666100E41E76 /* RespectNotification.swift in Sources */,
 				313F7369270E6EF8007E6BC8 /* PushNotificationManager.swift in Sources */,
 				31D2962D2656730E00965DD7 /* ResultTableViewCell.swift in Sources */,
 				31B4A47926453BC7001E7DD6 /* Notifications.swift in Sources */,
 				31CC0D6326D0442000E5F560 /* ActivityRespectCell.swift in Sources */,
+				31CACA71276362220032C50E /* AnnouncementService.swift in Sources */,
 				31CC0D3326C6F54C00E5F560 /* Just.swift in Sources */,
 				31C69CFB27583B7700DEA41E /* AuthManager.swift in Sources */,
 				31DEDDE626C3147900749E41 /* UserService.swift in Sources */,
@@ -494,14 +521,18 @@
 				31D9D1CB26D4D8A600954C1D /* CurrentUserController.swift in Sources */,
 				313F666727486966002865F8 /* JustsHeader.swift in Sources */,
 				316A98D5273EBEC3006CAA3A /* NetworkUserCell.swift in Sources */,
+				31CACA6F27635F190032C50E /* NewAnnouncementController.swift in Sources */,
 				316CE2F2264BB2AC0015C145 /* User.swift in Sources */,
 				31D296202653EAE700965DD7 /* NotificationsViewController.swift in Sources */,
 				31CE99DC271EC17000324501 /* RespectedByCell.swift in Sources */,
 				31CC0D3126C5FB7A00E5F560 /* Network.swift in Sources */,
+				31CACA692763548D0032C50E /* AnnouncementsController.swift in Sources */,
 				31D9D17F26D0796D00954C1D /* NetworkJustsController.swift in Sources */,
 				31B4A45A2642510A001E7DD6 /* JustTableViewCell.swift in Sources */,
 				31DEDDE426C3146200749E41 /* AuthService.swift in Sources */,
+				31CACA3D2761AD310032C50E /* Announcement.swift in Sources */,
 				31CC0D6026D0408200E5F560 /* ActivityRespectController.swift in Sources */,
+				31CAC9F1275C3BBF0032C50E /* JustDetailsController.swift in Sources */,
 				31307A6326D046EB005DA1FC /* Extensions.swift in Sources */,
 				316A98D82742B341006CAA3A /* LoadingView.swift in Sources */,
 				31B4A47D26455310001E7DD6 /* RequestsTableViewCell.swift in Sources */,
@@ -509,6 +540,7 @@
 				31D9D18526D1EF5300954C1D /* UserJustsController.swift in Sources */,
 				31D296262653FCF300965DD7 /* NetworksTableViewCell.swift in Sources */,
 				31D29610264E82D800965DD7 /* RespectedByViewController.swift in Sources */,
+				31984A0427636F1A003C0104 /* AnnouncementViewModel.swift in Sources */,
 				316A98DA2742C275006CAA3A /* InvitesEmptyView.swift in Sources */,
 				31C69CF52756F4D400DEA41E /* PhoneNumberVerificationController.swift in Sources */,
 			);

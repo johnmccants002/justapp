@@ -107,7 +107,11 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
                 fireLabel.anchor(top: imageView.topAnchor, left: imageView.rightAnchor, paddingTop: -2, paddingLeft: -20, width: 25, height: 15)
                 
                 UserService.shared.fetchFireImage(uid: just.uid) { url in
-                    self.imageView.sd_setImage(with: url) { image, err, cache, url in
+                    if url == nil {
+                        self.fetchUserImage()
+                    } else {
+                        self.imageView.sd_setImage(with: url) { image, err, cache, url in
+                        }
                     }
                 }
             }
@@ -314,15 +318,26 @@ class NetworkJustCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     @objc func tapLabel(gesture: UITapGestureRecognizer) {
         guard let postText = justLabel.text else { return }
         guard let just = just else { return }
-        if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: "\(just.firstName) \(just.lastName)") {
-            delegate?.imageTapped(cell: self)
-        } else if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: " (Photo 🖼)") {
-                self.justImageView.showImageViewerWithoutTap(iv: self.justImageView)
-                print(" Photo 🖼")
-        } else if let justImageUrl = just.justImageUrl {
+        
+        if let details = just.details {
+            delegate?.detailsTapped(cell: self)
+        } else {
+            if let justImageUrl = just.justImageUrl {
                 self.justImageView.showImageViewerWithoutTap(iv: self.justImageView)
             }
-
+        }
+//        if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: "\(just.firstName) \(just.lastName)") {
+//            delegate?.imageTapped(cell: self)
+//        } else if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: " (Photo 🖼)") {
+//                self.justImageView.showImageViewerWithoutTap(iv: self.justImageView)
+//                print(" Photo 🖼")
+//        }
+////        else if let justImageUrl = just.justImageUrl {
+////                self.justImageView.showImageViewerWithoutTap(iv: self.justImageView)
+////        }
+//        else if gesture.didTapAttributedTextInLabel(label: justLabel, targetText: " (Details 🧾)") {
+//            delegate?.detailsTapped(cell: self)
+//        }
 }
 }
 
@@ -334,5 +349,6 @@ protocol NetworkJustCellDelegate {
     func didLongPress(cell: NetworkJustCell)
     func respectCountTapped(cell: NetworkJustCell)
     func moreButtonTapped(cell: NetworkJustCell)
+    func detailsTapped(cell: NetworkJustCell)
     
 }
