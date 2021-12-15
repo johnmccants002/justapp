@@ -16,6 +16,7 @@ target 'PracticeCustomTableViews' do
   pod 'Firebase/Messaging'
   pod 'ImageViewer.swift', '~> 3.0'
   pod 'SwiftLinkPreview', '~> 3.4.0'
+  pod 'PhoneNumberKit', '~> 3.3'
 
 
 end
