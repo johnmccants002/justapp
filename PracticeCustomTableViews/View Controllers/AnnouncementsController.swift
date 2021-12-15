@@ -34,7 +34,11 @@ class AnnouncementController: UICollectionViewController, UINavigationController
         setupCollectionView()
         setupRightBarButtonItem()
         fetchAnnouncements()
+        addObservers()
+        
     }
+
+  
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         announcements?.count ?? 0
@@ -48,6 +52,7 @@ class AnnouncementController: UICollectionViewController, UINavigationController
         
         if let announcements = announcements {
             cell.announcement = announcements[indexPath.row]
+         
         }
         cell.delegate = self
         
@@ -142,9 +147,11 @@ class AnnouncementController: UICollectionViewController, UINavigationController
 extension AnnouncementController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
       
-     
+        
         return CGSize(width: view.frame.width, height: 155)
     }
+    
+
 }
 
 extension AnnouncementController: AnnouncementCellDelegate {
